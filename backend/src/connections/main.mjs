@@ -57,6 +57,14 @@ async function disconnect(env, clients, event) {
     const redisClient = clients.redisClient
     const connectionId = getConnectionId(event)
 
+    const rawConnection = await redisClient.HGET('connections', connectionId)
+    const connection = JSON.parse(rawConnection)
+    const user = connection.user
+
+    if (user) {
+        await redisClient.SREM(`users:${user.id}`, connectionId)
+    }
+
     await redisClient.HDEL('connections', connectionId)
 }
 

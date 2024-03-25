@@ -67,6 +67,13 @@ async function get(env, clients, event) {
     const body = getBody(event)
     const data = body.data
     
+    const rawConnection = await redisClient.HGET("connections", connectionId)
+    const connection = JSON.parse(rawConnection)
+
+    if (!connection.user) {
+        return { reason: "Not authenticated" }
+    }
+    
     const id = data.id
     
     const projects = await databaseClient.query(`
@@ -75,7 +82,7 @@ async function get(env, clients, event) {
         WHERE id = $1
     `, [id])
 
-    return projects?.[0] || null
+    return { result: projects?.[0] || null }
 }
 
 async function create(env, clients, event) {
@@ -87,8 +94,12 @@ async function create(env, clients, event) {
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
+
+    if (!connection.user) {
+        return { reason: "Not authenticated" }
+    }
     
-    const ownerId = connection.userId
+    const ownerId = connection.user.id
     const name = data.name
     const description = data.description
     
@@ -98,5 +109,5 @@ async function create(env, clients, event) {
         RETURNING *
     `, [ownerId, name, description])
     
-    return project
+    return { result: project }
 }

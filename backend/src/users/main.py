@@ -117,5 +117,6 @@ def login(pg_conn: connection, redis: redis.Redis, event):
         raise AuthError()
 
     redis.hset("connections", connection_id, json.dumps({"user": user}))
+    redis.sadd(f"users:{user['id']}", connection_id)
 
     return user
