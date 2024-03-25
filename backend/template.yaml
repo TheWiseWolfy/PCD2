@@ -102,16 +102,15 @@ Resources:
           - subnet-05131fc6f978ebc6a
           - subnet-0764d147586f6927e
         SecurityGroupIds:
-          - !Ref RedisSecurityGroup
-          # - !Ref DatabaseSecurityGroup
-      # Environment:
-      #   Variables:
-      #     REDIS_HOST: !GetAtt Redis.ConfigurationEndpoint.Address
-      #     REDIS_PORT: !GetAtt Redis.ConfigurationEndpoint.Port
-      #     DATABASE_HOST: !GetAtt Database.Endpoint.Address
-      #     DATABASE_PORT: !GetAtt Database.Endpoint.Port
-      #     DATABASE_USERNAME: !Ref DatabaseUsername
-      #     DATABASE_PASSWORD: !Ref DatabasePassword
+          - sg-00fe3732c89fa040e
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
+          REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
+          # DATABASE_HOST: !GetAtt Database.Endpoint.Address
+          # DATABASE_PORT: !GetAtt Database.Endpoint.Port
+          # DATABASE_USERNAME: !Ref DatabaseUsername
+          # DATABASE_PASSWORD: !Ref DatabasePassword
       Events:
         Api:
           Type: Api
