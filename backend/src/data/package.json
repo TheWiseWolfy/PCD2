@@ -5,6 +5,7 @@
     "private": true,
     "scripts": {},
     "dependencies": {
+        "aws-sdk": "^2.1585.0",
         "pg": "^8.11.3",
         "redis": "^4.6.13"
     }
