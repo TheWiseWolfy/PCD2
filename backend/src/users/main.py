@@ -1,7 +1,9 @@
 import os
 import json
 import psycopg2
+import psycopg2.extras
 import redis
+from psycopg2.extensions import connection
 
 
 class AuthError(Exception):
@@ -19,7 +21,6 @@ def lambda_handler(event, context):
 
     request_context = event.get("requestContext", {})
     route_key = request_context.get("routeKey", "")
-    connection_id = request_context.get("connectionId", "")
 
     redis_client = redis.Redis(host=redis_host, port=redis_port)
     pg_conn = psycopg2.connect(
@@ -31,11 +32,11 @@ def lambda_handler(event, context):
 
         match route_key:
             case "users-get":
-                result = get(pg_conn, event)
+                result = get(pg_conn, redis_client, event)
             case "users-create":
-                result = create(pg_conn, event)
+                result = create(pg_conn, redis_client, event)
             case "users-login":
-                result = login(pg_conn, event)
+                result = login(pg_conn, redis_client, event)
 
         return {"statusCode": 200, "body": json.dumps(result)}
     except AuthError:
@@ -51,7 +52,9 @@ def lambda_handler(event, context):
         pg_conn.close()
 
 
-def get(pg_conn, event):
+def get(pg_conn: connection, redis: redis.Redis, event):
+    request_context = event.get("requestContext", {})
+    connection_id = request_context.get("connectionId", "")
     body = event.get("body", "")
     body_json = json.loads(body)["data"]
 
@@ -59,14 +62,16 @@ def get(pg_conn, event):
 
     user = None
 
-    with pg_conn.cursor() as cursor:
+    with pg_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
         cursor.execute("SELECT * FROM users WHERE id = %s", (user_id))
-        user = cursor.fetchone()[0]
+        user = cursor.fetchone()
 
     return user
 
 
-def create(pg_conn, event):
+def create(pg_conn: connection, redis: redis.Redis, event):
+    request_context = event.get("requestContext", {})
+    connection_id = request_context.get("connectionId", "")
     body = event.get("body", "")
     body_json = json.loads(body)["data"]
 
@@ -76,7 +81,7 @@ def create(pg_conn, event):
 
     user = None
 
-    with pg_conn.cursor() as cursor:
+    with pg_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
         cursor.execute(
             "INSERT INTO users (email, name, password) VALUES (%s, %s, %s)",
             (email, name, password),
@@ -86,12 +91,14 @@ def create(pg_conn, event):
         cursor.execute(
             "SELECT * FROM users WHERE email = %s AND password = %s", (email, password)
         )
-        user = cursor.fetchone()[0]
+        user = cursor.fetchone()
 
     return user
 
 
-def login(pg_conn, event):
+def login(pg_conn: connection, redis: redis.Redis, event):
+    request_context = event.get("requestContext", {})
+    connection_id = request_context.get("connectionId", "")
     body = event.get("body", "")
     body_json = json.loads(body)["data"]
 
@@ -100,13 +107,15 @@ def login(pg_conn, event):
 
     user = None
 
-    with pg_conn.cursor() as cursor:
+    with pg_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
         cursor.execute(
             "SELECT * FROM users WHERE email = %s AND password = %s", (email, password)
         )
-        user = cursor.fetchone()[0]
+        user = cursor.fetchone()
 
     if not user:
         raise AuthError()
+
+    redis.hset("connections", connection_id, json.dumps({"user": user}))
 
     return user
