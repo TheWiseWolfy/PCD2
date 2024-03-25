@@ -1,5 +1,6 @@
 import redis from 'redis'
 import pg from 'pg'
+import aws from 'aws-sdk'
 import { getRouteKey, getConnectionId, getBody } from './utils.mjs'
 
 const env = makeEnv()
@@ -7,7 +8,7 @@ const boundMakeClients = makeClients(env)
 
 export async function handler(event) {
     try {
-        const clients = await boundMakeClients()
+        const clients = await boundMakeClients(event)
 
         const result = await handleRoute(env, clients, event)
         
@@ -45,20 +46,53 @@ function makeClients(env) {
         password: env.DATABASE_PASSWORD
     })
 
-    return async () => ({
+    return async (event) => ({
         redisClient: await redisClient,
-        databaseClient
+        databaseClient,
+        callbackAPIClient: new aws.ApiGatewayManagementApi({
+            apiVersion: '2018-11-29',
+            endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
+        })
     })
 }
 
 async function handleRoute(env, clients, event) {
     switch (getRouteKey(event)) {
-        case 'project-get':
+        case 'projects-get-all':
+            return getAll(env, clients, event)
+        case 'projects-get':
             return get(env, clients, event)
-        case 'project-create':
+        case 'projects-create':
             return create(env, clients, event)
     }
 }
+
+async function getAll(env, clients, event) {
+    const redisClient = clients.redisClient
+    const databaseClient = clients.databaseClient
+    const connectionId = getConnectionId(event)
+    const body = getBody(event)
+    const data = body.data
+    
+    const rawConnection = await redisClient.HGET("connections", connectionId)
+    const connection = JSON.parse(rawConnection)
+    const user = connection.user
+
+    if (!user) {
+        return { reason: "Not authenticated" }
+    }
+    
+    const ownerId = connection.ownerId
+    
+    const projects = await databaseClient.query(`
+        SELECT *
+        FROM projects
+        WHERE owner_id = $1
+    `, [ownerId])
+
+    return { result: projects }
+}
+
 
 async function get(env, clients, event) {
     const redisClient = clients.redisClient
@@ -69,18 +103,20 @@ async function get(env, clients, event) {
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
+    const user = connection.user
 
-    if (!connection.user) {
+    if (!user) {
         return { reason: "Not authenticated" }
     }
     
     const id = data.id
+    const ownerId = user.id
     
     const projects = await databaseClient.query(`
         SELECT *
         FROM projects
-        WHERE id = $1
-    `, [id])
+        WHERE id = $1 AND owner_id = $2
+    `, [id, ownerId])
 
     return { result: projects?.[0] || null }
 }
@@ -88,18 +124,20 @@ async function get(env, clients, event) {
 async function create(env, clients, event) {
     const redisClient = clients.redisClient
     const databaseClient = clients.databaseClient
+    const callbackAPIClient = clients.callbackAPIClient
     const connectionId = getConnectionId(event)
     const body = getBody(event)
     const data = body.data
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
+    const user = connection.user
 
-    if (!connection.user) {
+    if (!user) {
         return { reason: "Not authenticated" }
     }
     
-    const ownerId = connection.user.id
+    const ownerId = user.id
     const name = data.name
     const description = data.description
     
@@ -108,6 +146,18 @@ async function create(env, clients, event) {
         VALUES ($1, $2, $3)
         RETURNING *
     `, [ownerId, name, description])
+
+    const connections = await redisClient.SMEMBERS(`users:${user.id}`)
+    
+    for await (const connection of connections) {
+        await callbackAPIClient.postToConnection({
+            ConnectionId: connection,
+            data: {
+                action: "projects-created",
+                project
+            }
+        })
+    }
     
     return { result: project }
 }
