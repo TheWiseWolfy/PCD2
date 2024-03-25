@@ -48,7 +48,7 @@ const connect = async (env, clients, event) => {
     const redisClient = clients.redisClient
     const connectionId = event.requestContext.connectionId
 
-    await redisClient.HSET('connections', connectionId, 1)
+    await redisClient.HSET('connections', connectionId, JSON.stringify({}))
 }
 
 
