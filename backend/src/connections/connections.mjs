@@ -1,4 +1,5 @@
 import redis from 'redis'
+import { getRouteKey, getConnectionId } from './utils'
 
 const env = makeEnv()
 const boundMakeClients = makeClients(env)
@@ -36,7 +37,7 @@ function makeClients(env) {
 }
 
 async function handleRoute(env, clients, event) {
-    switch (event.requestContext.routeKey) {
+    switch (getRouteKey(event)) {
         case '$connect':
             return connect(env, clients, event)
         case '$disconnect':
@@ -46,7 +47,7 @@ async function handleRoute(env, clients, event) {
 
 async function connect(env, clients, event) {
     const redisClient = clients.redisClient
-    const connectionId = event.requestContext.connectionId
+    const connectionId = getConnectionId(event)
 
     await redisClient.HSET('connections', connectionId, JSON.stringify({}))
 }
@@ -54,7 +55,7 @@ async function connect(env, clients, event) {
 
 async function disconnect(env, clients, event) {
     const redisClient = clients.redisClient
-    const connectionId = event.requestContext.connectionId
+    const connectionId = getConnectionId(event)
 
     await redisClient.HDEL('connections', connectionId)
 }
