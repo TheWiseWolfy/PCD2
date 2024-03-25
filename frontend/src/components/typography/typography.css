@@ -1,6 +1,7 @@
-.h1, .h2, .h3, .h3, .h5, .h6, .p, .span {
+.h1, .h2, .h3, .h3, .h5, .h6, .p, .span, .div {
     font-family: sans-serif;
     color: var(--dark-color);
+
 }
 
 .h1 {
@@ -25,4 +26,11 @@
 
 .h6 {
     font-size: 1rem;
+}
+
+.div {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
 }
