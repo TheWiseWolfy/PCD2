@@ -3,7 +3,7 @@ import redis from 'redis'
 const env = makeEnv()
 const boundMakeClients = makeClients(env)
 
-export const handler = async (event) => {
+export async function handler(event) {
     try {
         const clients = await boundMakeClients()
 
@@ -20,14 +20,14 @@ export const handler = async (event) => {
     }
 }
 
-const makeEnv = () => {
+function makeEnv() {
     return {
         REDIS_HOST: process.env.REDIS_HOST,
         REDIS_PORT: process.env.REDIS_PORT,
     }
 }
 
-const makeClients = (env) => {
+function makeClients(env) {
     const redisClient = redis.createClient({ url: `redis://${env.REDIS_HOST}:${env.REDIS_PORT}` }).connect()
 
     return async () => ({
@@ -35,8 +35,8 @@ const makeClients = (env) => {
     })
 }
 
-const handleRoute = async (env, clients, event) => {
-    switch (env.requestContext.routeKey) {
+async function handleRoute(env, clients, event) {
+    switch (event.requestContext.routeKey) {
         case '$connect':
             return connect(env, clients, event)
         case '$disconnect':
@@ -44,7 +44,7 @@ const handleRoute = async (env, clients, event) => {
     }
 }
 
-const connect = async (env, clients, event) => {
+async function connect(env, clients, event) {
     const redisClient = clients.redisClient
     const connectionId = event.requestContext.connectionId
 
@@ -52,7 +52,7 @@ const connect = async (env, clients, event) => {
 }
 
 
-const disconnect = async (env, clients, event) => {
+async function disconnect(env, clients, event) {
     const redisClient = clients.redisClient
     const connectionId = event.requestContext.connectionId
 

@@ -1,6 +1,6 @@
 {
-    "name": "pcd-homework-2",
-    "description": "Second PCD homework",
+    "name": "pcd-homework-2-connections",
+    "description": "Second PCD homework, connections lambda",
     "version": "0.0.1",
     "private": true,
     "scripts": {},
