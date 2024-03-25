@@ -23,6 +23,7 @@ parameter_overrides = [
     "Stage=\"Production\"",
     "DatabaseUsername=\"postgres\"",
     "DatabasePassword=\"pcdhomeworktwo\"",
+    "DatabaseDatabase=\"pcd\"",
 ]
 
 [default.package.parameters]
