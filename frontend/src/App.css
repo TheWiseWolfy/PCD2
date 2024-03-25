@@ -1,0 +1,21 @@
+:root {
+  --white-color: hsl(20, 20%, 100%);
+  --light-color: hsl(20, 20%, 80%);
+  --normal-color: hsl(20, 20%, 60%);
+  --medium-color: hsl(20, 20%, 40%);
+  --dark-color: hsl(20, 20%, 20%);
+  --black-color: hsl(20, 20%, 0%);
+
+  --default-input-margin: 1rem;
+  --default-border-radius: 16px;
+  --default-shadow: 0 0 2rem var(--medium-color);
+}
+
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}

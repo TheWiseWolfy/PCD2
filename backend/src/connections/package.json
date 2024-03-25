@@ -1,0 +1,10 @@
+{
+    "name": "pcd-homework-2",
+    "description": "Second PCD homework",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {},
+    "dependencies": {
+        "redis": "^4.6.13"
+    }
+}
