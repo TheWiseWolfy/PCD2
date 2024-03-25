@@ -32,7 +32,7 @@ def lambda_handler(event, context):
         if route_key == 'user-create':
             # Extract data from the event body (assuming JSON format)
             body = event.get('body', '')
-            body_json = json.loads(body)
+            body_json = json.loads(body)["data"]
             # Example: Inserting data into PostgreSQL table
             with pg_conn.cursor() as cursor:
                 cursor.execute(
