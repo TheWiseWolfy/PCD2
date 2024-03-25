@@ -66,7 +66,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref ApiGateway
-      RouteKey: user-create
+      RouteKey: users-create
       AuthorizationType: NONE
       OperationName: UserCreateRoute
       Target: !Join
@@ -77,7 +77,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref ApiGateway
-      RouteKey: user-login
+      RouteKey: users-login
       AuthorizationType: NONE
       OperationName: UserLoginRoute
       Target: !Join
@@ -88,13 +88,46 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref ApiGateway
-      RouteKey: user-logout
+      RouteKey: users-logout
       AuthorizationType: NONE
       OperationName: UserLogoutRoute
       Target: !Join
         - "/"
         - - "integrations"
           - !Ref UserLogoutIntegration
+  ProjectsGetAllRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: projects-get-all
+      AuthorizationType: NONE
+      OperationName: ProjectsGetAllRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref ProjectsGetAllIntegration
+  ProjectsGetRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: projects-get
+      AuthorizationType: NONE
+      OperationName: ProjectsGetIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref ProjectsGetIntegration
+  ProjectsCreateRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: projects-create
+      AuthorizationType: NONE
+      OperationName: ProjectsCreateIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref ProjectsCreateIntegration
   ConnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn: 
@@ -118,33 +151,63 @@ Resources:
   UserCreateIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn: 
-      - AuthFunction
+      - UsersFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: User create Integration
       IntegrationType: AWS_PROXY
       IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthFunction.Arn}/invocations
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
   UserLoginIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn: 
-      - AuthFunction
+      - UsersFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: User login Integration
       IntegrationType: AWS_PROXY
       IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthFunction.Arn}/invocations
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
   UserLogoutIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn: 
-      - AuthFunction
+      - UsersFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: User logout Integration
       IntegrationType: AWS_PROXY
       IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthFunction.Arn}/invocations
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
+  ProjectsGetAllIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Projects fetch all Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  ProjectsGetIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Projects fetch Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  ProjectsCreateIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Projects create Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
 
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
@@ -154,6 +217,9 @@ Resources:
       - UserCreateRoute
       - UserLoginRoute
       - UserLogoutRoute
+      - ProjectsGetAllIntegration
+      - ProjectsGetIntegration
+      - ProjectsCreateIntegration
     Properties:
       ApiId: !Ref ApiGateway
   Stage:
@@ -171,7 +237,7 @@ Resources:
       - Database
     Properties:
       CodeUri: src/connections/
-      Handler: connections.handler
+      Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
         - arm64
@@ -197,7 +263,7 @@ Resources:
       FunctionName: !Ref ConnectionsFunction
       Principal: apigateway.amazonaws.com
 
-  AuthFunction:
+  UsersFunction:
     Type: AWS::Serverless::Function
     DependsOn:
       - Redis
@@ -210,7 +276,7 @@ Resources:
         - arm64
       MemorySize: 256
       Timeout: 100
-      Description: Handles auth
+      Description: Handles users
       VpcConfig:
         SubnetIds:
           - subnet-05131fc6f978ebc6a
@@ -226,13 +292,51 @@ Resources:
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
-  AuthFunctionPermission:
+  UsersFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
       - ApiGateway
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref AuthFunction
+      FunctionName: !Ref UsersFunction
+      Principal: apigateway.amazonaws.com
+
+  ProjectsFunction:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - Redis
+      - Database
+    Properties:
+      CodeUri: src/projects/
+      Handler: main.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 100
+      Description: Handles projects
+      VpcConfig:
+        SubnetIds:
+          - subnet-05131fc6f978ebc6a
+          - subnet-0764d147586f6927e
+        SecurityGroupIds:
+          - sg-00fe3732c89fa040e
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
+          REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
+          DATABASE_HOST: !GetAtt Database.Endpoint.Address
+          DATABASE_PORT: !GetAtt Database.Endpoint.Port
+          DATABASE_DATABASE: !Ref DatabaseDatabase
+          DATABASE_USERNAME: !Ref DatabaseUsername
+          DATABASE_PASSWORD: !Ref DatabasePassword
+  ProjectsFunctionPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - ApiGateway
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ProjectsFunction
       Principal: apigateway.amazonaws.com
 
 

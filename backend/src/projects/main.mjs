@@ -1,6 +1,6 @@
 import redis from 'redis'
 import pg from 'pg'
-import { getRouteKey, getConnectionId, getBody } from './utils'
+import { getRouteKey, getConnectionId, getBody } from './utils.mjs'
 
 const env = makeEnv()
 const boundMakeClients = makeClients(env)
@@ -9,10 +9,11 @@ export async function handler(event) {
     try {
         const clients = await boundMakeClients()
 
-        await handleRoute(env, clients, event)
+        const result = await handleRoute(env, clients, event)
         
         return {
-            statusCode: 200
+            statusCode: 200,
+            body: JSON.stringify(result)
         }
     } catch (error) {
         console.error(error)
@@ -52,13 +53,29 @@ function makeClients(env) {
 
 async function handleRoute(env, clients, event) {
     switch (getRouteKey(event)) {
-        case 'user-create':
+        case 'project-get':
+            return get(env, clients, event)
+        case 'project-create':
             return create(env, clients, event)
-        case 'user-login':
-            return login(env, clients, event)
-        case 'user-logout':
-            return logout(env, clients, event)
     }
+}
+
+async function get(env, clients, event) {
+    const redisClient = clients.redisClient
+    const databaseClient = clients.databaseClient
+    const connectionId = getConnectionId(event)
+    const body = getBody(event)
+    const data = body.data
+    
+    const id = data.id
+    
+    const projects = await databaseClient.query(`
+        SELECT *
+        FROM projects
+        WHERE id = $1
+    `, [id])
+
+    return projects?.[0] || null
 }
 
 async function create(env, clients, event) {
@@ -66,26 +83,20 @@ async function create(env, clients, event) {
     const databaseClient = clients.databaseClient
     const connectionId = getConnectionId(event)
     const body = getBody(event)
+    const data = body.data
     
+    const rawConnection = await redisClient.HGET("connections", connectionId)
+    const connection = JSON.parse(rawConnection)
     
+    const ownerId = connection.userId
+    const name = data.name
+    const description = data.description
+    
+    const project = await databaseClient.query(`
+        INSERT INTO projects (owner_id, name, description)
+        VALUES ($1, $2, $3)
+        RETURNING *
+    `, [ownerId, name, description])
+    
+    return project
 }
-
-async function login(env, clients, event) {
-    const redisClient = clients.redisClient
-    const databaseClient = clients.databaseClient
-    const connectionId = getConnectionId(event)
-    const body = getBody(event)
-    
-    console.log(event)
-}
-
-
-async function logout(env, clients, event) {
-    const redisClient = clients.redisClient
-    const databaseClient = clients.databaseClient
-    const connectionId = getConnectionId(event)
-    const body = getBody(event)
-    
-    console.log(event)
-}
-

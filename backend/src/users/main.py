@@ -30,12 +30,12 @@ def lambda_handler(event, context):
         result = None
 
         match route_key:
-            case "user-get":
-                result = user_get(pg_conn, event)
-            case "user-create":
-                result = user_create(pg_conn, event)
-            case "user-login":
-                result = user_login(pg_conn, event)
+            case "users-get":
+                result = get(pg_conn, event)
+            case "users-create":
+                result = create(pg_conn, event)
+            case "users-login":
+                result = login(pg_conn, event)
 
         return {"statusCode": 200, "body": json.dumps(result)}
     except AuthError:
@@ -51,7 +51,7 @@ def lambda_handler(event, context):
         pg_conn.close()
 
 
-def user_get(pg_conn, event):
+def get(pg_conn, event):
     body = event.get("body", "")
     body_json = json.loads(body)["data"]
 
@@ -66,7 +66,7 @@ def user_get(pg_conn, event):
     return user
 
 
-def user_create(pg_conn, event):
+def create(pg_conn, event):
     body = event.get("body", "")
     body_json = json.loads(body)["data"]
 
@@ -91,7 +91,7 @@ def user_create(pg_conn, event):
     return user
 
 
-def user_login(pg_conn, event):
+def login(pg_conn, event):
     body = event.get("body", "")
     body_json = json.loads(body)["data"]
 
