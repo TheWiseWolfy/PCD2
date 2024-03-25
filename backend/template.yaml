@@ -203,7 +203,7 @@ Resources:
       - Redis
       - Database
     Properties:
-      CodeUri: src/user_create/
+      CodeUri: src/users/
       Handler: main.lambda_handler
       Runtime: python3.11
       Architectures:
