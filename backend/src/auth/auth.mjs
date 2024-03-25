@@ -1,5 +1,6 @@
 import redis from 'redis'
 import pg from 'pg'
+import { getRouteKey, getConnectionId, getBody } from './utils'
 
 const env = makeEnv()
 const boundMakeClients = makeClients(env)
@@ -50,7 +51,7 @@ function makeClients(env) {
 }
 
 async function handleRoute(env, clients, event) {
-    switch (event.requestContext.routeKey) {
+    switch (getRouteKey(event)) {
         case 'user-create':
             return create(env, clients, event)
         case 'user-login':
@@ -69,7 +70,7 @@ async function create(env, clients, event) {
 
 async function login(env, clients, event) {
     const redisClient = clients.redisClient
-    const connectionId = event.requestContext.connectionId
+    const connectionId = getConnectionId(event)
     
     console.log(event)
 }
@@ -77,7 +78,7 @@ async function login(env, clients, event) {
 
 async function logout(env, clients, event) {
     const redisClient = clients.redisClient
-    const connectionId = event.requestContext.connectionId
+    const connectionId = getConnectionId(event)
     
     console.log(event)
 }
