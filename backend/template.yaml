@@ -203,12 +203,12 @@ Resources:
       - Redis
       - Database
     Properties:
-      CodeUri: src/auth/
-      Handler: auth.handler
-      Runtime: nodejs20.x
+      CodeUri: src/user_create/
+      Handler: main.lambda_handler
+      Runtime: python3.11
       Architectures:
         - arm64
-      MemorySize: 128
+      MemorySize: 256
       Timeout: 100
       Description: Handles auth
       VpcConfig:
