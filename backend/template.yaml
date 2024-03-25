@@ -32,7 +32,14 @@ Resources:
     Properties:
       Name: ApiGateway
       ProtocolType: WEBSOCKET
-      RouteSelectionExpression: "$request.body.action"
+      RouteSelectionExpression: "${request.body.action}"
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: $default
+      AuthorizationType: NONE
+      OperationName: DefaultRoute
   ConnectRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -55,8 +62,43 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref DisconnectIntegration
+  UserCreateRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: user-create
+      AuthorizationType: NONE
+      OperationName: UserCreateRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref UserCreateIntegration
+  UserLoginRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: user-login
+      AuthorizationType: NONE
+      OperationName: UserLoginRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref UserLoginIntegration
+  UserLogoutRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: user-logout
+      AuthorizationType: NONE
+      OperationName: UserLogoutRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref UserLogoutIntegration
   ConnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ConnectionsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Connect Integration
@@ -65,18 +107,53 @@ Resources:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionsFunction.Arn}/invocations
   DisconnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ConnectionsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Disconnect Integration
       IntegrationType: AWS_PROXY
       IntegrationUri:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionsFunction.Arn}/invocations
+  UserCreateIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - AuthFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: User create Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthFunction.Arn}/invocations
+  UserLoginIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - AuthFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: User login Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthFunction.Arn}/invocations
+  UserLogoutIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - AuthFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: User logout Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthFunction.Arn}/invocations
 
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
     DependsOn:
       - ConnectRoute
       - DisconnectRoute
+      - UserCreateRoute
+      - UserLoginRoute
+      - UserLogoutRoute
     Properties:
       ApiId: !Ref ApiGateway
   Stage:
