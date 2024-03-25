@@ -36,6 +36,26 @@ const makeClients = (env) => {
 }
 
 const handleRoute = async (env, clients, event) => {
+    switch (env.requestContext.routeKey) {
+        case '$connect':
+            return connect(env, clients, event)
+        case '$disconnect':
+            return disconnect(env, clients, event)
+    }
+}
 
+const connect = async (env, clients, event) => {
+    const redisClient = clients.redisClient
+    const connectionId = event.requestContext.connectionId
+
+    await redisClient.HSET('connections', connectionId, 1)
+}
+
+
+const disconnect = async (env, clients, event) => {
+    const redisClient = clients.redisClient
+    const connectionId = event.requestContext.connectionId
+
+    await redisClient.HDEL('connections', connectionId)
 }
 
