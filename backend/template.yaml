@@ -128,6 +128,28 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref ProjectsCreateIntegration
+  DataGetRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: data-get
+      AuthorizationType: NONE
+      OperationName: DataGetIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref DataGetIntegration
+  DataCreateRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: data-create
+      AuthorizationType: NONE
+      OperationName: DataCreateIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref DataCreateIntegration
   ConnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn: 
@@ -208,6 +230,26 @@ Resources:
       IntegrationType: AWS_PROXY
       IntegrationUri:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  DataGetIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - DataFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Data fetch Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
+  DataCreateIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - DataFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Data create Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
 
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
@@ -220,6 +262,8 @@ Resources:
       - ProjectsGetAllIntegration
       - ProjectsGetIntegration
       - ProjectsCreateIntegration
+      - DataGetIntegration
+      - DataCreateIntegration
     Properties:
       ApiId: !Ref ApiGateway
   Stage:
@@ -337,6 +381,44 @@ Resources:
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref ProjectsFunction
+      Principal: apigateway.amazonaws.com
+
+  DataFunction:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - Redis
+      - Database
+    Properties:
+      CodeUri: src/data/
+      Handler: main.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      MemorySize: 512
+      Timeout: 100
+      Description: Handles data
+      VpcConfig:
+        SubnetIds:
+          - subnet-05131fc6f978ebc6a
+          - subnet-0764d147586f6927e
+        SecurityGroupIds:
+          - sg-00fe3732c89fa040e
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
+          REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
+          DATABASE_HOST: !GetAtt Database.Endpoint.Address
+          DATABASE_PORT: !GetAtt Database.Endpoint.Port
+          DATABASE_DATABASE: !Ref DatabaseDatabase
+          DATABASE_USERNAME: !Ref DatabaseUsername
+          DATABASE_PASSWORD: !Ref DatabasePassword
+  DataFunctionPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - ApiGateway
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref DataFunction
       Principal: apigateway.amazonaws.com
 
 
