@@ -63,14 +63,18 @@ async function handleRoute(env, clients, event) {
 
 async function create(env, clients, event) {
     const redisClient = clients.redisClient
-    const connectionId = event.requestContext.connectionId
+    const databaseClient = clients.databaseClient
+    const connectionId = getConnectionId(event)
+    const body = getBody(event)
     
-    console.log(event)
+    
 }
 
 async function login(env, clients, event) {
     const redisClient = clients.redisClient
+    const databaseClient = clients.databaseClient
     const connectionId = getConnectionId(event)
+    const body = getBody(event)
     
     console.log(event)
 }
@@ -78,7 +82,9 @@ async function login(env, clients, event) {
 
 async function logout(env, clients, event) {
     const redisClient = clients.redisClient
+    const databaseClient = clients.databaseClient
     const connectionId = getConnectionId(event)
+    const body = getBody(event)
     
     console.log(event)
 }
