@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import './App.css';
 import { useWebSockets } from './hooks/useWebSockets';
 import { UsersContextProvider } from './reducer/users/context'
+import { ProjectsContextProvider } from './reducer/projects/context';
+import { DataContextProvider } from './reducer/data/context';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router/router';
 
@@ -10,7 +12,11 @@ export const App = () => {
 
   return (
     <UsersContextProvider websocket={websocket}>
-      <RouterProvider router={router} />
+      <ProjectsContextProvider websocket={websocket}>
+        <DataContextProvider websocket={websocket}>
+          <RouterProvider router={router} />
+        </DataContextProvider>
+      </ProjectsContextProvider>
     </UsersContextProvider>
   );
 }

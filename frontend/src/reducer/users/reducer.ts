@@ -62,7 +62,7 @@ export const usersSideEffects =
         return (state, action, dispatch) => {
             switch (action.type) {
                 case 'hydrate':
-                    return hidrate(state, action, dispatch)
+                    return hydrate(state, action, dispatch)
                 case 'login':
                     return boundLogin(state, action, dispatch)
                 case 'login-success':
@@ -71,7 +71,7 @@ export const usersSideEffects =
         }
     }
 
-const hidrate: ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersHydrateAction> = (state, action, dispatch) => {
+const hydrate: ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersHydrateAction> = (state, action, dispatch) => {
     try {
         const data = localStorage.getItem('auth-reducer')
 

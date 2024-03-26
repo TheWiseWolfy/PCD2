@@ -10,8 +10,8 @@ type Message<T> = {
 
 export type ManagedWebSocket = {
     request<R, T = unknown>(action: string, data: T): Promise<R>,
-    send<T>(action: string, data: T): void,
-    receive<T>(action: string, callback: (data: T) => void): void
+    publish<T>(action: string, data: T): void,
+    subscribe<T>(action: string, callback: (data: T) => void): void
 }
 
 export const useWebSockets = (url: string): ManagedWebSocket => {
@@ -40,7 +40,7 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
         return deferredPromise.promise
     }
 
-    const send = <T>(action: string, data: T) => {
+    const publish = <T>(action: string, data: T) => {
         if (!socket.current || !opened.current) {
             return
         }
@@ -52,7 +52,7 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
         }))
     }
 
-    const receive = <T>(action: string, callback: (data: T) => void) => {
+    const subscribe = <T>(action: string, callback: (data: T) => void) => {
         if (!socket.current || !opened.current) {
             return
         }
@@ -70,8 +70,8 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
 
     return {
         request,
-        send,
-        receive
+        publish,
+        subscribe
     }
 }
 
