@@ -14,3 +14,11 @@ export function getBody(event) {
         return null
     }
 }
+
+export function getRequestId(body) {
+    return body.requestId
+}
+
+export function getData(body) {
+    return body.data
+}

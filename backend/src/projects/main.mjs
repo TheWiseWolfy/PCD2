@@ -1,7 +1,7 @@
 import redis from 'redis'
 import pg from 'pg'
 import aws from 'aws-sdk'
-import { getRouteKey, getConnectionId, getBody } from './utils.mjs'
+import { getRouteKey, getConnectionId, getBody, getData, getRequestId } from './utils.mjs'
 
 const env = makeEnv()
 const boundMakeClients = makeClients(env)
@@ -70,16 +70,24 @@ async function handleRoute(env, clients, event) {
 async function getAll(env, clients, event) {
     const redisClient = clients.redisClient
     const databaseClient = clients.databaseClient
+    const callbackAPIClient = clients.callbackAPIClient
     const connectionId = getConnectionId(event)
     const body = getBody(event)
-    const data = body.data
+    const requestId = getRequestId(body)
+    const data = getData(body)
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
     const user = connection.user
 
     if (!user) {
-        return { reason: "Not authenticated" }
+        return {
+            action: 'projects-get-all',
+            requestId,
+            data: {
+                reason: "Not authenticated"
+            }
+        }
     }
     
     const ownerId = user.id
@@ -90,23 +98,35 @@ async function getAll(env, clients, event) {
         WHERE owner_id = $1
     `, [ownerId])
 
-    return { result: projects.rows }
+    return {
+        action: 'projects-get-all',
+        requestId,
+        data: projects.rows
+    }
 }
 
 
 async function get(env, clients, event) {
     const redisClient = clients.redisClient
     const databaseClient = clients.databaseClient
+    const callbackAPIClient = clients.callbackAPIClient
     const connectionId = getConnectionId(event)
     const body = getBody(event)
-    const data = body.data
+    const requestId = getRequestId(body)
+    const data = getData(body)
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
     const user = connection.user
 
     if (!user) {
-        return { reason: "Not authenticated" }
+        return {
+            action: 'projects-get',
+            requestId,
+            data: {
+                reason: "Not authenticated"
+            }
+        }
     }
     
     const id = data.id
@@ -118,7 +138,11 @@ async function get(env, clients, event) {
         WHERE id = $1 AND owner_id = $2
     `, [id, ownerId])
 
-    return { result: projects.rows?.[0] || null }
+    return {
+        action: 'projects-get',
+        requestId,
+        data: projects.rows?.[0] || null
+    }
 }
 
 async function create(env, clients, event) {
@@ -127,14 +151,21 @@ async function create(env, clients, event) {
     const callbackAPIClient = clients.callbackAPIClient
     const connectionId = getConnectionId(event)
     const body = getBody(event)
-    const data = body.data
+    const requestId = getRequestId(body)
+    const data = getData(body)
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
     const user = connection.user
 
     if (!user) {
-        return { reason: "Not authenticated" }
+        return {
+            action: 'projects-create',
+            requestId,
+            data: {
+                reason: "Not authenticated"
+            }
+        }
     }
     
     const ownerId = user.id
@@ -153,11 +184,15 @@ async function create(env, clients, event) {
         await callbackAPIClient.postToConnection({
             ConnectionId: connectionId,
             data: {
-                action: "projects-created",
-                project: project.rows[0]
+                action: "projects-create",
+                data: project.rows[0]
             }
         })
     }
     
-    return { result: project.rows[0] }
+    return {
+        action: 'projects-create',
+        requestId,
+        result: project.rows[0]
+    }
 }

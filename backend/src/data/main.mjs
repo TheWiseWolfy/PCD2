@@ -1,7 +1,7 @@
 import redis from 'redis'
 import pg from 'pg'
 import aws from 'aws-sdk'
-import { getRouteKey, getConnectionId, getBody } from './utils.mjs'
+import { getRouteKey, getConnectionId, getBody, getData, getRequestId } from './utils.mjs'
 
 const env = makeEnv()
 const boundMakeClients = makeClients(env)
@@ -68,16 +68,24 @@ async function handleRoute(env, clients, event) {
 async function get(env, clients, event) {
     const redisClient = clients.redisClient
     const databaseClient = clients.databaseClient
+    const callbackAPIClient = clients.callbackAPIClient
     const connectionId = getConnectionId(event)
     const body = getBody(event)
-    const data = body.data
+    const requestId = getRequestId(body)
+    const data = getData(body)
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
     const user = connection.user
 
     if (!user) {
-        return { reason: "Not authenticated" }
+        return {
+            action: 'data-get',
+            requestId,
+            data: {
+                reason: "Not authenticated"
+            }
+        }
     }
     
     const ownerId = user.id
@@ -90,7 +98,13 @@ async function get(env, clients, event) {
     `, [projectId, ownerId])
 
     if (!project.rows?.[0]) {
-        return { reason: "Not found" }
+        return {
+            action: 'data-get',
+            requestId,
+            data: {
+                reason: "Not found"
+            }
+        }
     }
 
     const results = await databaseClient.query(`
@@ -101,7 +115,11 @@ async function get(env, clients, event) {
         LIMIT 25
     `, [projectId])
 
-    return { result: results.rows }
+    return {
+        action: 'data-get',
+        requestId,
+        data: results.rows
+    }
 }
 
 async function create(env, clients, event) {
@@ -110,14 +128,21 @@ async function create(env, clients, event) {
     const callbackAPIClient = clients.callbackAPIClient
     const connectionId = getConnectionId(event)
     const body = getBody(event)
-    const data = body.data
+    const requestId = getRequestId(body)
+    const data = getData(body)
     
     const rawConnection = await redisClient.HGET("connections", connectionId)
     const connection = JSON.parse(rawConnection)
     const user = connection.user
 
     if (!user) {
-        return { reason: "Not authenticated" }
+        return {
+            action: 'data-create',
+            requestId,
+            data: {
+                reason: "Not authenticated"
+            }
+        }
     }
     
     const ownerId = user.id
@@ -131,7 +156,13 @@ async function create(env, clients, event) {
     `, [projectId, ownerId])
 
     if (!project.rows?.[0]) {
-        return { reason: "Not found" }
+        return {
+            action: 'data-create',
+            requestId,
+            data: {
+                reason: "Not found"
+            }
+        }
     }
     
     const result = await databaseClient.query(`
@@ -152,5 +183,9 @@ async function create(env, clients, event) {
         })
     }
 
-    return { result: result.rows[0] }
+    return {
+        action: 'data-create',
+        requestId,
+        data: result.rows[0]
+    }
 }

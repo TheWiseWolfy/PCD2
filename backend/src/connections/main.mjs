@@ -1,5 +1,5 @@
 import redis from 'redis'
-import { getRouteKey, getConnectionId } from './utils.mjs'
+import { getRouteKey, getConnectionId, getRequestId, getData } from './utils.mjs'
 
 const env = makeEnv()
 const boundMakeClients = makeClients(env)
@@ -48,6 +48,9 @@ async function handleRoute(env, clients, event) {
 async function connect(env, clients, event) {
     const redisClient = clients.redisClient
     const connectionId = getConnectionId(event)
+    const body = getBody(event)
+    const requestId = getRequestId(body)
+    const data = getData(body)
 
     await redisClient.HSET('connections', connectionId, JSON.stringify({}))
 }
@@ -56,6 +59,9 @@ async function connect(env, clients, event) {
 async function disconnect(env, clients, event) {
     const redisClient = clients.redisClient
     const connectionId = getConnectionId(event)
+    const body = getBody(event)
+    const requestId = getRequestId(body)
+    const data = getData(body)
 
     const rawConnection = await redisClient.HGET('connections', connectionId)
     const connection = JSON.parse(rawConnection)
