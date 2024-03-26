@@ -18,30 +18,23 @@ export const App: React.FC = () => {
 
     return (
         <Page centered={true}>
-            
-              <Card>
-               <H1>Projects</H1>
+            <Card>
+                <H1>Projects</H1>
                 {jsonData.map((project: any) => (
                     <Div>
-                    <Project
-                        id={project.id}
-                        ownerId={project.ownerId}
-                        name={project.name}
-                        url={project.url}
-                        description={project.description}
-                    />
-                    {/* <Routes>
-                    <Route path="users">
-                        <Route path=":userId" element={<ProfilePage />} />
-                        <Route path="me" element={...} />
-                    </Route>
-                    </Routes> */}
-                    <Link to={`/statistics/statistics/${project.name}`}>
-                        <Button onClick={onSubmit}>Go to Statistics Page</Button>
-                    </Link>
-                </Div>
+                        <Project
+                            id={project.id}
+                            ownerId={project.ownerId}
+                            name={project.name}
+                            url={project.url}
+                            description={project.description}
+                        />
+                        <Link to={`/statistics/statistics/${project.id}`}>
+                            <Button onClick={onSubmit}>Go to Statistics Page</Button>
+                        </Link>
+                    </Div>
                 ))}
-                </Card>
+            </Card>
         </Page>
     )
 }
