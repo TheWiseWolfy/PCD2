@@ -6,7 +6,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './router/router';
 
 export const App = () => {
-  const websocket = useWebSockets('wss://ucj8p60zy7.execute-api.eu-central-1.amazonaws.com/production/')
+  const websocket = useWebSockets('wss://qyf60arjr8.execute-api.eu-central-1.amazonaws.com/Production')
 
   return (
     <AuthContextProvider websocket={websocket}>
