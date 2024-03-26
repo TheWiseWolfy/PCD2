@@ -63,7 +63,7 @@ def get(pg_conn: connection, redis: redis.Redis, event):
     user = None
 
     with pg_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id))
+        cursor.execute("SELECT id, email, name FROM users WHERE id = %s", (user_id))
         user = cursor.fetchone()
 
     return user
@@ -89,7 +89,8 @@ def create(pg_conn: connection, redis: redis.Redis, event):
         pg_conn.commit()
 
         cursor.execute(
-            "SELECT * FROM users WHERE email = %s AND password = %s", (email, password)
+            "SELECT id, email, name FROM users WHERE email = %s AND password = %s",
+            (email, password),
         )
         user = cursor.fetchone()
 
@@ -109,7 +110,8 @@ def login(pg_conn: connection, redis: redis.Redis, event):
 
     with pg_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
         cursor.execute(
-            "SELECT * FROM users WHERE email = %s AND password = %s", (email, password)
+            "SELECT id, email, name FROM users WHERE email = %s AND password = %s",
+            (email, password),
         )
         user = cursor.fetchone()
 
