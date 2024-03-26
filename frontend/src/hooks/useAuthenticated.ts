@@ -1,29 +1,29 @@
 import { useContext, useEffect } from "react"
-import { AuthContext } from "../reducer/auth/context"
+import { UsersContext } from "../reducer/users/context"
 import { useNavigate } from "react-router-dom"
 
 export const useAuthenticated = () => {
-    const [authState, authDispatch] = useContext(AuthContext)
+    const [usersState, usersDispatch] = useContext(UsersContext)
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (authState.loading) {
-            authDispatch({ type: 'hydrate' })
-        } else if (!authState.isAuthenticated) {
+        if (usersState.loading) {
+            usersDispatch({ type: 'hydrate' })
+        } else if (!usersState.isAuthenticated) {
             navigate('/')
         }
-    }, [authState])
+    }, [usersState])
 }
 
 export const useNotAuthenticated = () => {
-    const [authState, authDispatch] = useContext(AuthContext)
+    const [usersState, usersDispatch] = useContext(UsersContext)
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (authState.loading) {
-            authDispatch({ type: 'hydrate' })
-        } else if (authState.isAuthenticated) {
+        if (usersState.loading) {
+            usersDispatch({ type: 'hydrate' })
+        } else if (usersState.isAuthenticated) {
             navigate('/')
         }
-    }, [authState])
+    }, [usersState])
 }

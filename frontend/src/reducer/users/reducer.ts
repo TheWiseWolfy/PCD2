@@ -1,10 +1,10 @@
 import React from 'react'
-import { AuthActions, AuthError, AuthHydrateAction, AuthLoginAction, AuthLoginSuccessAction, AuthState, Tokens, User } from './types'
+import { UsersActions, UsersError, UsersHydrateAction, UsersLoginAction, UsersLoginSuccessAction, UsersState, Tokens, User } from './types'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
 
-export const authInitialState: AuthState = ({
+export const usersInitialState: UsersState = ({
     loading: true,
     fetching: false,
     isAuthenticated: false,
@@ -13,7 +13,7 @@ export const authInitialState: AuthState = ({
     user: null
 })
 
-export const authReducer: React.Reducer<AuthState, AuthActions> = (state, action) => {
+export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, action) => {
     switch (action.type) {
         case 'hydrate-successful':
             return {
@@ -55,8 +55,8 @@ export const authReducer: React.Reducer<AuthState, AuthActions> = (state, action
     }
 }
 
-export const authSideEffects =
-    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<AuthState, AuthActions>> => {
+export const usersSideEffects =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<UsersState, UsersActions>> => {
         const boundLogin = login(websocket)
 
         return (state, action, dispatch) => {
@@ -71,7 +71,7 @@ export const authSideEffects =
         }
     }
 
-const hidrate: ReducerSideEffect<React.Reducer<AuthState, AuthActions>, AuthHydrateAction> = (state, action, dispatch) => {
+const hidrate: ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersHydrateAction> = (state, action, dispatch) => {
     try {
         const data = localStorage.getItem('auth-reducer')
 
@@ -87,10 +87,10 @@ const hidrate: ReducerSideEffect<React.Reducer<AuthState, AuthActions>, AuthHydr
 
 
 const login =
-    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<AuthState, AuthActions>, AuthLoginAction> =>
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersLoginAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ user: User, tokens: Tokens } | AuthError>('users-login', action.credentials)
+                const result = await websocket.request<{ user: User, tokens: Tokens } | UsersError>('users-login', action.credentials)
 
                 if ('reason' in result) {
                     return dispatch({ type: 'login-failed', error: result.reason })
@@ -103,7 +103,7 @@ const login =
         }
 
 
-const loginSuccessful: ReducerSideEffect<React.Reducer<AuthState, AuthActions>, AuthLoginSuccessAction> = async (state, action, dispatch) => {
+const loginSuccessful: ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersLoginSuccessAction> = async (state, action, dispatch) => {
     localStorage.setItem(
         'auth-reducer',
         JSON.stringify({

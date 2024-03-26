@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { Page } from "../../components/page/page"
-import { AuthContext } from "../../reducer/auth/context"
+import { UsersContext } from "../../reducer/users/context"
 import { Card } from "../../components/card/card"
 import { H1 } from "../../components/typography/h1"
 import { Div } from "../../components/typography/div"

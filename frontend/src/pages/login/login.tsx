@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { Page } from "../../components/page/page"
-import { AuthContext } from "../../reducer/auth/context"
+import { UsersContext } from "../../reducer/users/context"
 import { Card } from "../../components/card/card"
 import { H1 } from "../../components/typography/h1"
 import { TextField } from "../../components/input/textfield"
@@ -13,31 +13,31 @@ import { useNavigate } from "react-router-dom"
 import { P } from "../../components/typography/p"
 
 export const Login: React.FC = () => {
-    const [authState, authDispatch] = useContext(AuthContext)
+    const [usersState, usersDispatch] = useContext(UsersContext)
     const [disabled, setDisabled] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
 
     const onSubmit = () => {
-        authDispatch({ type: 'login', credentials: { email, password } })
+        usersDispatch({ type: 'login', credentials: { email, password } })
     }
 
     useNotAuthenticated()
 
     useEffect(() => {
-        if (authState.fetching) {
+        if (usersState.fetching) {
             setDisabled(true)
         } else {
             setDisabled(false)
         }
-    }, [authState.fetching])
+    }, [usersState.fetching])
 
     useEffect(() => {
-        if (authState.isAuthenticated) {
+        if (usersState.isAuthenticated) {
             navigate('/')
         }
-    }, [authState.isAuthenticated])
+    }, [usersState.isAuthenticated])
 
     return (
         <Page centered={true}>
@@ -47,9 +47,9 @@ export const Login: React.FC = () => {
                     <TextField value={email} onChange={setEmail} placeholder="Email" />
                     <TextField value={password} onChange={setPassword} placeholder="Password" />
                     <Button onClick={onSubmit} disabled={disabled}>
-                        {!authState.fetching ? 'Submit' : <Spin><Image id="gear" /></Spin>}
+                        {!usersState.fetching ? 'Submit' : <Spin><Image id="gear" /></Spin>}
                     </Button>
-                    {authState.error && <P>{authState.error}</P>}
+                    {usersState.error && <P>{usersState.error}</P>}
                 </Form>
             </Card>
         </Page>
