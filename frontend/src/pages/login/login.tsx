@@ -10,16 +10,17 @@ import { Spin } from "../../components/animate/spin"
 import { useNotAuthenticated } from "../../hooks/useAuthenticated"
 import { Form } from "../../components/input/form"
 import { useNavigate } from "react-router-dom"
+import { P } from "../../components/typography/p"
 
 export const Login: React.FC = () => {
     const [authState, authDispatch] = useContext(AuthContext)
     const [disabled, setDisabled] = useState(false)
-    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
 
     const onSubmit = () => {
-        authDispatch({ type: 'login', credentials: { username, password } })
+        authDispatch({ type: 'login', credentials: { email, password } })
     }
 
     useNotAuthenticated()
@@ -43,11 +44,12 @@ export const Login: React.FC = () => {
             <Card>
                 <Form onSubmit={onSubmit}>
                     <H1>Login</H1>
-                    <TextField value={username} onChange={setUsername} placeholder="Username" />
+                    <TextField value={email} onChange={setEmail} placeholder="Email" />
                     <TextField value={password} onChange={setPassword} placeholder="Password" />
                     <Button onClick={onSubmit} disabled={disabled}>
                         {!authState.fetching ? 'Submit' : <Spin><Image id="gear" /></Spin>}
                     </Button>
+                    {authState.error && <P>{authState.error}</P>}
                 </Form>
             </Card>
         </Page>

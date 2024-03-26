@@ -90,10 +90,10 @@ const login =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<AuthState, AuthActions>, AuthLoginAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ user: User, tokens: Tokens } | AuthError>('login', action.credentials)
+                const result = await websocket.request<{ user: User, tokens: Tokens } | AuthError>('users-login', action.credentials)
 
-                if ('cause' in result) {
-                    return dispatch({ type: 'login-failed', error: result.cause })
+                if ('reason' in result) {
+                    return dispatch({ type: 'login-failed', error: result.reason })
                 }
 
                 dispatch({ type: 'login-success', user: result.user, tokens: result.tokens })

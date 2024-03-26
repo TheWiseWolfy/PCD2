@@ -9,7 +9,7 @@ export type Tokens = {
 }
 
 export type AuthError = {
-    cause: string
+    reason: string
 }
 
 export type AuthState = {
@@ -24,7 +24,7 @@ export type AuthState = {
 export type AuthHydrateAction = { type: 'hydrate' }
 export type AuthHydrateSuccessfulAction = { type: 'hydrate-successful', state: AuthState }
 export type AuthHydrateFailedAction = { type: 'hydrate-failed' }
-export type AuthLoginAction = { type: 'login', credentials: { username: string, password: string } }
+export type AuthLoginAction = { type: 'login', credentials: { email: string, password: string } }
 export type AuthLoginSuccessAction = { type: 'login-success', user: User, tokens: Tokens }
 export type AuthLoginFailedAction = { type: 'login-failed', error: string }
 export type AuthActions = AuthHydrateAction | AuthHydrateSuccessfulAction | AuthHydrateFailedAction | AuthLoginAction | AuthLoginSuccessAction | AuthLoginFailedAction
