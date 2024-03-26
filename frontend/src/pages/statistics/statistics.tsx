@@ -9,21 +9,21 @@ import { useParams } from 'react-router-dom';
 import { ProjectStatistics } from "../../components/projects/statistics"
 
 export const Statistics: React.FC = () => {
-    const { name } = useParams<{ name: string }>();
+    const { projectId } = useParams<{ projectId: string }>();
 
     return (
         <Page centered={true}>
-              <Card>
-               <H1>{name}</H1>
-               {jsonData.map((project: any) => (
+            <Card>
+                <H1>{projectId}</H1>
+                {jsonData.map((project: any) => (
                     <Div>
-                    <ProjectStatistics
-                        timestamp={project.timestamp}
-                        value={project.value}
-                    />
-                </Div>
+                        <ProjectStatistics
+                            timestamp={project.timestamp}
+                            value={project.value}
+                        />
+                    </Div>
                 ))}
-                </Card>
+            </Card>
         </Page>
     )
 }

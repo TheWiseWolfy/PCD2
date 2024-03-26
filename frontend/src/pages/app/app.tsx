@@ -7,34 +7,18 @@ import { useAuthenticated } from "../../hooks/useAuthenticated"
 import { Div } from "../../components/typography/div"
 import jsonData from '../../resources/data.json'
 import { Project } from "../../components/projects/projects"
-import { BrowserRouter as Router, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import { Button } from "../../components/input/button"
 
 
 export const App: React.FC = () => {
-    // useAuthenticated()
-    const onSubmit = () => {
-    }
+    const navigate = useNavigate()
 
-    return (
-        <Page centered={true}>
-            <Card>
-                <H1>Projects</H1>
-                {jsonData.map((project: any) => (
-                    <Div>
-                        <Project
-                            id={project.id}
-                            ownerId={project.ownerId}
-                            name={project.name}
-                            url={project.url}
-                            description={project.description}
-                        />
-                        <Link to={`/statistics/statistics/${project.id}`}>
-                            <Button onClick={onSubmit}>Go to Statistics Page</Button>
-                        </Link>
-                    </Div>
-                ))}
-            </Card>
-        </Page>
-    )
+    useAuthenticated()
+
+    useEffect(() => {
+        navigate('/projects')
+    }, [])
+
+    return <></>
 }
