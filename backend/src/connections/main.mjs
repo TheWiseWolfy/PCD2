@@ -1,5 +1,5 @@
 import redis from 'redis'
-import { getRouteKey, getConnectionId, getRequestId, getData } from './utils.mjs'
+import { getRouteKey, getConnectionId, getRequestId, getData, getBody } from './utils.mjs'
 
 const env = makeEnv()
 const boundMakeClients = makeClients(env)

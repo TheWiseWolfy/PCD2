@@ -16,9 +16,9 @@ export function getBody(event) {
 }
 
 export function getRequestId(body) {
-    return body.requestId
+    return body?.requestId
 }
 
 export function getData(body) {
-    return body.data
+    return body?.data
 }
