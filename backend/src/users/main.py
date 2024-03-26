@@ -3,6 +3,8 @@ import json
 import psycopg2
 import psycopg2.extras
 import redis
+import random
+import string
 from psycopg2.extensions import connection
 
 
@@ -102,8 +104,21 @@ def login(pg_conn: connection, redis: redis.Redis, event):
     request_data = body_json.get("data", {})
     email = request_data.get("email", "")
     password = request_data.get("password", "")
+    session = request_data.get("session", "")
 
     user = None
+
+    existing_session = redis.hget("user:sessions", session)
+
+    if existing_session:
+        existing_session = json.loads(existing_session)
+        user = existing_session.get("user", {})
+
+        return {
+            "action": "users-login",
+            "requestId": request_id,
+            "data": {"user": user, "tokens": {"auth": session}},
+        }
 
     with pg_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
         cursor.execute(
@@ -119,7 +134,17 @@ def login(pg_conn: connection, redis: redis.Redis, event):
             "data": {"reason": "Invalid credentials"},
         }
 
+    session = "".join(
+        random.SystemRandom().choice(string.ascii_uppercase + string.digits)
+        for _ in range(16)
+    )
+
     redis.hset("connections", connection_id, json.dumps({"user": user}))
     redis.sadd(f"users:{user['id']}", connection_id)
+    redis.hset("user:sessions", session, json.dumps({"user": user}))
 
-    return {"action": "users-login", "requestId": request_id, "data": user}
+    return {
+        "action": "users-login",
+        "requestId": request_id,
+        "data": {"user": user, "tokens": {"auth": session}},
+    }
