@@ -87,7 +87,7 @@ export const dataSideEffects =
 
 const hydrate: ReducerSideEffect<React.Reducer<DataState, DataActions>, DataHydrateAction> = (state, action, dispatch) => {
     try {
-        const data = localStorage.getItem('auth-reducer')
+        const data = localStorage.getItem('data-reducer')
 
         if (!data) {
             return dispatch({ type: 'hydrate-failed' })

@@ -95,7 +95,7 @@ export const projectsSideEffects =
 
 const hydrate: ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsHydrateAction> = (state, action, dispatch) => {
     try {
-        const data = localStorage.getItem('auth-reducer')
+        const data = localStorage.getItem('projects-reducer')
 
         if (!data) {
             return dispatch({ type: 'hydrate-failed' })

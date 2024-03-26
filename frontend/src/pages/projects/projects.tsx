@@ -7,34 +7,43 @@ import { useAuthenticated } from "../../hooks/useAuthenticated"
 import { Div } from "../../components/typography/div"
 import jsonData from '../../resources/data.json'
 import { Project } from "../../components/projects/projects"
-import { BrowserRouter as Router, Route, Link, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import { Button } from "../../components/input/button"
+import { ProjectsContext } from "../../reducer/projects/context"
 
 
 export const Projects: React.FC = () => {
-    // useAuthenticated()
-    const onSubmit = () => {
+    const [projectsState, projectsDispatch] = useContext(ProjectsContext)
+    const navigate = useNavigate()
+
+    const goToProjectStatistics = (projectId: string) => () => {
+        navigate(`/projects/${projectId}/statistics`)
     }
+
+    useAuthenticated()
+
+    useEffect(() => {
+        if (projectsState.projects.length === 0) {
+            projectsDispatch({ type: 'projects-get-all' })
+        }
+    }, [])
 
     return (
         <Page centered={true}>
             <Card>
                 <H1>Projects</H1>
-                {jsonData.map((project: any) => (
+                {projectsState.projects.map((project) => (
                     <Div>
                         <Project
                             id={project.id}
-                            ownerId={project.ownerId}
+                            ownerId={project.owner_id}
                             name={project.name}
-                            url={project.url}
                             description={project.description}
                         />
-                        <Link to={`/projects/${project.id}/statistics`}>
-                            <Button onClick={onSubmit}>Go to Statistics Page</Button>
-                        </Link>
+                        <Button onClick={goToProjectStatistics(project.id)}>Go to Statistics Page</Button>
                     </Div>
                 ))}
             </Card>
-        </Page>
+        </Page >
     )
 }

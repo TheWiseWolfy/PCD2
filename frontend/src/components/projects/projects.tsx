@@ -5,20 +5,19 @@ import { Span } from "../../components/typography/span"
 import { Link } from "../control/link"
 
 interface Props {
-    id: number;
+    id: string;
     ownerId: string;
     name: string;
-    url: string;
     description: string;
 }
 
-export const Project: React.FC<Props> = ({ id, ownerId, name, url, description }) => {
+export const Project: React.FC<Props> = ({ id, name, description }) => {
     return (
         <Span>
-             <H3>{name}</H3>
-             <P>URL: <Link href={url}> {name} </Link></P>
-             <P>{description}</P>
+            <H3>{name}</H3>
+            <P>URL: <Link href={`/projects/${id}/statistics`}>{name}</Link></P>
+            <P>{description}</P>
         </Span>
-           
+
     );
 };
