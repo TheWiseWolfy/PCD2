@@ -83,13 +83,13 @@ async function get(env, clients, event) {
     const ownerId = user.id
     const projectId = data.projectId
 
-    const [project] = await databaseClient.query(`
+    const project = await databaseClient.query(`
         SELECT *
         FROM projects
         WHERE id = $1 AND owner_id = $2
     `, [projectId, ownerId])
 
-    if (!project) {
+    if (!project.rows?.[0]) {
         return { reason: "Not found" }
     }
 
@@ -99,7 +99,7 @@ async function get(env, clients, event) {
         WHERE project_id = $1
     `, [projectId])
 
-    return { result: results }
+    return { result: results.rows[0] }
 }
 
 async function create(env, clients, event) {
@@ -122,13 +122,13 @@ async function create(env, clients, event) {
     const projectId = data.projectId
     const value = data.value
 
-    const [project] = await databaseClient.query(`
+    const project = await databaseClient.query(`
         SELECT *
         FROM projects
         WHERE id = $1 AND owner_id = $2
     `, [projectId, ownerId])
 
-    if (!project) {
+    if (!project.rows?.[0]) {
         return { reason: "Not found" }
     }
     
@@ -145,10 +145,10 @@ async function create(env, clients, event) {
             ConnectionId: connection,
             data: {
                 action: "data-created",
-                data: result
+                data: result.rows[0]
             }
         })
     }
 
-    return { result }
+    return { result: result.rows[0] }
 }

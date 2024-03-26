@@ -6,7 +6,7 @@ const boundMakeClients = makeClients(env)
 
 export async function handler(event) {
     try {
-        const clients = await boundMakeClients()
+        const clients = await boundMakeClients(env)
 
         await handleRoute(env, clients, event)
         
@@ -31,7 +31,7 @@ function makeEnv() {
 function makeClients(env) {
     const redisClient = redis.createClient({ url: `redis://${env.REDIS_HOST}:${env.REDIS_PORT}` }).connect()
 
-    return async () => ({
+    return async (env) => ({
         redisClient: await redisClient
     })
 }

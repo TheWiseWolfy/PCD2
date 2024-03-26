@@ -90,7 +90,7 @@ async function getAll(env, clients, event) {
         WHERE owner_id = $1
     `, [ownerId])
 
-    return { result: projects }
+    return { result: projects.rows }
 }
 
 
@@ -118,7 +118,7 @@ async function get(env, clients, event) {
         WHERE id = $1 AND owner_id = $2
     `, [id, ownerId])
 
-    return { result: projects?.[0] || null }
+    return { result: projects.rows?.[0] || null }
 }
 
 async function create(env, clients, event) {
@@ -150,14 +150,15 @@ async function create(env, clients, event) {
     const connections = await redisClient.SMEMBERS(`users:${user.id}`)
     
     for await (const connection of connections) {
+        console.log("Sending to", connection)
         await callbackAPIClient.postToConnection({
             ConnectionId: connection,
             data: {
                 action: "projects-created",
-                project
+                project: project.rows[0]
             }
         })
     }
     
-    return { result: project }
+    return { result: project.rows[0] }
 }
