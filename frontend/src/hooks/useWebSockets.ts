@@ -3,15 +3,15 @@ import { makeDeferredPromise, DeferredPromise } from "../utils/promise"
 import { useTimeout } from "./useTimeout"
 
 type Message<T> = {
+    action: string
     requestId: undefined | string
-    type: string
     data: T
 }
 
 export type ManagedWebSocket = {
-    request<R, T = unknown>(type: string, data: T): Promise<R>,
-    send<T>(type: string, data: T): void,
-    receive<T>(type: string, callback: (data: T) => void): void
+    request<R, T = unknown>(action: string, data: T): Promise<R>,
+    send<T>(action: string, data: T): void,
+    receive<T>(action: string, callback: (data: T) => void): void
 }
 
 export const useWebSockets = (url: string): ManagedWebSocket => {
@@ -22,7 +22,7 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
     const requestListeners = useRef<Record<string, DeferredPromise<any>>>({})
     const plainListeners = useRef<Record<string, (data: any) => void>>({})
 
-    const request = async <T, R>(type: string, data: T): Promise<R> => {
+    const request = async <T, R>(action: string, data: T): Promise<R> => {
         if (!socket.current || !opened.current) {
             throw new Error('Socket not connected')
         }
@@ -32,36 +32,36 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
 
         requestListeners.current[requestId] = deferredPromise
         socket.current.send(JSON.stringify({
+            action,
             requestId,
-            type,
             data
         }))
 
         return deferredPromise.promise
     }
 
-    const send = <T>(type: string, data: T) => {
+    const send = <T>(action: string, data: T) => {
         if (!socket.current || !opened.current) {
             return
         }
 
         socket.current.send(JSON.stringify({
+            action,
             requestId: undefined,
-            type,
             data
         }))
     }
 
-    const receive = <T>(type: string, callback: (data: T) => void) => {
+    const receive = <T>(action: string, callback: (data: T) => void) => {
         if (!socket.current || !opened.current) {
             return
         }
 
-        plainListeners.current[type] = callback
+        plainListeners.current[action] = callback
         socket.current.send(JSON.stringify({
+            action,
             requestId: undefined,
-            type: 'listening',
-            data: { channel: type }
+            data: { channel: action }
         }))
     }
 
@@ -120,8 +120,8 @@ const useWebsocketManager = (
 
     const handleMessage = (event: MessageEvent) => {
         const message = JSON.parse(event.data) as Message<any>
-        const requestId = message?.requestId
-        const messageType = message?.type
+        const requestId = message.requestId
+        const messageAction = message.action
 
         if (requestId) {
             return setRequests(requests => {
@@ -131,18 +131,16 @@ const useWebsocketManager = (
             })
         }
 
-        if (messageType) {
-            return setMessages(messages => {
-                const messagesCopy = { ...messages }
+        return setMessages(messages => {
+            const messagesCopy = { ...messages }
 
-                if (!(messageType in messagesCopy)) {
-                    messagesCopy[messageType] = []
-                }
+            if (!(messageAction in messagesCopy)) {
+                messagesCopy[messageAction] = []
+            }
 
-                messagesCopy[messageType].push(message)
-                return messagesCopy
-            })
-        }
+            messagesCopy[messageAction].push(message)
+            return messagesCopy
+        })
     }
 
     useEffect(() => {
@@ -186,8 +184,8 @@ const useWebSocketMessageQueue = (
         if (Object.values(messages).length > 0) {
             const messagesCopy = { ...messages }
 
-            for (const [messageType, oldMessages] of Object.entries(messagesCopy)) {
-                const listener = plainListeners.current[messageType]
+            for (const [messageAction, oldMessages] of Object.entries(messagesCopy)) {
+                const listener = plainListeners.current[messageAction]
 
                 for (const message of oldMessages) {
                     if (listener) {
@@ -195,7 +193,7 @@ const useWebSocketMessageQueue = (
                     }
                 }
 
-                delete messagesCopy[messageType]
+                delete messagesCopy[messageAction]
             }
 
             setMessages(messagesCopy)
