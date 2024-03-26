@@ -23,10 +23,12 @@ export const Projects: React.FC = () => {
     useAuthenticated()
 
     useEffect(() => {
-        if (projectsState.projects.length === 0) {
+        if (projectsState.initial) {
             projectsDispatch({ type: 'projects-get-all' })
         }
     }, [])
+
+    console.log({ projectsState })
 
     return (
         <Page centered={true}>

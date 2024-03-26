@@ -12,6 +12,7 @@ export type DataError = {
 
 export type DataState = {
     loading: boolean
+    initial: boolean
     fetching: boolean
     error: null | string
     data: Data[]
@@ -20,7 +21,7 @@ export type DataState = {
 export type DataHydrateAction = { type: 'hydrate' }
 export type DataHydrateSuccessfulAction = { type: 'hydrate-successful', state: DataState }
 export type DataHydrateFailedAction = { type: 'hydrate-failed' }
-export type DataGetAction = { type: 'data-get' }
+export type DataGetAction = { type: 'data-get', data: { projectId: string } }
 export type DataGetSuccessAction = { type: 'data-get-success', data: Data[] }
 export type DataGetFailedAction = { type: 'data-get-failed', error: string }
 export type DataCreateAction = { type: 'data-create', data: { projectId: string, value: number } }

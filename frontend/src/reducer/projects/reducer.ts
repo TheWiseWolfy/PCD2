@@ -6,6 +6,7 @@ import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
 export const projectsInitialState: ProjectsState = ({
     loading: true,
+    initial: true,
     fetching: false,
     error: null,
     projects: []
@@ -34,6 +35,7 @@ export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (s
         case 'projects-get-all-success':
             return {
                 ...state,
+                initial: false,
                 fetching: false,
                 error: null,
                 projects: action.projects
@@ -128,7 +130,7 @@ const get =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsGetAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ project: Project } | ProjectsError>('projects-get', action.project)
+                const result = await websocket.request<{ project: Project } | ProjectsError>('projects-get', { projectId: action.project })
 
                 if ('reason' in result) {
                     return dispatch({ type: 'projects-get-failed', error: result.reason })

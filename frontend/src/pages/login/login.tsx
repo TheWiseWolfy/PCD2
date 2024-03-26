@@ -45,7 +45,7 @@ export const Login: React.FC = () => {
                 <Form onSubmit={onSubmit}>
                     <H1>Login</H1>
                     <TextField value={email} onChange={setEmail} placeholder="Email" />
-                    <TextField value={password} onChange={setPassword} placeholder="Password" />
+                    <TextField value={password} onChange={setPassword} placeholder="Password" masked />
                     <Button onClick={onSubmit} disabled={disabled}>
                         {!usersState.fetching ? 'Submit' : <Spin><Image id="gear" /></Spin>}
                     </Button>

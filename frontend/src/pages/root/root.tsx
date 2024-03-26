@@ -17,14 +17,13 @@ export const Root: React.FC = () => {
             projectsDispatch({ type: 'hydrate' })
         } else if (dataState.loading) {
             dataDispatch({ type: 'hydrate' })
-        } else {
-            if (!usersState.isAuthenticated) {
-                navigate('/login')
-            } else {
-                navigate('/app')
-            }
+        } else if (!usersState.isAuthenticated) {
+            navigate('/login')
+        // } else if (!usersState.fetching && usersState.tokens?.auth) {
+        //     usersDispatch({ type: 'login', credentials: { auth: usersState.tokens.auth } })
+        } else if (usersState.isAuthenticated) {
+            navigate('/app')
         }
-
     }, [usersState, projectsState, dataState])
 
     return <></>

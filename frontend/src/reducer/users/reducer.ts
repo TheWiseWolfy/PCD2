@@ -73,13 +73,16 @@ export const usersSideEffects =
 
 const hydrate: ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersHydrateAction> = (state, action, dispatch) => {
     try {
-        const data = localStorage.getItem('auth-reducer')
-
-        if (!data) {
+        const rawState = localStorage.getItem('auth-reducer')
+        
+        if (!rawState) {
             return dispatch({ type: 'hydrate-failed' })
         }
 
-        dispatch({ type: 'hydrate-successful', state: JSON.parse(data) })
+        const state = JSON.parse(rawState)
+        delete state.isAuthenticated
+
+        dispatch({ type: 'hydrate-successful', state: state })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }

@@ -12,6 +12,7 @@ export type ProjectsError = {
 
 export type ProjectsState = {
     loading: boolean
+    initial: boolean
     fetching: boolean
     error: null | string
     projects: Project[]

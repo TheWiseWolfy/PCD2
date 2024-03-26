@@ -6,6 +6,7 @@ import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
 export const dataInitialState: DataState = ({
     loading: true,
+    initial: true,
     fetching: false,
     error: null,
     data: []
@@ -53,6 +54,7 @@ export const dataReducer: React.Reducer<DataState, DataActions> = (state, action
         case 'data-get-success':
             return {
                 ...state,
+                initial: true,
                 fetching: false,
                 error: null,
                 data: action.data
@@ -103,7 +105,7 @@ const get =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>, DataGetAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ data: Data[] } | DataError>('data-get', undefined)
+                const result = await websocket.request<{ data: Data[] } | DataError>('data-get', { projectId: action.data.projectId })
 
                 if ('reason' in result) {
                     return dispatch({ type: 'data-get-failed', error: result.reason })
