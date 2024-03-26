@@ -6,10 +6,6 @@ import redis
 from psycopg2.extensions import connection
 
 
-class AuthError(Exception):
-    pass
-
-
 def lambda_handler(event, context):
     redis_host = os.environ.get("REDIS_HOST")
     redis_port = int(os.environ.get("REDIS_PORT"))
@@ -39,11 +35,6 @@ def lambda_handler(event, context):
                 result = login(pg_conn, redis_client, event)
 
         return {"statusCode": 200, "body": json.dumps(result)}
-    except AuthError:
-        return {
-            "statusCode": 200,
-            "body": json.dumps({"reason": "Credentials not valid"}),
-        }
     except Exception as e:
         return {"statusCode": 500, "body": f"Error: {str(e)}"}
     finally:
@@ -66,7 +57,7 @@ def get(pg_conn: connection, redis: redis.Redis, event):
         cursor.execute("SELECT id, email, name FROM users WHERE id = %s", (user_id))
         user = cursor.fetchone()
 
-    return user
+    return {"result": user}
 
 
 def create(pg_conn: connection, redis: redis.Redis, event):
@@ -94,7 +85,7 @@ def create(pg_conn: connection, redis: redis.Redis, event):
         )
         user = cursor.fetchone()
 
-    return user
+    return {"result": user}
 
 
 def login(pg_conn: connection, redis: redis.Redis, event):
@@ -116,9 +107,9 @@ def login(pg_conn: connection, redis: redis.Redis, event):
         user = cursor.fetchone()
 
     if not user:
-        raise AuthError()
+        return {"reason": "Invalid credentials"}
 
     redis.hset("connections", connection_id, json.dumps({"user": user}))
     redis.sadd(f"users:{user['id']}", connection_id)
 
-    return user
+    return {"result": user}

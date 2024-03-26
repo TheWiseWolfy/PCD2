@@ -138,11 +138,11 @@ async function create(env, clients, event) {
         RETURNING *
     `, [projectId, value, new Date().toISOString()])
 
-    const connections = await redisClient.SMEMBERS(`users:${user.id}`)
+    const connectionIds = await redisClient.SMEMBERS(`users:${user.id}`)
 
-    for await (const connection of connections) {
+    for await (const connectionId of connectionIds) {
         await callbackAPIClient.postToConnection({
-            ConnectionId: connection,
+            ConnectionId: connectionId,
             data: {
                 action: "data-created",
                 data: result.rows[0]

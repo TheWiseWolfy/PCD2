@@ -82,7 +82,7 @@ async function getAll(env, clients, event) {
         return { reason: "Not authenticated" }
     }
     
-    const ownerId = connection.ownerId
+    const ownerId = user.id
     
     const projects = await databaseClient.query(`
         SELECT *
@@ -147,12 +147,11 @@ async function create(env, clients, event) {
         RETURNING *
     `, [ownerId, name, description])
 
-    const connections = await redisClient.SMEMBERS(`users:${user.id}`)
+    const connectionIds = await redisClient.SMEMBERS(`users:${user.id}`)
     
-    for await (const connection of connections) {
-        console.log("Sending to", connection)
+    for await (const connectionId of connectionIds) {
         await callbackAPIClient.postToConnection({
-            ConnectionId: connection,
+            ConnectionId: connectionId,
             data: {
                 action: "projects-created",
                 project: project.rows[0]
