@@ -8,7 +8,7 @@ const boundMakeClients = makeClients(env)
 
 export async function handler(event) {
     try {
-        const clients = await boundMakeClients()
+        const clients = await boundMakeClients(event)
 
         const result = await handleRoute(env, clients, event)
         
@@ -46,7 +46,7 @@ function makeClients(env) {
         password: env.DATABASE_PASSWORD
     })
 
-    return async () => ({
+    return async (event) => ({
         redisClient: await redisClient,
         databaseClient,
         callbackAPIClient: new aws.ApiGatewayManagementApi({
@@ -97,9 +97,11 @@ async function get(env, clients, event) {
         SELECT *
         FROM data
         WHERE project_id = $1
+        ORDER BY timestamp DESC 
+        LIMIT 25
     `, [projectId])
 
-    return { result: results.rows[0] }
+    return { result: results.rows }
 }
 
 async function create(env, clients, event) {
