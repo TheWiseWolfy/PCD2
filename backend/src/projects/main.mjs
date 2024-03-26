@@ -101,7 +101,9 @@ async function getAll(env, clients, event) {
     return {
         action: 'projects-get-all',
         requestId,
-        data: projects.rows
+        data: {
+            projects: projects.rows
+        }
     }
 }
 
@@ -141,7 +143,9 @@ async function get(env, clients, event) {
     return {
         action: 'projects-get',
         requestId,
-        data: projects.rows?.[0] || null
+        data: {
+            project: projects.rows?.[0] || null
+        }
     }
 }
 
@@ -193,6 +197,8 @@ async function create(env, clients, event) {
     return {
         action: 'projects-create',
         requestId,
-        result: project.rows[0]
+        result: {
+            project: project.rows[0]
+        }
     }
 }

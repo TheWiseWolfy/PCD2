@@ -118,7 +118,9 @@ async function get(env, clients, event) {
     return {
         action: 'data-get',
         requestId,
-        data: results.rows
+        data: {
+            data: results.rows
+        }
     }
 }
 
@@ -186,6 +188,8 @@ async function create(env, clients, event) {
     return {
         action: 'data-create',
         requestId,
-        data: result.rows[0]
+        data: {
+            data: result.rows[0]
+        }
     }
 }
