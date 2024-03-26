@@ -47,9 +47,11 @@ def get(pg_conn: connection, redis: redis.Redis, event):
     request_context = event.get("requestContext", {})
     connection_id = request_context.get("connectionId", "")
     body = event.get("body", "")
-    body_json = json.loads(body)["data"]
+    body_json = json.loads(body)
 
-    user_id = body_json.get("id", "")
+    request_id = body_json.get("requestId", "")
+    request_data = body_json.get("data", {})
+    user_id = request_data.get("id", "")
 
     user = None
 
@@ -57,18 +59,20 @@ def get(pg_conn: connection, redis: redis.Redis, event):
         cursor.execute("SELECT id, email, name FROM users WHERE id = %s", (user_id))
         user = cursor.fetchone()
 
-    return {"result": user}
+    return {"action": "users-get", "requestId": request_id, "result": user}
 
 
 def create(pg_conn: connection, redis: redis.Redis, event):
     request_context = event.get("requestContext", {})
     connection_id = request_context.get("connectionId", "")
     body = event.get("body", "")
-    body_json = json.loads(body)["data"]
+    body_json = json.loads(body)
 
-    email = body_json.get("email", "")
-    name = body_json.get("name", "")
-    password = body_json.get("password", "")
+    request_id = body_json.get("requestId", "")
+    request_data = body_json.get("data", {})
+    email = request_data.get("email", "")
+    name = request_data.get("name", "")
+    password = request_data.get("password", "")
 
     user = None
 
@@ -85,17 +89,19 @@ def create(pg_conn: connection, redis: redis.Redis, event):
         )
         user = cursor.fetchone()
 
-    return {"result": user}
+    return {"action": "users-create", "requestId": request_id, "data": user}
 
 
 def login(pg_conn: connection, redis: redis.Redis, event):
     request_context = event.get("requestContext", {})
     connection_id = request_context.get("connectionId", "")
     body = event.get("body", "")
-    body_json = json.loads(body)["data"]
+    body_json = json.loads(body)
 
-    email = body_json.get("email", "")
-    password = body_json.get("password", "")
+    request_id = body_json.get("requestId", "")
+    request_data = body_json.get("data", {})
+    email = request_data.get("email", "")
+    password = request_data.get("password", "")
 
     user = None
 
@@ -107,9 +113,13 @@ def login(pg_conn: connection, redis: redis.Redis, event):
         user = cursor.fetchone()
 
     if not user:
-        return {"reason": "Invalid credentials"}
+        return {
+            "action": "users-login",
+            "requestId": request_id,
+            "data": {"reason": "Invalid credentials"},
+        }
 
     redis.hset("connections", connection_id, json.dumps({"user": user}))
     redis.sadd(f"users:{user['id']}", connection_id)
 
-    return {"result": user}
+    return {"action": "users-login", "requestId": request_id, "data": user}
