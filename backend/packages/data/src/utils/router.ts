@@ -34,7 +34,7 @@ const call = (self: Self): Router['call'] => async (event) => {
     let response: Response<any>
 
     self.logger.info(
-        `[Connection id ${request.connectionId}${request.requestId === undefined ? '' : `, request id ${request.requestId} -> request`}] Route key: ${request.route}, data: ${request.data}`
+        `[Connection id ${request.connectionId}${request.requestId === undefined ? '' : `, request id ${request.requestId} -> request`}] Route key: ${request.route}, data: ${JSON.stringify(request.data)}`
     )
 
     const routeHandler = self.routes[request.route]
@@ -63,7 +63,7 @@ const call = (self: Self): Router['call'] => async (event) => {
     }
 
     self.logger.info(
-        `[Connection id ${request.connectionId}${request.requestId === undefined ? '' : `, request id ${request.requestId} <- response`}] Route key: ${request.route}, status code: ${response.statusCode}, data: ${response.data}`
+        `[Connection id ${request.connectionId}${request.requestId === undefined ? '' : `, request id ${request.requestId} <- response`}] Route key: ${request.route}, status code: ${response.statusCode}, data: ${JSON.stringify(response.data)}`
     )
 
     return response

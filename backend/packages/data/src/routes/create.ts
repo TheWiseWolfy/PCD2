@@ -26,7 +26,7 @@ export const makeCreateRoute = (service: BaseService<Input, any>): CreateRoute =
 }
 
 const call = (self: Self): CreateRoute['call'] => async (request) => {
-    const connectionId = request.data.connectionId
+    const connectionId = request.connectionId
     const projectId = request.data.projectId
     const visualisationId = request.data.visualisationId
     const value = request.data.value

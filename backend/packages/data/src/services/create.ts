@@ -68,7 +68,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
         RETURNING *
     `, [visualisationId, String(value), new Date().toISOString()])
 
-    const connectionIds = await self.redisClient.SMEMBERS(`users:${user.id}`)
+    const connectionIds = await self.redisClient.SMEMBERS(`users:${userId}`)
 
     for await (const connectionId of connectionIds) {
         await self.callbackAPIClient.postToConnection({

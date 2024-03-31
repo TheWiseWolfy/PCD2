@@ -23,7 +23,7 @@ export const makeConnectRoute = (service: BaseService<Input, any>): ConnectRoute
 }
 
 const call = (self: Self): ConnectRoute['call'] => async (request) => {
-    const connectionId = request.data.connectionId
+    const connectionId = request.connectionId
 
     const response = await self.service.call({ connectionId })
 

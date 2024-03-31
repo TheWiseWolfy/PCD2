@@ -24,7 +24,7 @@ export const makeGetRoute = (service: BaseService<Input, any>): GetRoute => {
 }
 
 const call = (self: Self): GetRoute['call'] => async (request) => {
-    const connectionId = request.data.connectionId
+    const connectionId = request.connectionId
     const projectId = request.data.projectId
 
     const response = await self.service.call({ connectionId, projectId })

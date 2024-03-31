@@ -9,7 +9,7 @@ import { makeCreateRoute } from './src/routes/create'
 import { makeRouter } from './src/utils/router'
 import { makeLogger } from './src/utils/logger'
 
-export const handler = async (event: any, context: any) => {
+export const handler = async (event: any, _context: any) => {
     const REDIS_HOST = process.env['REDIS_HOST']
     const REDIS_PORT = !!process.env['REDIS_PORT'] ? Number(process.env['REDIS_PORT']) : undefined
     const DATABASE_HOST = process.env['DATABASE_HOST']

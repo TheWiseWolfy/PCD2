@@ -15,17 +15,17 @@ export const makeLogger = () => {
 }
 
 const debug = () => (...params: any[]) => {
-    console.debug(params)
+    console.debug(...params)
 }
 
 const info = () => (...params: any[]) => {
-    console.info(params)
+    console.info(...params)
 }
 
 const warn = () => (...params: any[]) => {
-    console.warn(params)
+    console.warn(...params)
 }
 
 const error = () => (...params: any[]) => {
-    console.error(params)
+    console.error(...params)
 }
