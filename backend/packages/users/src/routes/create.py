@@ -19,7 +19,7 @@ class CreateRoute(BaseRoute):
 
         return Response(
             status_code=200,
-            request_id=request.request_id,
             action=request.action,
+            request_id=request.request_id,
             data=response,
         )

@@ -21,15 +21,15 @@ class CreateService(BaseService):
             cursor_factory=psycopg2.extras.RealDictCursor
         ) as cursor:
             cursor.execute(
-                "INSERT INTO users (email, name, password) VALUES (%s, %s, %s)",
+                """
+                INSERT INTO users (email, name, password)
+                VALUES (%s, %s, %s)
+                RETURNING *
+                """,
                 (email, name, password_hash),
             )
             self._postgres_client.commit()
-
-            cursor.execute(
-                "SELECT user_id, email, name FROM users WHERE email = %s AND password = %s",
-                (email, password_hash),
-            )
             user = cursor.fetchone()
+            del user["password"]
 
-        return user
+        return {"user": user}

@@ -18,10 +18,17 @@ class GetService(BaseService):
         with self._postgres_client.cursor(
             cursor_factory=psycopg2.extras.RealDictCursor
         ) as cursor:
-            cursor.execute("SELECT user_id, email, name FROM users WHERE user_id = %s", (user_id,))
+            cursor.execute(
+                """
+                SELECT u.user_id, u.email, u.name
+                FROM users u
+                WHERE u.user_id = %s
+                """,
+                (user_id,),
+            )
             user = cursor.fetchone()
 
         if user is None:
             return {"reason": "Not found"}
 
-        return user
+        return {"user": user}

@@ -8,8 +8,8 @@ T = t.TypeVar("T")
 @dataclass
 class Response(t.Generic[T]):
     status_code: int
-    request_id: int
     action: str
+    request_id: int
     data: T
 
     def __repr__(self) -> str:

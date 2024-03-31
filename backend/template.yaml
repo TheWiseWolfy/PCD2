@@ -298,6 +298,14 @@ Resources:
         Variables:
           REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
           REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+        - main.ts
   ConnectionsFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -374,6 +382,14 @@ Resources:
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+        - main.ts
   ProjectsFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -412,6 +428,14 @@ Resources:
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+        - main.ts
   DataFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:

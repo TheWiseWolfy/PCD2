@@ -33,7 +33,11 @@ class LoginService(BaseService):
             cursor_factory=psycopg2.extras.RealDictCursor
         ) as cursor:
             cursor.execute(
-                "SELECT user_id, email, name FROM users WHERE email = %s AND password = %s",
+                """
+                SELECT u.user_id, u.email, u.name
+                FROM users u
+                WHERE email = %s AND password = %s
+                """,
                 (email, password_hash),
             )
             user = cursor.fetchone()

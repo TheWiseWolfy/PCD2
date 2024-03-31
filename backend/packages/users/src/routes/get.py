@@ -11,13 +11,13 @@ class GetRoute(BaseRoute):
         self._service = service
 
     def call(self, request: Request):
-        user_id = request.data.get("user_id", "")
+        user_id = request.data.get("userId", "")
 
         response = self._service.call(user_id=user_id)
 
         return Response(
             status_code=200,
-            request_id=request.request_id,
             action=request.action,
+            request_id=request.request_id,
             data=response,
         )

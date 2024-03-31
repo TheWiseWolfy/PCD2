@@ -1,3 +1,4 @@
+import json
 import os
 import psycopg2
 import psycopg2.extras
@@ -44,3 +45,26 @@ def lambda_handler(event, context):
     response = router.call(event)
 
     return response
+
+
+os.environ["REDIS_HOST"] = "localhost"
+os.environ["REDIS_PORT"] = "6379"
+os.environ["DATABASE_HOST"] = "localhost"
+os.environ["DATABASE_PORT"] = "5432"
+os.environ["DATABASE_DATABASE"] = "postgres"
+os.environ["DATABASE_USERNAME"] = "postgres"
+os.environ["DATABASE_PASSWORD"] = "password"
+
+print(lambda_handler(
+    {
+        "requestContext": {"routeKey": "users-create"},
+        "body": json.dumps(
+            {
+                "action": "users-create",
+                "requestId": "requestId",
+                "data": {"email": "test-user@email.com", "password": "password"},
+            }
+        ),
+    },
+    context=None,
+))

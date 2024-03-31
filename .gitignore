@@ -24,3 +24,5 @@ yarn-error.log*
 venv
 .aws-sam
 temp
+
+__pycache__

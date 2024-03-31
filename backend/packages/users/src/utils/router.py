@@ -23,14 +23,14 @@ class Router:
         response = None
 
         self._logger.info(
-            f"[Connection id{request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} -> request'}] Route key: {request.route}, data: {json.dumps(request.data)}"
+            f"[Connection id {request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} -> request'}] Route key: {request.route}, data: {json.dumps(request.data)}"
         )
 
         if request.route not in self._routes:
             response = Response(
                 status_code=404,
-                request_id=request.request_id,
                 action=request.action,
+                request_id=request.request_id,
                 data={},
             )
         else:
@@ -39,13 +39,13 @@ class Router:
 
             except Exception as e:
                 self._logger.error(
-                    f"[Connection id{request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} !! error'}] Route key: {request.route}, error: {e}, traceback: {traceback.format_exc()}"
+                    f"[Connection id {request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} !! error'}] Route key: {request.route}, error: {e}, traceback: {traceback.format_exc()}"
                 )
 
                 response = Response(
                     status_code=500,
-                    request_id=request.request_id,
                     action=request.action,
+                    request_id=request.request_id,
                     data={},
                 )
 
@@ -53,7 +53,7 @@ class Router:
             return
 
         self._logger.info(
-            f"[Connection id{request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} <- response'}] Route key: {request.route}, status code: {response.status_code}, data: {json.dumps(response.data)}"
+            f"[Connection id {request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} <- response'}] Route key: {request.route}, status code: {response.status_code}, data: {json.dumps(response.data)}"
         )
 
         return response
