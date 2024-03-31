@@ -95,17 +95,6 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref UserLogoutIntegration
-  ProjectsGetAllRoute:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref ApiGateway
-      RouteKey: projects-get-all
-      AuthorizationType: NONE
-      OperationName: ProjectsGetAllRoute
-      Target: !Join
-        - "/"
-        - - "integrations"
-          - !Ref ProjectsGetAllIntegration
   ProjectsGetRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -117,6 +106,17 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref ProjectsGetIntegration
+  ProjectsGetAllRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: projects-get-all
+      AuthorizationType: NONE
+      OperationName: ProjectsGetAllRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref ProjectsGetAllIntegration
   ProjectsCreateRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -128,17 +128,50 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref ProjectsCreateIntegration
-  DataGetRoute:
+          - !Ref VisualisationsGetAllIntegration
+  VisualisationsGetRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref ApiGateway
-      RouteKey: data-get
+      RouteKey: visualisations-get
       AuthorizationType: NONE
-      OperationName: DataGetIntegration
+      OperationName: VisualisationsGetIntegration
       Target: !Join
         - "/"
         - - "integrations"
-          - !Ref DataGetIntegration
+          - !Ref VisualisationsGetIntegration
+  VisualisationsGetAllRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: visualisations-get-all
+      AuthorizationType: NONE
+      OperationName: VisualisationsGetAllRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+  VisualisationsCreateRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: visualisations-create
+      AuthorizationType: NONE
+      OperationName: VisualisationsCreateIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref VisualisationsCreateIntegration
+  DataGetAllRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: data-get-all
+      AuthorizationType: NONE
+      OperationName: DataGetAllIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref DataGetAllIntegration
   DataCreateRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -200,16 +233,6 @@ Resources:
       IntegrationType: AWS_PROXY
       IntegrationUri:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
-  ProjectsGetAllIntegration:
-    Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
-      - ProjectsFunction
-    Properties:
-      ApiId: !Ref ApiGateway
-      Description: Projects fetch all Integration
-      IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   ProjectsGetIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn: 
@@ -217,6 +240,16 @@ Resources:
     Properties:
       ApiId: !Ref ApiGateway
       Description: Projects fetch Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  ProjectsGetAllIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Projects fetch all Integration
       IntegrationType: AWS_PROXY
       IntegrationUri:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
@@ -230,7 +263,37 @@ Resources:
       IntegrationType: AWS_PROXY
       IntegrationUri:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
-  DataGetIntegration:
+  VisualisationsGetIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Visualisations fetch Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  VisualisationsGetAllIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Visualisations fetch all Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  VisualisationsCreateIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn: 
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Visualisations create Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  DataGetAllIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn: 
       - DataFunction
@@ -262,7 +325,10 @@ Resources:
       - ProjectsGetAllIntegration
       - ProjectsGetIntegration
       - ProjectsCreateIntegration
-      - DataGetIntegration
+      - VisualisationsGetAllIntegration
+      - VisualisationsGetIntegration
+      - VisualisationsCreateIntegration
+      - DataGetAllIntegration
       - DataCreateIntegration
     Properties:
       ApiId: !Ref ApiGateway

@@ -2,7 +2,7 @@
 import redis from 'redis'
 import pg from 'pg'
 import aws from 'aws-sdk'
-import { BaseService } from '../utils/service'
+import { BaseService } from '../../utils/service'
 
 type Input = {
     connectionId: string
@@ -10,7 +10,7 @@ type Input = {
     description: string
 }
 
-interface CreateService extends BaseService<Input, any> { }
+interface CreateProjectsService extends BaseService<Input, any> { }
 
 type Self = {
     callbackAPIClient: aws.ApiGatewayManagementApi
@@ -18,7 +18,7 @@ type Self = {
     postgresClient: pg.Pool
 }
 
-export const makeCreateService = (callbackAPIClient: aws.ApiGatewayManagementApi, redisClient: redis.RedisClientType, postgresClient: pg.Pool): CreateService => {
+export const makeCreateProjectsService = (callbackAPIClient: aws.ApiGatewayManagementApi, redisClient: redis.RedisClientType, postgresClient: pg.Pool): CreateProjectsService => {
     const self: Self = {
         callbackAPIClient,
         redisClient,
@@ -30,7 +30,7 @@ export const makeCreateService = (callbackAPIClient: aws.ApiGatewayManagementApi
     }
 }
 
-const call = (self: Self): CreateService['call'] => async (input) => {
+const call = (self: Self): CreateProjectsService['call'] => async (input) => {
     const connectionId = input.connectionId
     const name = input.name
     const description = input.description

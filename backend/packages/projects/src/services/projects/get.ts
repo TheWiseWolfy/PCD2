@@ -1,20 +1,21 @@
 
 import redis from 'redis'
 import pg from 'pg'
-import { BaseService } from '../utils/service'
+import { BaseService } from '../../utils/service'
 
 type Input = {
     connectionId: string
+    projectId: string
 }
 
-interface GetAllService extends BaseService<Input, any> { }
+interface GetProjectsService extends BaseService<Input, any> { }
 
 type Self = {
     redisClient: redis.RedisClientType
     postgresClient: pg.Pool
 }
 
-export const makeGetAllService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetAllService => {
+export const makeGetProjectsService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetProjectsService => {
     const self: Self = {
         redisClient,
         postgresClient
@@ -25,8 +26,9 @@ export const makeGetAllService = (redisClient: redis.RedisClientType, postgresCl
     }
 }
 
-const call = (self: Self): GetAllService['call'] => async (input) => {
+const call = (self: Self): GetProjectsService['call'] => async (input) => {
     const connectionId = input.connectionId
+    const projectId = input.projectId
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)
@@ -43,10 +45,10 @@ const call = (self: Self): GetAllService['call'] => async (input) => {
     const projects = await self.postgresClient.query(`
         SELECT *
         FROM projects p
-        WHERE p.user_id = $1
-    `, [userId])
+        WHERE p.project_id = $1 AND p.user_id = $2
+    `, [projectId, userId])
 
     return {
-        projects: projects?.rows
+        project: projects?.rows?.[0] || null
     }
 }
