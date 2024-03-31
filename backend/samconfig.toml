@@ -2,7 +2,7 @@ version = 0.1
 
 [default]
 [default.global.parameters]
-stack_name = "backend"
+stack_name = "pcd-homework-2-backend"
 
 [default.build.parameters]
 cached = true
@@ -21,6 +21,10 @@ profile = "pcd-homework-2"
 image_repositories = []
 parameter_overrides = [
     "Stage=\"Production\"",
+    "VpcId=vpc-048a0f0fdca7c541b",
+    "VpcSubnetId1=subnet-009c075286313f428",
+    "VpcSubnetId2=subnet-054f22f8aadaebe50",
+    "VpcSecurityGroupId=sg-06af517a154dc870e",
     "DatabaseUsername=\"postgres\"",
     "DatabasePassword=\"pcdhomeworktwo\"",
     "DatabaseDatabase=\"postgres\"",

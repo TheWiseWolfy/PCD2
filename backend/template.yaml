@@ -6,23 +6,39 @@ Transform:
   - AWS::Serverless-2016-10-31
 
 Parameters:
+  VpcId:
+    NoEcho: "false"
+    Description: ID of the VPC to use
+    Type: String
+  VpcSubnetId1:
+    NoEcho: "false"
+    Description: ID of the VPC subnet 1 to use
+    Type: String
+  VpcSubnetId2:
+    NoEcho: "false"
+    Description: ID of the VPC subnet 2 to use
+    Type: String
+  VpcSecurityGroupId:
+    NoEcho: "false"
+    Description: ID of the VPC security group to use
+    Type: String
   DatabaseUsername:
-    NoEcho: 'true'
+    NoEcho: "true"
     Description: Username for Postgres database access
     Type: String
-    MinLength: '1'
-    MaxLength: '16'
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    MinLength: "1"
+    MaxLength: "16"
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
     ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
   DatabasePassword:
-    NoEcho: 'true'
+    NoEcho: "true"
     Description: Password for Postgres database access
     Type: String
-    MinLength: '8'
-    MaxLength: '41'
-    AllowedPattern: '[a-zA-Z0-9]*'
+    MinLength: "8"
+    MaxLength: "41"
+    AllowedPattern: "[a-zA-Z0-9]*"
   DatabaseDatabase:
-    NoEcho: 'true'
+    NoEcho: "true"
     Description: Database to use from the Postgres database instance
     Type: String
 
@@ -128,7 +144,6 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref ProjectsCreateIntegration
-          - !Ref VisualisationsGetAllIntegration
   VisualisationsGetRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -150,6 +165,7 @@ Resources:
       Target: !Join
         - "/"
         - - "integrations"
+          - !Ref VisualisationsGetAllIntegration
   VisualisationsCreateRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -185,134 +201,121 @@ Resources:
           - !Ref DataCreateIntegration
   ConnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ConnectionsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Connect Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionsFunction.Arn}/invocations
   DisconnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ConnectionsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Disconnect Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionsFunction.Arn}/invocations
   UserCreateIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - UsersFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: User create Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
   UserLoginIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - UsersFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: User login Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
   UserLogoutIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - UsersFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: User logout Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersFunction.Arn}/invocations
   ProjectsGetIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ProjectsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Projects fetch Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   ProjectsGetAllIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ProjectsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Projects fetch all Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   ProjectsCreateIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ProjectsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Projects create Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   VisualisationsGetIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ProjectsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Visualisations fetch Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   VisualisationsGetAllIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ProjectsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Visualisations fetch all Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   VisualisationsCreateIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - ProjectsFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Visualisations create Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   DataGetAllIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - DataFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Data fetch Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
   DataCreateIntegration:
     Type: AWS::ApiGatewayV2::Integration
-    DependsOn: 
+    DependsOn:
       - DataFunction
     Properties:
       ApiId: !Ref ApiGateway
       Description: Data create Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri:
-        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
 
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
@@ -356,10 +359,10 @@ Resources:
       Description: Handles connections
       VpcConfig:
         SubnetIds:
-          - subnet-05131fc6f978ebc6a
-          - subnet-0764d147586f6927e
+          - !Ref VpcSubnetId1
+          - !Ref VpcSubnetId2
         SecurityGroupIds:
-          - sg-00fe3732c89fa040e
+          - !Ref VpcSecurityGroupId
       Environment:
         Variables:
           REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
@@ -371,7 +374,7 @@ Resources:
         Target: es2020
         Sourcemap: true
         EntryPoints:
-        - main.ts
+          - main.ts
   ConnectionsFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -397,10 +400,10 @@ Resources:
       Description: Handles users
       VpcConfig:
         SubnetIds:
-          - subnet-05131fc6f978ebc6a
-          - subnet-0764d147586f6927e
+          - !Ref VpcSubnetId1
+          - !Ref VpcSubnetId2
         SecurityGroupIds:
-          - sg-00fe3732c89fa040e
+          - !Ref VpcSecurityGroupId
       Environment:
         Variables:
           REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
@@ -435,10 +438,10 @@ Resources:
       Description: Handles projects
       VpcConfig:
         SubnetIds:
-          - subnet-05131fc6f978ebc6a
-          - subnet-0764d147586f6927e
+          - !Ref VpcSubnetId1
+          - !Ref VpcSubnetId2
         SecurityGroupIds:
-          - sg-00fe3732c89fa040e
+          - !Ref VpcSecurityGroupId
       Environment:
         Variables:
           REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
@@ -455,7 +458,7 @@ Resources:
         Target: es2020
         Sourcemap: true
         EntryPoints:
-        - main.ts
+          - main.ts
   ProjectsFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -481,10 +484,10 @@ Resources:
       Description: Handles data
       VpcConfig:
         SubnetIds:
-          - subnet-05131fc6f978ebc6a
-          - subnet-0764d147586f6927e
+          - !Ref VpcSubnetId1
+          - !Ref VpcSubnetId2
         SecurityGroupIds:
-          - sg-00fe3732c89fa040e
+          - !Ref VpcSecurityGroupId
       Environment:
         Variables:
           REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
@@ -501,7 +504,7 @@ Resources:
         Target: es2020
         Sourcemap: true
         EntryPoints:
-        - main.ts
+          - main.ts
   DataFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -511,27 +514,26 @@ Resources:
       FunctionName: !Ref DataFunction
       Principal: apigateway.amazonaws.com
 
-
   DatabaseSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: PCD Database subnet group
-      SubnetIds: 
-        - subnet-05131fc6f978ebc6a
-        - subnet-0764d147586f6927e
+      SubnetIds:
+        - !Ref VpcSubnetId1
+        - !Ref VpcSubnetId2
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: PCD Database security group
-      VpcId: vpc-03d6424bee6aa6c85
+      VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 5432
           ToPort: 5432
-          SourceSecurityGroupId: sg-00fe3732c89fa040e
+          SourceSecurityGroupId: !Ref VpcSecurityGroupId
   Database:
     Type: AWS::RDS::DBInstance
-    DependsOn: 
+    DependsOn:
       - DatabaseSubnetGroup
       - DatabaseSecurityGroup
     Properties:
@@ -545,7 +547,7 @@ Resources:
       MasterUserPassword: !Ref DatabasePassword
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       VPCSecurityGroups:
-        - !GetAtt 
+        - !GetAtt
           - DatabaseSecurityGroup
           - GroupId
 
@@ -553,22 +555,22 @@ Resources:
     Type: AWS::ElastiCache::SubnetGroup
     Properties:
       Description: PCD Redis subnet group
-      SubnetIds: 
-        - subnet-05131fc6f978ebc6a
-        - subnet-0764d147586f6927e
+      SubnetIds:
+        - !Ref VpcSubnetId1
+        - !Ref VpcSubnetId2
   RedisSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: PCD Redis security group
-      VpcId: vpc-03d6424bee6aa6c85
+      VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 6379
           ToPort: 6379
-          SourceSecurityGroupId: sg-00fe3732c89fa040e
+          SourceSecurityGroupId: !Ref VpcSecurityGroupId
   Redis:
     Type: AWS::ElastiCache::CacheCluster
-    DependsOn: 
+    DependsOn:
       - RedisSubnetGroup
       - RedisSecurityGroup
     Properties:
@@ -577,7 +579,7 @@ Resources:
       NumCacheNodes: 1
       CacheSubnetGroupName: !Ref RedisSubnetGroup
       VpcSecurityGroupIds:
-        - !GetAtt 
+        - !GetAtt
           - RedisSecurityGroup
           - GroupId
 
