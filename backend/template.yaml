@@ -280,7 +280,7 @@ Resources:
       - Redis
       - Database
     Properties:
-      CodeUri: src/connections/
+      CodeUri: packages/connections/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
@@ -313,7 +313,7 @@ Resources:
       - Redis
       - Database
     Properties:
-      CodeUri: src/users/
+      CodeUri: packages/users/
       Handler: main.lambda_handler
       Runtime: python3.11
       Architectures:
@@ -351,7 +351,7 @@ Resources:
       - Redis
       - Database
     Properties:
-      CodeUri: src/projects/
+      CodeUri: packages/projects/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
@@ -389,7 +389,7 @@ Resources:
       - Redis
       - Database
     Properties:
-      CodeUri: src/data/
+      CodeUri: packages/data/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
