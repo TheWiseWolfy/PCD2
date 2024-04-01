@@ -12,6 +12,18 @@ class Response(t.Generic[T]):
     request_id: int
     data: T
 
+    def to_lambda_response(self) -> dict:
+        return {
+            "statusCode": self.status_code,
+            "body": json.dumps({
+                "action": self.action,
+                "requestId": self.request_id,
+                "data": json.dumps(self.data)
+            })
+        }
+
+
+
     def __repr__(self) -> str:
         return json.dumps(
             {
@@ -19,7 +31,7 @@ class Response(t.Generic[T]):
                 "data": {
                     "action": self.action,
                     "requestId": self.request_id,
-                    "data": self.data,
-                },
+                    "data": json.dumps(self.data)
+                }
             }
         )

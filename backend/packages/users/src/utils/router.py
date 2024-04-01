@@ -53,7 +53,7 @@ class Router:
             return
 
         self._logger.info(
-            f"[Connection id {request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} <- response'}] Route key: {request.route}, status code: {response.status_code}, data: {json.dumps(response.data)}"
+            f"[Connection id {request.connection_id}{'' if request.request_id is None else f', request id {request.request_id} <- response'}] Route key: {request.route}, status code: {response.status_code}, data: {response.data}"
         )
 
         return response

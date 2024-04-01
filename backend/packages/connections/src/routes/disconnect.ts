@@ -25,12 +25,12 @@ export const makeDisconnectRoute = (service: BaseService<Input, any>): Disconnec
 const call = (self: Self): DisconnectRoute['call'] => async (request) => {
     const connectionId = request.connectionId
 
-    const response = await self.service.call({ connectionId })
+    await self.service.call({ connectionId })
 
     return makeResponse(
         200,
-        request.action,
-        request.requestId,
-        response
+        undefined,
+        undefined,
+        undefined
     )
 }

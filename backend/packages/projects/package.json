@@ -1,6 +1,8 @@
 {
-    "name": "pcd-homework-2-auth",
-    "description": "Second PCD homework, auth lambda",
+    "name": "pcd-homework-2-projects",
+    "type": "module",
+    "main": "main.mjs",
+    "description": "Second PCD homework, projects lambda",
     "version": "0.0.1",
     "private": true,
     "scripts": {},

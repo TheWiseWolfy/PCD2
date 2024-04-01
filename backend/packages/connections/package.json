@@ -1,5 +1,7 @@
 {
     "name": "pcd-homework-2-connections",
+    "type": "module",
+    "main": "main.mjs",
     "description": "Second PCD homework, connections lambda",
     "version": "0.0.1",
     "private": true,

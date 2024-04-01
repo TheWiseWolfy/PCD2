@@ -5,7 +5,7 @@ import { BaseRoute } from "./route"
 
 export interface Router {
     register<Input, Output>(routeKey: string, handler: BaseRoute<Input, Output>): void
-    call<Output>(event: any): Promise<Response<Output> | undefined>
+    call<Output>(event: any): Promise<Response<Output> | Response<undefined>>
 }
 
 type Self = {
@@ -59,11 +59,16 @@ const call = (self: Self): Router['call'] => async (event) => {
     }
 
     if (response === undefined) {
-        return
+        response = makeResponse(
+            200,
+            undefined,
+            undefined,
+            undefined
+        )
     }
 
     self.logger.info(
-        `[Connection id ${request.connectionId}${request.requestId === undefined ? '' : `, request id ${request.requestId} <- response`}] Route key: ${request.route}, status code: ${response.statusCode}, data: ${JSON.stringify(response.data)}`
+        `[Connection id ${request.connectionId}${request.requestId === undefined ? '' : `, request id ${request.requestId} <- response`}] Route key: ${request.route}, status code: ${response.statusCode}, ${!('data' in response) ? '' : `data: ${JSON.stringify(response.data)}`}`
     )
 
     return response

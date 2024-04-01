@@ -50,5 +50,5 @@ export const handler = async (event: any, _context: any) => {
 
     const response = await router.call(event)
 
-    return response
+    return response.toLambdaResponse()
 }
