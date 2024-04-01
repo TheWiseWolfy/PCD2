@@ -1,7 +1,8 @@
 
 export type User = {
-    id: string
-    username: string
+    user_id: string
+    email: string
+    name: string
 }
 
 export type Tokens = {

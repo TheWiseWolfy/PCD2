@@ -1,6 +1,6 @@
 
 export type Data = {
-    id: string
+    visualisation_id: string
     project_id: string
     value: number
     timestamp: string

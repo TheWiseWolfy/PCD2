@@ -19,7 +19,7 @@ export const Statistics: React.FC = () => {
     const navigation = useNavigate()
 
     useEffect(() => {
-        const project = projectsState.projects.find(item => item.id === projectId)
+        const project = projectsState.projects.find(item => item.project_id === projectId)
 
         if (project) {
             setProject(project)
@@ -30,7 +30,7 @@ export const Statistics: React.FC = () => {
 
     useEffect(() => {
         if (project && dataState.initial) {
-            dispatchData({ type: 'data-get', data: { projectId: project.id } })
+            dispatchData({ type: 'data-get', data: { projectId: project.project_id } })
         }
     }, [project])
 

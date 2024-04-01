@@ -37,12 +37,12 @@ export const Projects: React.FC = () => {
                 {projectsState.projects.map((project) => (
                     <Div>
                         <Project
-                            id={project.id}
-                            ownerId={project.owner_id}
+                            id={project.project_id}
+                            ownerId={project.user_id}
                             name={project.name}
                             description={project.description}
                         />
-                        <Button onClick={goToProjectStatistics(project.id)}>Go to Statistics Page</Button>
+                        <Button onClick={goToProjectStatistics(project.project_id)}>Go to Statistics Page</Button>
                     </Div>
                 ))}
             </Card>

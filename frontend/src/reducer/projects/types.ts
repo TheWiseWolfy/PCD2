@@ -1,7 +1,7 @@
 
 export type Project = {
-    id: string
-    owner_id: string
+    project_id: string
+    user_id: string
     name: string
     description: string
 }

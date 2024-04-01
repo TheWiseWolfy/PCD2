@@ -53,7 +53,7 @@ export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (s
                 error: null
             }
         case 'projects-get-success': {
-            const existingProjectIndex = state.projects.findIndex(item => item.id === action.project.id)
+            const existingProjectIndex = state.projects.findIndex(item => item.project_id === action.project.project_id)
             return {
                 ...state,
                 fetching: false,
