@@ -18,6 +18,7 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
         case 'hydrate-successful':
             return {
                 ...action.state,
+                error: null,
                 loading: false,
                 fetching: false
             }

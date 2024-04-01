@@ -7,22 +7,22 @@
 
 .text-field {
     padding: 1rem;
-    border: 1px solid var(--medium-color);
+    border: 1px solid var(--light-color);
     border-radius: calc(var(--default-border-radius) / 2);
-    margin-bottom: var(--default-input-margin);
+    background: var(--lighter-color);
     color: var(--dark-color);
 }
 
 .button {
     padding: 1rem;
-    margin-bottom: var(--default-input-margin);
-    border: 1px solid var(--medium-color);
+    border: 1px solid var(--light-color);
     border-radius: calc(var(--default-border-radius) / 2);
-    background: var(--light-color);
-    color: var(--dark-color);
+    background: var(--lighter-color);
+    color: var(--black-color);
+    width: 100%;
 }
 
 .button:disabled {
     background: var(--white-color);
-    color: var(--medium-color);
+    color: var(--light-color);
 }

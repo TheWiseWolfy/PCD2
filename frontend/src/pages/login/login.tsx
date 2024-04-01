@@ -11,6 +11,8 @@ import { useNotAuthenticated } from "../../hooks/useAuthenticated"
 import { Form } from "../../components/input/form"
 import { useNavigate } from "react-router-dom"
 import { P } from "../../components/typography/p"
+import { List } from "../../components/list/list"
+import { Spacing } from "../../components/spacing/spacing"
 
 export const Login: React.FC = () => {
     const [usersState, usersDispatch] = useContext(UsersContext)
@@ -44,8 +46,11 @@ export const Login: React.FC = () => {
             <Card>
                 <Form onSubmit={onSubmit}>
                     <H1>Login</H1>
-                    <TextField value={email} onChange={setEmail} placeholder="Email" />
-                    <TextField value={password} onChange={setPassword} placeholder="Password" masked />
+                    <List>
+                        <TextField value={email} onChange={setEmail} placeholder="Email" />
+                        <TextField value={password} onChange={setPassword} placeholder="Password" masked />
+                    </List>
+                    <Spacing spacing="m" />
                     <Button onClick={onSubmit} disabled={disabled}>
                         {!usersState.fetching ? 'Submit' : <Spin><Image id="gear" /></Spin>}
                     </Button>
