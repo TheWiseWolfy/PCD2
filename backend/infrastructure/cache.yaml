@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  backend-cache
+
+Parameters:
+  VpcId:
+    NoEcho: "false"
+    Description: ID of the VPC to use
+    Type: String
+  VpcSubnetId1:
+    NoEcho: "false"
+    Description: ID of the VPC subnet 1 to use
+    Type: String
+  VpcSubnetId2:
+    NoEcho: "false"
+    Description: ID of the VPC subnet 2 to use
+    Type: String
+  VpcSecurityGroupId:
+    NoEcho: "false"
+    Description: ID of the VPC security group to use
+    Type: String
+
+Resources:
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: PCD Redis subnet group
+      SubnetIds:
+        - !Ref VpcSubnetId1
+        - !Ref VpcSubnetId2
+  RedisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PCD Redis security group
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !Ref VpcSecurityGroupId
+  Redis:
+    Type: AWS::ElastiCache::CacheCluster
+    DependsOn:
+      - RedisSubnetGroup
+      - RedisSecurityGroup
+    Properties:
+      Engine: redis
+      CacheNodeType: cache.t2.micro
+      NumCacheNodes: 1
+      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      VpcSecurityGroupIds:
+        - !GetAtt
+          - RedisSecurityGroup
+          - GroupId
+

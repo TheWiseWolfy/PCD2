@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  backend
+  backend-compute
 
 Transform:
   - AWS::Serverless-2016-10-31
@@ -22,24 +22,34 @@ Parameters:
     NoEcho: "false"
     Description: ID of the VPC security group to use
     Type: String
-  DatabaseUsername:
-    NoEcho: "true"
-    Description: Username for Postgres database access
+
+  RedisHost:
+    NoEcho: 'true'
+    Description: Redis Host
     Type: String
-    MinLength: "1"
-    MaxLength: "16"
-    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DatabasePassword:
-    NoEcho: "true"
-    Description: Password for Postgres database access
+  RedisPort:
+    NoEcho: 'true'
+    Description: Redis Port
     Type: String
-    MinLength: "8"
-    MaxLength: "41"
-    AllowedPattern: "[a-zA-Z0-9]*"
+  DatabaseHost:
+    NoEcho: 'true'
+    Description: Database Host
+    Type: String
+  DatabasePort:
+    NoEcho: 'true'
+    Description: Database Port
+    Type: String
   DatabaseDatabase:
-    NoEcho: "true"
-    Description: Database to use from the Postgres database instance
+    NoEcho: 'true'
+    Description: Database Database
+    Type: String
+  DatabaseUsername:
+    NoEcho: 'true'
+    Description: Database Username
+    Type: String
+  DatabasePassword:
+    NoEcho: 'true'
+    Description: Database Password
     Type: String
 
 Resources:
@@ -49,13 +59,18 @@ Resources:
       Name: ApiGateway
       ProtocolType: WEBSOCKET
       RouteSelectionExpression: "${request.body.action}"
-  DefaultRoute:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref ApiGateway
-      RouteKey: $default
-      AuthorizationType: NONE
-      OperationName: DefaultRoute
+
+  # DefaultRoute:
+  #   Type: AWS::ApiGatewayV2::Route
+  #   Properties:
+  #     ApiId: !Ref ApiGateway
+  #     RouteKey: $default
+  #     AuthorizationType: NONE
+  #     OperationName: DefaultRoute
+  #     Target: !Join
+  #       - "/"
+  #       - - "integrations"
+  #         - !Ref ConnectIntegration
   ConnectRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -320,6 +335,7 @@ Resources:
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
     DependsOn:
+      # - DefaultRoute
       - ConnectRoute
       - DisconnectRoute
       - UserCreateRoute
@@ -345,11 +361,8 @@ Resources:
 
   ConnectionsFunction:
     Type: AWS::Serverless::Function
-    DependsOn:
-      - Redis
-      - Database
     Properties:
-      CodeUri: packages/connections/
+      CodeUri: ../packages/connections/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
@@ -365,8 +378,8 @@ Resources:
           - !Ref VpcSecurityGroupId
       Environment:
         Variables:
-          REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
-          REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
+          REDIS_HOST: !Ref RedisHost
+          REDIS_PORT: !Ref RedisPort
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -386,11 +399,8 @@ Resources:
 
   UsersFunction:
     Type: AWS::Serverless::Function
-    DependsOn:
-      - Redis
-      - Database
     Properties:
-      CodeUri: packages/users/
+      CodeUri: ../packages/users/
       Handler: main.lambda_handler
       Runtime: python3.11
       Architectures:
@@ -406,10 +416,10 @@ Resources:
           - !Ref VpcSecurityGroupId
       Environment:
         Variables:
-          REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
-          REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
-          DATABASE_HOST: !GetAtt Database.Endpoint.Address
-          DATABASE_PORT: !GetAtt Database.Endpoint.Port
+          REDIS_HOST: !Ref RedisHost
+          REDIS_PORT: !Ref RedisPort
+          DATABASE_HOST: !Ref DatabaseHost
+          DATABASE_PORT: !Ref DatabasePort
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
@@ -424,11 +434,8 @@ Resources:
 
   ProjectsFunction:
     Type: AWS::Serverless::Function
-    DependsOn:
-      - Redis
-      - Database
     Properties:
-      CodeUri: packages/projects/
+      CodeUri: ../packages/projects/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
@@ -444,10 +451,10 @@ Resources:
           - !Ref VpcSecurityGroupId
       Environment:
         Variables:
-          REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
-          REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
-          DATABASE_HOST: !GetAtt Database.Endpoint.Address
-          DATABASE_PORT: !GetAtt Database.Endpoint.Port
+          REDIS_HOST: !Ref RedisHost
+          REDIS_PORT: !Ref RedisPort
+          DATABASE_HOST: !Ref DatabaseHost
+          DATABASE_PORT: !Ref DatabasePort
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
@@ -470,11 +477,8 @@ Resources:
 
   DataFunction:
     Type: AWS::Serverless::Function
-    DependsOn:
-      - Redis
-      - Database
     Properties:
-      CodeUri: packages/data/
+      CodeUri: ../packages/data/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
@@ -490,10 +494,10 @@ Resources:
           - !Ref VpcSecurityGroupId
       Environment:
         Variables:
-          REDIS_HOST: !GetAtt Redis.RedisEndpoint.Address
-          REDIS_PORT: !GetAtt Redis.RedisEndpoint.Port
-          DATABASE_HOST: !GetAtt Database.Endpoint.Address
-          DATABASE_PORT: !GetAtt Database.Endpoint.Port
+          REDIS_HOST: !Ref RedisHost
+          REDIS_PORT: !Ref RedisPort
+          DATABASE_HOST: !Ref DatabaseHost
+          DATABASE_PORT: !Ref DatabasePort
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
@@ -513,75 +517,6 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref DataFunction
       Principal: apigateway.amazonaws.com
-
-  DatabaseSubnetGroup:
-    Type: AWS::RDS::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: PCD Database subnet group
-      SubnetIds:
-        - !Ref VpcSubnetId1
-        - !Ref VpcSubnetId2
-  DatabaseSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: PCD Database security group
-      VpcId: !Ref VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          SourceSecurityGroupId: !Ref VpcSecurityGroupId
-  Database:
-    Type: AWS::RDS::DBInstance
-    DependsOn:
-      - DatabaseSubnetGroup
-      - DatabaseSecurityGroup
-    Properties:
-      DBInstanceIdentifier: PCD-homework-2
-      DBName: PCDHomework2
-      DBInstanceClass: db.t3.micro
-      AllocatedStorage: "20"
-      Engine: postgres
-      EngineVersion: "16.1"
-      MasterUsername: !Ref DatabaseUsername
-      MasterUserPassword: !Ref DatabasePassword
-      DBSubnetGroupName: !Ref DatabaseSubnetGroup
-      VPCSecurityGroups:
-        - !GetAtt
-          - DatabaseSecurityGroup
-          - GroupId
-
-  RedisSubnetGroup:
-    Type: AWS::ElastiCache::SubnetGroup
-    Properties:
-      Description: PCD Redis subnet group
-      SubnetIds:
-        - !Ref VpcSubnetId1
-        - !Ref VpcSubnetId2
-  RedisSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: PCD Redis security group
-      VpcId: !Ref VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 6379
-          ToPort: 6379
-          SourceSecurityGroupId: !Ref VpcSecurityGroupId
-  Redis:
-    Type: AWS::ElastiCache::CacheCluster
-    DependsOn:
-      - RedisSubnetGroup
-      - RedisSecurityGroup
-    Properties:
-      Engine: redis
-      CacheNodeType: cache.t2.micro
-      NumCacheNodes: 1
-      CacheSubnetGroupName: !Ref RedisSubnetGroup
-      VpcSecurityGroupIds:
-        - !GetAtt
-          - RedisSecurityGroup
-          - GroupId
 
 Outputs:
   WebEndpoint:
