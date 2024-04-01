@@ -1,18 +1,18 @@
-import { BaseRoute } from '../../utils/route'
-import { BaseService } from '../../utils/service'
-import { makeResponse } from '../../utils/response'
+import { BaseRoute } from '../utils/route'
+import { BaseService } from '../utils/service'
+import { makeResponse } from '../utils/response'
 
 type Input = {
     connectionId: string
 }
 
-interface GetAllProjectsRoute extends BaseRoute<Input, any> { }
+interface GetAllRoute extends BaseRoute<Input, any> { }
 
 type Self = {
     service: BaseService<Input, any>
 }
 
-export const makeGetAllProjectsRoute = (service: BaseService<Input, any>): GetAllProjectsRoute => {
+export const makeGetAllRoute = (service: BaseService<Input, any>): GetAllRoute => {
     const self: Self = {
         service
     }
@@ -22,7 +22,7 @@ export const makeGetAllProjectsRoute = (service: BaseService<Input, any>): GetAl
     }
 }
 
-const call = (self: Self): GetAllProjectsRoute['call'] => async (request) => {
+const call = (self: Self): GetAllRoute['call'] => async (request) => {
     const connectionId = request.connectionId
 
     const response = await self.service.call({ connectionId })

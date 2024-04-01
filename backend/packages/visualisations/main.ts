@@ -44,9 +44,9 @@ export const handler = async (event: any, _context: any) => {
     const createRoute = makeCreateRoute(createService)
 
     const router = makeRouter(logger)
-    router.register('projects-get', getRoute)
-    router.register('projects-get-all', getAllRoute)
-    router.register('projects-create', createRoute)
+    router.register('visualisations-get', getRoute)
+    router.register('visualisations-get-all', getAllRoute)
+    router.register('visualisations-create', createRoute)
 
     const response = await router.call(event)
 

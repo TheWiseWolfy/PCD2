@@ -1,20 +1,20 @@
 
 import redis from 'redis'
 import pg from 'pg'
-import { BaseService } from '../../utils/service'
+import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
 }
 
-interface GetAllProjectsService extends BaseService<Input, any> { }
+interface GetAllService extends BaseService<Input, any> { }
 
 type Self = {
     redisClient: redis.RedisClientType
     postgresClient: pg.Pool
 }
 
-export const makeGetAllProjectsService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetAllProjectsService => {
+export const makeGetAllService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetAllService => {
     const self: Self = {
         redisClient,
         postgresClient
@@ -25,7 +25,7 @@ export const makeGetAllProjectsService = (redisClient: redis.RedisClientType, po
     }
 }
 
-const call = (self: Self): GetAllProjectsService['call'] => async (input) => {
+const call = (self: Self): GetAllService['call'] => async (input) => {
     const connectionId = input.connectionId
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)

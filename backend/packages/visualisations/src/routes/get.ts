@@ -1,6 +1,6 @@
-import { BaseRoute } from '../../utils/route'
-import { BaseService } from '../../utils/service'
-import { makeResponse } from '../../utils/response'
+import { BaseRoute } from '../utils/route'
+import { BaseService } from '../utils/service'
+import { makeResponse } from '../utils/response'
 
 type Input = {
     connectionId: string
@@ -8,13 +8,13 @@ type Input = {
     visualisationId: string
 }
 
-interface GetVisualisationsRoute extends BaseRoute<Input, any> { }
+interface GetRoute extends BaseRoute<Input, any> { }
 
 type Self = {
     service: BaseService<Input, any>
 }
 
-export const makeGetVisualisationsRoute = (service: BaseService<Input, any>): GetVisualisationsRoute => {
+export const makeGetRoute = (service: BaseService<Input, any>): GetRoute => {
     const self: Self = {
         service
     }
@@ -24,7 +24,7 @@ export const makeGetVisualisationsRoute = (service: BaseService<Input, any>): Ge
     }
 }
 
-const call = (self: Self): GetVisualisationsRoute['call'] => async (request) => {
+const call = (self: Self): GetRoute['call'] => async (request) => {
     const connectionId = request.connectionId
     const projectId = request.data.projectId
     const visualisationId = request.data.visualisationId

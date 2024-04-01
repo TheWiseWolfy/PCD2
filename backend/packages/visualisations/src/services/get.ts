@@ -1,21 +1,22 @@
 
 import redis from 'redis'
 import pg from 'pg'
-import { BaseService } from '../../utils/service'
+import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
     projectId: string
+    visualisationId: string
 }
 
-interface GetAllVisualisationsService extends BaseService<Input, any> { }
+interface GetService extends BaseService<Input, any> { }
 
 type Self = {
     redisClient: redis.RedisClientType
     postgresClient: pg.Pool
 }
 
-export const makeGetAllVisualisationsService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetAllVisualisationsService => {
+export const makeGetService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetService => {
     const self: Self = {
         redisClient,
         postgresClient
@@ -26,9 +27,10 @@ export const makeGetAllVisualisationsService = (redisClient: redis.RedisClientTy
     }
 }
 
-const call = (self: Self): GetAllVisualisationsService['call'] => async (input) => {
+const call = (self: Self): GetService['call'] => async (input) => {
     const connectionId = input.connectionId
     const projectId = input.projectId
+    const visualisationId = input.visualisationId
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)
@@ -57,10 +59,10 @@ const call = (self: Self): GetAllVisualisationsService['call'] => async (input) 
     const visualisations = await self.postgresClient.query(`
         SELECT *
         FROM visualisations v
-        WHERE v.project_id = $1
-    `, [projectId])
+        WHERE v.visualisationId = $1 AND v.project_id = $2
+    `, [visualisationId, projectId])
 
     return {
-        visualisations: visualisations?.rows
+        visualisation: visualisations?.rows?.[0] || null
     }
 }

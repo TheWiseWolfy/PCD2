@@ -2,15 +2,16 @@
 import redis from 'redis'
 import pg from 'pg'
 import aws from 'aws-sdk'
-import { BaseService } from '../../utils/service'
+import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
+    projectId: string
     name: string
     description: string
 }
 
-interface CreateProjectsService extends BaseService<Input, any> { }
+interface CreateService extends BaseService<Input, any> { }
 
 type Self = {
     callbackAPIClient: aws.ApiGatewayManagementApi
@@ -18,7 +19,7 @@ type Self = {
     postgresClient: pg.Pool
 }
 
-export const makeCreateProjectsService = (callbackAPIClient: aws.ApiGatewayManagementApi, redisClient: redis.RedisClientType, postgresClient: pg.Pool): CreateProjectsService => {
+export const makeCreateService = (callbackAPIClient: aws.ApiGatewayManagementApi, redisClient: redis.RedisClientType, postgresClient: pg.Pool): CreateService => {
     const self: Self = {
         callbackAPIClient,
         redisClient,
@@ -30,8 +31,9 @@ export const makeCreateProjectsService = (callbackAPIClient: aws.ApiGatewayManag
     }
 }
 
-const call = (self: Self): CreateProjectsService['call'] => async (input) => {
+const call = (self: Self): CreateService['call'] => async (input) => {
     const connectionId = input.connectionId
+    const projectId = input.projectId
     const name = input.name
     const description = input.description
 
@@ -48,10 +50,22 @@ const call = (self: Self): CreateProjectsService['call'] => async (input) => {
     const userId = user.user_id
 
     const projects = await self.postgresClient.query(`
-        INSERT INTO projects (user_id, name, description)
+        SELECT project_id
+        FROM projects p
+        WHERE p.project_id = $1 AND p.user_id = $2
+    `, [projectId, userId])
+
+    if (!projects.rows[0]) {
+        return {
+            reason: "Not found"
+        }
+    }
+
+    const visualisations = await self.postgresClient.query(`
+        INSERT INTO visualisations (user_id, project_id, name, description)
         VALUES ($1, $2, $3)
         RETURNING *
-    `, [userId, name, description])
+    `, [userId, projectId, name, description])
 
     const connectionIds = await self.redisClient.SMEMBERS(`users:${userId}`)
 
@@ -59,15 +73,15 @@ const call = (self: Self): CreateProjectsService['call'] => async (input) => {
         await self.callbackAPIClient.postToConnection({
             ConnectionId: connectionId,
             Data: {
-                action: "projects-create",
+                action: "visualisations-create",
                 data: {
-                    project: projects.rows[0]
+                    project: visualisations.rows[0]
                 }
             }
         }).promise()
     }
 
     return {
-        project: projects.rows[0]
+        visualisation: visualisations.rows[0]
     }
 }
