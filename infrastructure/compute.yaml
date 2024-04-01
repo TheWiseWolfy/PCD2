@@ -362,7 +362,7 @@ Resources:
   ConnectionsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../packages/connections/
+      CodeUri: ../backend/packages/connections/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
@@ -400,7 +400,7 @@ Resources:
   UsersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../packages/users/
+      CodeUri: ../backend/packages/users/
       Handler: main.lambda_handler
       Runtime: python3.11
       Architectures:
@@ -435,7 +435,7 @@ Resources:
   ProjectsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../packages/projects/
+      CodeUri: ../backend/packages/projects/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:
@@ -478,7 +478,7 @@ Resources:
   DataFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../packages/data/
+      CodeUri: ../backend/packages/data/
       Handler: main.handler
       Runtime: nodejs20.x
       Architectures:

@@ -21,35 +21,42 @@ Parameters:
     Type: String
 
 Resources:
-  RedisSubnetGroup:
+  CacheSubnetGroup:
     Type: AWS::ElastiCache::SubnetGroup
     Properties:
-      Description: PCD Redis subnet group
+      Description: PCD cache subnet group
       SubnetIds:
         - !Ref VpcSubnetId1
         - !Ref VpcSubnetId2
-  RedisSecurityGroup:
+  CacheSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: PCD Redis security group
+      GroupDescription: PCD cache security group
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 6379
           ToPort: 6379
           SourceSecurityGroupId: !Ref VpcSecurityGroupId
-  Redis:
+  Cache:
     Type: AWS::ElastiCache::CacheCluster
     DependsOn:
-      - RedisSubnetGroup
-      - RedisSecurityGroup
+      - CacheSubnetGroup
+      - CacheSecurityGroup
     Properties:
       Engine: redis
       CacheNodeType: cache.t2.micro
       NumCacheNodes: 1
-      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      CacheSubnetGroupName: !Ref CacheSubnetGroup
       VpcSecurityGroupIds:
         - !GetAtt
-          - RedisSecurityGroup
+          - CacheSecurityGroup
           - GroupId
 
+Outputs:
+  CacheHost:
+    Description: Cache host
+    Value: !GetAtt Cache.RedisEndpoint.Address
+  CachePort:
+    Description: Cache port
+    Value: !GetAtt Cache.RedisEndpoint.Port

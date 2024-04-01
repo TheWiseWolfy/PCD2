@@ -76,3 +76,11 @@ Resources:
         - !GetAtt
           - DatabaseSecurityGroup
           - GroupId
+
+Outputs:
+  DatabaseHost:
+    Description: Database host
+    Value: !GetAtt Database.Endpoint.Address
+  DatabasePort:
+    Description: Database port
+    Value: !GetAtt Database.Endpoint.Port
