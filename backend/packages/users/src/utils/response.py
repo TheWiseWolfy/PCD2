@@ -8,21 +8,25 @@ T = t.TypeVar("T")
 @dataclass
 class Response(t.Generic[T]):
     status_code: int
-    action: str
-    request_id: int
-    data: T
+    action: t.Optional[str]
+    request_id: t.Optional[int]
+    data: t.Optional[T]
 
     def to_lambda_response(self) -> dict:
-        return {
+        result = {
             "statusCode": self.status_code,
-            "body": json.dumps({
-                "action": self.action,
-                "requestId": self.request_id,
-                "data": json.dumps(self.data)
-            })
         }
 
+        if (
+            self.action is not None
+            or self.request_id is not None
+            or self.data is not None
+        ):
+            result["data"] = json.dumps(
+                {"action": self.action, "requestId": self.request_id, "data": self.data}
+            )
 
+        return result
 
     def __repr__(self) -> str:
         return json.dumps(
@@ -31,7 +35,7 @@ class Response(t.Generic[T]):
                 "data": {
                     "action": self.action,
                     "requestId": self.request_id,
-                    "data": json.dumps(self.data)
-                }
+                    "data": json.dumps(self.data),
+                },
             }
         )

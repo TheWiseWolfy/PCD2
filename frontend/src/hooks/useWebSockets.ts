@@ -183,7 +183,7 @@ const useWebSocketMessageQueue = (
                 const listener = requestListeners.current[requestId]
 
                 if (listener) {
-                    listener.resolve(JSON.parse(message.data))
+                    listener.resolve(message.data)
                 }
 
                 delete requestsCopy[requestId]
@@ -200,7 +200,7 @@ const useWebSocketMessageQueue = (
 
                 for (const message of oldMessages) {
                     if (listener) {
-                        listener(JSON.parse(message.data))
+                        listener(message.data)
                     }
                 }
 
