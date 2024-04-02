@@ -5,7 +5,7 @@ import { Statistics } from "../pages/statistics/statistics";
 import { Projects } from "../pages/projects/projects";
 import { CreateProject } from "../pages/createProject/createProject";
 import { PrivateRoutes } from "../components/router/privateRoutes";
-import { Root } from "../pages/root/root";
+import { App } from "../pages/app/app";
 
 export const router = createBrowserRouter([
     {
@@ -22,7 +22,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '/*',
-                element: <Root />
+                element: <App />
             },
             {
                 path: '/app/projects',

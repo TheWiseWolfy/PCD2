@@ -1,13 +1,7 @@
-import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-
+import { useAppPageLogic } from "./logic"
 
 export const App: React.FC = () => {
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        navigate('/app/projects')
-    }, [])
-
+    useAppPageLogic()
+    
     return <></>
 }
