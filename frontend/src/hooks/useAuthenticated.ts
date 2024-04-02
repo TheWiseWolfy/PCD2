@@ -9,7 +9,7 @@ export const useAuthenticated = () => {
     useEffect(() => {
         if (usersState.loading) {
             usersDispatch({ type: 'hydrate' })
-        } else if (!usersState.isAuthenticated) {
+        } else if (!usersState.login.isAuthenticated) {
             navigate('/')
         }
     }, [usersState])
@@ -22,7 +22,7 @@ export const useNotAuthenticated = () => {
     useEffect(() => {
         if (usersState.loading) {
             usersDispatch({ type: 'hydrate' })
-        } else if (usersState.isAuthenticated) {
+        } else if (usersState.login.isAuthenticated) {
             navigate('/')
         }
     }, [usersState])

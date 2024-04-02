@@ -4,6 +4,7 @@ interface Props {
     value: string,
     onChange: (value: string) => void
     placeholder?: string
+    invalid?: boolean
     masked?: boolean
 }
 

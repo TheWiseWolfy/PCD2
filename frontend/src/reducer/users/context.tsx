@@ -1,4 +1,4 @@
-import React, { ReducerAction, createContext } from "react";
+import React, { createContext } from "react";
 import { UsersActions, UsersState } from "./types";
 import { usersInitialState, usersReducer, usersSideEffects } from "./reducer";
 import { useReducerWithSideEffects } from "../../hooks/useReducerWithSideEffects";

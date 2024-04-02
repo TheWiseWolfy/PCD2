@@ -28,11 +28,11 @@ export const Root: React.FC = () => {
             visualisationsDispatch({ type: 'hydrate' })
         } else if (dataState.loading) {
             dataDispatch({ type: 'hydrate' })
-        } else if (!usersState.isAuthenticated) {
+        } else if (!usersState.login.isAuthenticated) {
             navigate('/login')
             // } else if (!usersState.fetching && usersState.tokens?.auth) {
             //     usersDispatch({ type: 'login', credentials: { auth: usersState.tokens.auth } })
-        } else if (usersState.isAuthenticated) {
+        } else if (usersState.login.isAuthenticated) {
             navigate('/app')
         }
     }, [netState, usersState, projectsState, visualisationsState, dataState])

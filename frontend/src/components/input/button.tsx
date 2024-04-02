@@ -9,7 +9,12 @@ interface Props {
 
 export const Button: React.FC<Props> = ({ onClick, disabled, children }) => {
     const onClickInterceptor = (event: MouseEvent) => {
-        onClick?.()
+        if (!onClick) {
+            return
+        }
+
+        event.preventDefault()
+        onClick()
     }
 
     return (

@@ -8,19 +8,20 @@ import { Spin } from "../../components/animate/spin"
 import { Form } from "../../components/input/form"
 import { List } from "../../components/list/list"
 import { Spacing } from "../../components/spacing/spacing"
-import { useLoginLogic } from "./logic"
+import { useCreateUserLogic } from "./logic"
 
-export const Login: React.FC = () => {
-    const logic = useLoginLogic()
+export const CreateUser: React.FC = () => {
+    const logic = useCreateUserLogic()
 
     return (
         <Page centered={true}>
             <Card>
                 <Form onSubmit={logic.onSubmit}>
-                    <H1>Login</H1>
+                    <H1>Create user</H1>
                     <List>
-                        <TextField value={logic.email} onChange={logic.setEmail} placeholder="Email" />
-                        <TextField value={logic.password} onChange={logic.setPassword} placeholder="Password" masked />
+                        <TextField value={logic.name} onChange={logic.setName} placeholder="Name" invalid={!logic.nameValid} />
+                        <TextField value={logic.email} onChange={logic.setEmail} placeholder="Email" invalid={!logic.emailValid} />
+                        <TextField value={logic.password} onChange={logic.setPassword} placeholder="Password" invalid={!logic.passwordValid} masked />
                     </List>
                     <Spacing spacing="m" />
                     <Button disabled={logic.disabled}>
@@ -32,11 +33,12 @@ export const Login: React.FC = () => {
                         }
                     </Button>
                     <Spacing spacing="xs" />
-                    <Button onClick={logic.onGoToCreateUserClick}>
-                        Create user
+                    <Button onClick={logic.onGoToLoginClick}>
+                        Go back
                     </Button>
                 </Form>
             </Card>
         </Page>
     )
 }
+

@@ -6,11 +6,16 @@
 }
 
 .text-field {
+    width: 100%;
     padding: 1rem;
     border: 1px solid var(--light-color);
     border-radius: calc(var(--m-border-radius) / 2);
     background: var(--lighter-color);
     color: var(--dark-color);
+}
+
+.text-field-invalid {
+    background: var(--negative-color);
 }
 
 .button {
