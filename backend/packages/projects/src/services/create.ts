@@ -56,14 +56,18 @@ const call = (self: Self): CreateService['call'] => async (input) => {
     const connectionIds = await self.redisClient.SMEMBERS(`users:${userId}`)
 
     for await (const connectionId of connectionIds) {
+        if (connection === input.connectionId) {
+            continue
+        }
+
         await self.callbackAPIClient.postToConnection({
             ConnectionId: connectionId,
-            Data: {
+            Data: JSON.stringify({
                 action: "projects-create",
                 data: {
                     project: projects.rows[0]
                 }
-            }
+            })
         }).promise()
     }
 
