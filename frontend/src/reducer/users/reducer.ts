@@ -11,12 +11,12 @@ export const usersInitialState: UsersState = ({
         error: null,
         isAuthenticated: false,
         tokens: null,
-        user: null
+        data: null
     },
     createUser: {
         fetching: false,
         error: null,
-        user: null
+        data: null
     }
 })
 
@@ -24,15 +24,15 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
     switch (action.type) {
         case 'hydrate-successful':
             return {
-                ...action.state,
+                ...action.data,
                 loading: false,
                 login: {
-                    ...action.state.login,
+                    ...action.data.login,
                     error: null,
                     fetching: false
                 },
                 createUser: {
-                    ...action.state.createUser,
+                    ...action.data.createUser,
                     error: null,
                     fetching: false
                 }
@@ -69,7 +69,7 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
                     error: null,
                     isAuthenticated: true,
                     tokens: action.tokens,
-                    user: action.user
+                    data: action.data
                 }
             }
         case 'login-failed':
@@ -78,10 +78,10 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
                 login: {
                     ...state.login,
                     fetching: false,
-                    error: action.error,
+                    error: action.data,
                     isAuthenticated: false,
                     tokens: null,
-                    user: null
+                    data: null
                 }
             }
         case 'create-user':
@@ -99,7 +99,7 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
                     ...state.createUser,
                     fetching: false,
                     error: null,
-                    user: action.user
+                    data: action.data
                 }
             }
         case 'create-user-failed':
@@ -108,8 +108,8 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
                 createUser: {
                     ...state.createUser,
                     fetching: false,
-                    error: action.error,
-                    user: null
+                    error: action.data,
+                    data: null
                 }
             }
         default:
@@ -147,7 +147,7 @@ const hydrate: ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersH
         const state = JSON.parse(rawState)
         delete state.isAuthenticated
 
-        dispatch({ type: 'hydrate-successful', state: state })
+        dispatch({ type: 'hydrate-successful', data: state })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }
@@ -157,15 +157,15 @@ const login =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersLoginAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ user: User, tokens: Tokens } | UsersError>('users-login', action.credentials)
+                const result = await websocket.request<{ user: User, tokens: Tokens } | UsersError>('users-login', action.data)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'login-failed', error: result.reason })
+                    return dispatch({ type: 'login-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'login-success', user: result.user, tokens: result.tokens })
+                dispatch({ type: 'login-success', data: result.user, tokens: result.tokens })
             } catch (error) {
-                dispatch({ type: 'login-failed', error: (error as Error).message })
+                dispatch({ type: 'login-failed', data: (error as Error).message })
             }
         }
 
@@ -176,7 +176,7 @@ const loginSuccessful: ReducerSideEffect<React.Reducer<UsersState, UsersActions>
         JSON.stringify({
             ...state,
             isAuthenticated: true,
-            user: action.user,
+            user: action.data,
             tokens: action.tokens
         })
     )
@@ -186,15 +186,15 @@ const createUser =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersCreateUserAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ user: User, tokens: Tokens } | UsersError>('users-create', action.user)
+                const result = await websocket.request<{ user: User, tokens: Tokens } | UsersError>('users-create', action.data)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'create-user-failed', error: result.reason })
+                    return dispatch({ type: 'create-user-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'create-user-success', user: result.user })
+                dispatch({ type: 'create-user-success', data: result.user })
             } catch (error) {
-                dispatch({ type: 'create-user-failed', error: (error as Error).message })
+                dispatch({ type: 'create-user-failed', data: (error as Error).message })
             }
         }
 

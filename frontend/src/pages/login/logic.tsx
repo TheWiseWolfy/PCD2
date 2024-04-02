@@ -15,7 +15,7 @@ export const useLoginLogic = () => {
     const navigate = useNavigate();
 
     const onSubmit = () => {
-        usersDispatch({ type: 'login', credentials: { email, password } });
+        usersDispatch({ type: 'login', data: { email, password } });
         setPageState(PageState.Fetching);
     };
 
@@ -35,7 +35,7 @@ export const useLoginLogic = () => {
                 setDisabled(false);
                 notificationsDispatch({
                     type: 'notifications-add',
-                    notification: {
+                    data: {
                         type: 'negative',
                         title: 'Login error',
                         description: usersState.login.error || ''
@@ -46,7 +46,7 @@ export const useLoginLogic = () => {
                 setDisabled(false);
                 notificationsDispatch({
                     type: 'notifications-add',
-                    notification: {
+                    data: {
                         type: 'positive',
                         title: 'Login succeeded',
                         description: 'Redirecting...'
@@ -63,7 +63,7 @@ export const useLoginLogic = () => {
         if (pageState !== PageState.Initial) {
             if (!usersState.login.fetching && usersState.login.error) {
                 setPageState(PageState.Failed);
-            } else if (!usersState.login.fetching && !usersState.login.error && usersState.login.user) {
+            } else if (!usersState.login.fetching && !usersState.login.error && usersState.login.data) {
                 setPageState(PageState.Successful);
             }
         }

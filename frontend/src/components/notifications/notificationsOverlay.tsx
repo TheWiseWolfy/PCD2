@@ -7,7 +7,7 @@ export const NotificationsOverlay: FC = () => {
     const [notificationsState, notificationsDispatch] = useContext(NotificationsContext)
 
     const remove = (id: string) => () => {
-        notificationsDispatch({ type: 'notifications-remove', notification: { id } })
+        notificationsDispatch({ type: 'notifications-remove', data: { id } })
     }
 
     return (

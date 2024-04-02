@@ -1,7 +1,42 @@
 .card {
     display: flex;
     padding: 2rem;
-    box-shadow: var(--xs-shadow);
+}
+
+.card-border {
     border-radius: var(--m-border-radius);
+}
+
+.card-shadow {
+    box-shadow: var(--xs-shadow);
+}
+
+.card-centered {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-column {
     flex-direction: column;
+}
+
+.card-row {
+    flex-direction: row;
+}
+
+.card-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    gap: var(--xl-size);
+    padding: var(--xl-size);
+    overflow: scroll;
+}
+
+.card-list-column {
+    flex-direction: column;
+}
+
+.card-list-row {
+    flex-direction: row;
 }

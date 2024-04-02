@@ -12,41 +12,42 @@ import { Project } from "../../reducer/projects/types"
 import { DataContext } from "../../reducer/data/context"
 
 export const Statistics: React.FC = () => {
-    const [projectsState, dispatchProjects] = useContext(ProjectsContext)
-    const [dataState, dispatchData] = useContext(DataContext)
-    const { projectId } = useParams<{ projectId: string }>();
-    const [project, setProject] = useState<Project>()
-    const navigation = useNavigate()
+    // const [projectsState, dispatchProjects] = useContext(ProjectsContext)
+    // const [dataState, dispatchData] = useContext(DataContext)
+    // const { projectId } = useParams<{ projectId: string }>();
+    // const [project, setProject] = useState<Project>()
+    // const navigation = useNavigate()
 
-    useEffect(() => {
-        const project = projectsState.projects.find(item => item.project_id === projectId)
+    // useEffect(() => {
+    //     const project = projectsState.getProjects.find(item => item.project_id === projectId)
 
-        if (project) {
-            setProject(project)
-        } else {
-            navigation('/projects')
-        }
-    }, [])
+    //     if (project) {
+    //         setProject(project)
+    //     } else {
+    //         navigation('/projects')
+    //     }
+    // }, [])
 
-    useEffect(() => {
-        if (project && dataState.initial) {
-            dispatchData({ type: 'data-get', data: { projectId: project.project_id } })
-        }
-    }, [project])
+    // useEffect(() => {
+    //     if (project && dataState.initial) {
+    //         dispatchData({ type: 'data-get', data: { projectId: project.project_id } })
+    //     }
+    // }, [project])
 
-    return (
-        <Page centered={true}>
-            <Card>
-                <H1>{project?.name}</H1>
-                {dataState.data.map((project: any) => (
-                    <Div>
-                        <ProjectStatistics
-                            timestamp={project.timestamp}
-                            value={project.value}
-                        />
-                    </Div>
-                ))}
-            </Card>
-        </Page>
-    )
+    // return (
+    //     <Page centered={true}>
+    //         <Card>
+    //             <H1>{project?.name}</H1>
+    //             {dataState.data.map((project: any) => (
+    //                 <Div>
+    //                     <ProjectStatistics
+    //                         timestamp={project.timestamp}
+    //                         value={project.value}
+    //                     />
+    //                 </Div>
+    //             ))}
+    //         </Card>
+    //     </Page>
+    // )
+    return <></>
 }

@@ -19,6 +19,8 @@ export const Root: React.FC = () => {
     const [dataState, dataDispatch] = useContext(DataContext)
 
     useEffect(() => {
+        navigate('/app')
+
         if (!netState.connected) {
         } else if (usersState.loading) {
             usersDispatch({ type: 'hydrate' })

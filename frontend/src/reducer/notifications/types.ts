@@ -11,6 +11,8 @@ export type NotificationsState = {
     notifications: Notification[]
 }
 
-export type NotificationsAddAction = { type: 'notifications-add', notification: Omit<Notification, 'id'> }
-export type NotificationsRemoveAction = { type: 'notifications-remove', notification: { id: string } }
-export type NotificationsActions = NotificationsAddAction | NotificationsRemoveAction
+export type NotificationsAddAction = { type: 'notifications-add', data: Omit<Notification, 'id'> }
+export type NotificationsRemoveAction = { type: 'notifications-remove', data: { id: string } }
+export type NotificationsActions =
+    | NotificationsAddAction
+    | NotificationsRemoveAction

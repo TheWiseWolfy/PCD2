@@ -1,10 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Root } from '../pages/root/root'
 import { Login } from "../pages/login/login";
-import { CreateUser } from "../pages/createUser/createUser";
+import { Register } from "../pages/register/register";
 import { App } from "../pages/app/app";
 import { Statistics } from "../pages/statistics/statistics";
 import { Projects } from "../pages/projects/projects";
+import { CreateProject } from "../pages/createProject/createProject";
 
 export const router = createBrowserRouter([
     {
@@ -16,19 +17,23 @@ export const router = createBrowserRouter([
         element: <Login />
     },
     {
-        path: '/create-user',
-        element: <CreateUser />
+        path: '/register',
+        element: <Register />
     },
     {
         path: '/app',
         element: <App />
     },
     {
-        path: '/projects',
+        path: '/app/projects',
         element: <Projects />
     },
     {
-        path: '/projects/:projectId/statistics',
+        path: '/app/projects/create',
+        element: <CreateProject />
+    },
+    {
+        path: '/app/projects/:projectId/visualisations/statistics',
         element: <Statistics />
     }
 ])

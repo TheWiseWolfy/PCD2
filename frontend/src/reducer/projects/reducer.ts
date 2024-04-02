@@ -1,77 +1,155 @@
 import React from 'react'
-import { ProjectsActions, ProjectsError, ProjectsHydrateAction, ProjectsState, Project, ProjectsGetAction, ProjectsGetAllAction } from './types'
+import { ProjectsActions, ProjectsError, ProjectsHydrateAction, ProjectsState, Project, ProjectsGetAction, ProjectsGetAllAction, ProjectsCreateAction } from './types'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
 
 export const projectsInitialState: ProjectsState = ({
     loading: true,
-    initial: true,
-    fetching: false,
-    error: null,
-    projects: []
+    getProjects: {
+        fetching: false,
+        error: null,
+        data: []
+    },
+    getProject: {
+        fetching: false,
+        error: null,
+        data: null
+    },
+    createProject: {
+        fetching: false,
+        error: null,
+        data: null
+    }
 })
 
 export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (state, action) => {
     switch (action.type) {
         case 'hydrate-successful':
             return {
-                ...action.state,
+                ...action.data,
                 loading: false,
-                fetching: false
+                getProjects: {
+                    ...action.data.getProjects,
+                    error: null,
+                    fetching: false
+                },
+                getProject: {
+                    ...action.data.getProject,
+                    error: null,
+                    fetching: false
+                }
             }
         case 'hydrate-failed':
             return {
                 ...state,
                 loading: false,
-                fetching: false
+                getProjects: {
+                    ...state.getProjects,
+                    error: null,
+                    fetching: false
+                },
+                getProject: {
+                    ...state.getProject,
+                    error: null,
+                    fetching: false
+                }
             }
-        case 'projects-get-all':
+        case 'get-all-projects':
             return {
                 ...state,
-                fetching: true,
-                error: null
+                getProjects: {
+                    ...state.getProjects,
+                    fetching: true,
+                    error: null
+                }
             }
-        case 'projects-get-all-success':
+        case 'get-all-projects-success':
             return {
                 ...state,
-                initial: false,
-                fetching: false,
-                error: null,
-                projects: action.projects
+                getProjects: {
+                    ...state.getProjects,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                }
             }
-        case 'projects-get-all-failed':
+        case 'get-all-projects-failed':
             return {
                 ...state,
-                fetching: false,
-                error: action.error,
+                getProjects: {
+                    ...state.getProjects,
+                    fetching: false,
+                    error: action.data,
+                }
             }
-        case 'projects-get':
+        case 'get-project':
             return {
                 ...state,
-                fetching: true,
-                error: null
+                getProject: {
+                    ...state.getProject,
+                    fetching: true,
+                    error: null
+                }
             }
-        case 'projects-get-success': {
-            const existingProjectIndex = state.projects.findIndex(item => item.project_id === action.project.project_id)
+        case 'get-project-success': {
+            const existingProjectIndex = state.getProjects.data.findIndex(item => item.project_id === action.data.project_id)
             return {
                 ...state,
-                fetching: false,
-                error: null,
-                projects: existingProjectIndex === -1
-                    ? [action.project]
-                    : [
-                        ...state.projects.slice(0, existingProjectIndex),
-                        action.project,
-                        ...state.projects.slice(existingProjectIndex + 1)
-                    ]
+                getProjects: {
+                    ...state.getProjects,
+                    data: existingProjectIndex === -1
+                        ? [action.data]
+                        : [
+                            ...state.getProjects.data.slice(0, existingProjectIndex),
+                            action.data,
+                            ...state.getProjects.data.slice(existingProjectIndex + 1)
+                        ]
+                },
+                getProject: {
+                    ...state.getProject,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                }
             }
         }
-        case 'projects-get-failed':
+        case 'get-project-failed':
             return {
                 ...state,
-                fetching: false,
-                error: state.error
+                getProject: {
+                    ...state.getProject,
+                    fetching: false,
+                    error: action.data
+                }
+            }
+        case 'create-project':
+            return {
+                ...state,
+                createProject: {
+                    ...state.createProject,
+                    fetching: true,
+                    error: null
+                }
+            }
+        case 'create-project-success':
+            return {
+                ...state,
+                createProject: {
+                    ...state.createProject,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                }
+            }
+        case 'create-project-failed':
+            return {
+                ...state,
+                createProject: {
+                    ...state.createProject,
+                    fetching: false,
+                    error: action.data
+                }
             }
         default:
             return state
@@ -80,17 +158,20 @@ export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (s
 
 export const projectsSideEffects =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>> => {
-        const boundGet = get(websocket)
         const boundGetAll = getAll(websocket)
+        const boundGet = get(websocket)
+        const boundCreate = create(websocket)
 
         return (state, action, dispatch) => {
             switch (action.type) {
                 case 'hydrate':
                     return hydrate(state, action, dispatch)
-                case 'projects-get-all':
+                case 'get-all-projects':
                     return boundGetAll(state, action, dispatch)
-                case 'projects-get':
+                case 'get-project':
                     return boundGet(state, action, dispatch)
+                case 'create-project':
+                    return boundCreate(state, action, dispatch)
             }
         }
     }
@@ -103,7 +184,7 @@ const hydrate: ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, 
             return dispatch({ type: 'hydrate-failed' })
         }
 
-        dispatch({ type: 'hydrate-successful', state: JSON.parse(data) })
+        dispatch({ type: 'hydrate-successful', data: JSON.parse(data) })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }
@@ -117,12 +198,12 @@ const getAll =
                 const result = await websocket.request<{ projects: Project[] } | ProjectsError>('projects-get-all', undefined)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'projects-get-all-failed', error: result.reason })
+                    return dispatch({ type: 'get-all-projects-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'projects-get-all-success', projects: result.projects })
+                dispatch({ type: 'get-all-projects-success', data: result.projects })
             } catch (error) {
-                dispatch({ type: 'projects-get-all-failed', error: error as string })
+                dispatch({ type: 'get-all-projects-failed', data: error as string })
             }
         }
 
@@ -130,18 +211,30 @@ const get =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsGetAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ project: Project } | ProjectsError>('projects-get', { projectId: action.project })
+                const result = await websocket.request<{ project: Project } | ProjectsError>('projects-get', action.data)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'projects-get-failed', error: result.reason })
+                    return dispatch({ type: 'get-project-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'projects-get-success', project: result.project })
+                dispatch({ type: 'get-project-success', data: result.project })
             } catch (error) {
-                dispatch({ type: 'projects-get-failed', error: error as string })
+                dispatch({ type: 'get-project-failed', data: error as string })
             }
         }
 
+const create =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsCreateAction> =>
+        async (state, action, dispatch) => {
+            try {
+                const result = await websocket.request<{ project: Project } | ProjectsError>('projects-create', action.data)
 
+                if ('reason' in result) {
+                    return dispatch({ type: 'get-project-failed', data: result.reason })
+                }
 
-
+                dispatch({ type: 'get-project-success', data: result.project })
+            } catch (error) {
+                dispatch({ type: 'get-project-failed', data: error as string })
+            }
+        }

@@ -5,7 +5,7 @@ import { useNotAuthenticated } from "../../hooks/useAuthenticated";
 import { useNavigate } from "react-router-dom";
 import { PageState } from "../../common/page/types";
 
-export const useCreateUserLogic = () => {
+export const useRegisterLogic = () => {
     const [usersState, usersDispatch] = useContext(UsersContext);
     const [, notificationsDispatch] = useContext(NotificationsContext);
     const [pageState, setPageState] = useState<PageState>(PageState.Initial)
@@ -19,7 +19,7 @@ export const useCreateUserLogic = () => {
     const navigate = useNavigate();
 
     const onSubmit = () => {
-        usersDispatch({ type: 'create-user', user: { email, name, password } });
+        usersDispatch({ type: 'create-user', data: { email, name, password } });
         setPageState(PageState.Fetching)
     };
 
@@ -30,9 +30,9 @@ export const useCreateUserLogic = () => {
     useNotAuthenticated();
 
     useEffect(() => {
-        setNameValid(name.length > 0);
-        setEmailValid(/.+?@.+?\..+?/.test(email));
-        setPasswordValid(password.length > 7);
+        setNameValid(name.length > 0 && name.length < 65);
+        setEmailValid(/.+?@.+?\..+?/.test(email) && email.length < 65);
+        setPasswordValid(password.length > 7 && password.length < 65);
     }, [email, name, password]);
 
     useEffect(() => {
@@ -45,7 +45,7 @@ export const useCreateUserLogic = () => {
                 setDisabled(false)
                 notificationsDispatch({
                     type: 'notifications-add',
-                    notification: {
+                    data: {
                         type: 'negative',
                         title: 'User creation error',
                         description: usersState.createUser.error || ''
@@ -56,7 +56,7 @@ export const useCreateUserLogic = () => {
                 setDisabled(false)
                 notificationsDispatch({
                     type: 'notifications-add',
-                    notification: {
+                    data: {
                         type: 'positive',
                         title: 'User creation succeeded',
                         description: 'Navigating back to login page'
@@ -73,7 +73,7 @@ export const useCreateUserLogic = () => {
         if (pageState !== PageState.Initial) {
             if (!usersState.createUser.fetching && usersState.createUser.error) {
                 setPageState(PageState.Failed);
-            } else if (!usersState.createUser.fetching && !usersState.createUser.error && usersState.createUser.user) {
+            } else if (!usersState.createUser.fetching && !usersState.createUser.error && usersState.createUser.data) {
                 setPageState(PageState.Successful);
             }
         }
@@ -87,7 +87,7 @@ export const useCreateUserLogic = () => {
         password,
         setPassword,
 
-        fetching: usersState.createUser.fetching,
+        fetching: pageState === PageState.Fetching,
         disabled,
 
         emailValid,

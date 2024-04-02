@@ -4,4 +4,6 @@ export type NetState = {
 
 export type NetConnectedAction = { type: 'net-connected' }
 export type NetDisconnectedAction = { type: 'net-disconnected' }
-export type NetActions = NetConnectedAction | NetDisconnectedAction
+export type NetActions =
+    | NetConnectedAction
+    | NetDisconnectedAction

@@ -16,7 +16,7 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
     switch (action.type) {
         case 'hydrate-successful':
             return {
-                ...action.state,
+                ...action.data,
                 loading: false,
                 fetching: false
             }
@@ -38,13 +38,13 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
                 initial: false,
                 fetching: false,
                 error: null,
-                visualisations: action.visualisations
+                visualisations: action.data
             }
         case 'visualisations-get-all-failed':
             return {
                 ...state,
                 fetching: false,
-                error: action.error,
+                error: action.data,
             }
         case 'visualisations-get':
             return {
@@ -53,16 +53,16 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
                 error: null
             }
         case 'visualisations-get-success': {
-            const existingProjectIndex = state.visualisations.findIndex(item => item.visualisation_id === action.project.visualisation_id)
+            const existingProjectIndex = state.visualisations.findIndex(item => item.visualisation_id === action.data.visualisation_id)
             return {
                 ...state,
                 fetching: false,
                 error: null,
                 visualisations: existingProjectIndex === -1
-                    ? [action.project]
+                    ? [action.data]
                     : [
                         ...state.visualisations.slice(0, existingProjectIndex),
-                        action.project,
+                        action.data,
                         ...state.visualisations.slice(existingProjectIndex + 1)
                     ]
             }
@@ -103,7 +103,7 @@ const hydrate: ReducerSideEffect<React.Reducer<VisualisationsState, Visualisatio
             return dispatch({ type: 'hydrate-failed' })
         }
 
-        dispatch({ type: 'hydrate-successful', state: JSON.parse(data) })
+        dispatch({ type: 'hydrate-successful', data: JSON.parse(data) })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }
@@ -117,12 +117,12 @@ const getAll =
                 const result = await websocket.request<{ visualisations: Visualisation[] } | VisualisationsError>('visualisations-get-all', undefined)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'visualisations-get-all-failed', error: result.reason })
+                    return dispatch({ type: 'visualisations-get-all-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'visualisations-get-all-success', visualisations: result.visualisations })
+                dispatch({ type: 'visualisations-get-all-success', data: result.visualisations })
             } catch (error) {
-                dispatch({ type: 'visualisations-get-all-failed', error: error as string })
+                dispatch({ type: 'visualisations-get-all-failed', data: error as string })
             }
         }
 
@@ -130,15 +130,15 @@ const get =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsGetAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ project: Visualisation } | VisualisationsError>('visualisations-get', { projectId: action.project })
+                const result = await websocket.request<{ project: Visualisation } | VisualisationsError>('visualisations-get', { projectId: action.data })
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'visualisations-get-failed', error: result.reason })
+                    return dispatch({ type: 'visualisations-get-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'visualisations-get-success', project: result.project })
+                dispatch({ type: 'visualisations-get-success', data: result.project })
             } catch (error) {
-                dispatch({ type: 'visualisations-get-failed', error: error as string })
+                dispatch({ type: 'visualisations-get-failed', data: error as string })
             }
         }
 

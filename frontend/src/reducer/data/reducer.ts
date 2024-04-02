@@ -16,7 +16,7 @@ export const dataReducer: React.Reducer<DataState, DataActions> = (state, action
     switch (action.type) {
         case 'hydrate-successful':
             return {
-                ...action.state,
+                ...action.data,
                 loading: false,
                 fetching: false
             }
@@ -95,7 +95,7 @@ const hydrate: ReducerSideEffect<React.Reducer<DataState, DataActions>, DataHydr
             return dispatch({ type: 'hydrate-failed' })
         }
 
-        dispatch({ type: 'hydrate-successful', state: JSON.parse(data) })
+        dispatch({ type: 'hydrate-successful', data: JSON.parse(data) })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }
@@ -108,12 +108,12 @@ const get =
                 const result = await websocket.request<{ data: Data[] } | DataError>('data-get', { projectId: action.data.projectId })
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'data-get-failed', error: result.reason })
+                    return dispatch({ type: 'data-get-failed', data: result.reason })
                 }
 
                 dispatch({ type: 'data-get-success', data: result.data })
             } catch (error) {
-                dispatch({ type: 'data-get-failed', error: error as string })
+                dispatch({ type: 'data-get-failed', data: error as string })
             }
         }
 
@@ -125,12 +125,12 @@ const create =
                 const result = await websocket.request<{ data: Data } | DataError>('data-create', action.data)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'data-create-failed', error: result.reason })
+                    return dispatch({ type: 'data-create-failed', data: result.reason })
                 }
 
                 dispatch({ type: 'data-create-success', data: result.data })
             } catch (error) {
-                dispatch({ type: 'data-create-failed', error: error as string })
+                dispatch({ type: 'data-create-failed', data: error as string })
             }
         }
 

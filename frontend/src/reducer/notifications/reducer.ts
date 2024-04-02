@@ -10,10 +10,10 @@ export const notificationsReducer: React.Reducer<NotificationsState, Notificatio
         case 'notifications-add':
             return {
                 ...state,
-                notifications: [...state.notifications, { ...action.notification, id: window.crypto.randomUUID() }]
+                notifications: [...state.notifications, { ...action.data, id: window.crypto.randomUUID() }]
             }
         case 'notifications-remove': {
-            const index = state.notifications.findIndex(item => item.id === action.notification.id)
+            const index = state.notifications.findIndex(item => item.id === action.data.id)
             return {
                 ...state,
                 notifications: index === -1 ? state.notifications : [...state.notifications.slice(0, index), ...state.notifications.slice(index + 1)]

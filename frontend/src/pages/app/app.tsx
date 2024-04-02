@@ -9,7 +9,7 @@ export const App: React.FC = () => {
     useAuthenticated()
 
     useEffect(() => {
-        navigate('/projects')
+        navigate('/app/projects')
     }, [])
 
     return <></>
