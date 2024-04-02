@@ -18,14 +18,38 @@ class LoginService(BaseService):
 
     def call(self, connection_id: str, email: str, password: str, session: str):
         if session:
-            existing_session = self._redis_client.hget("user:sessions", session)
+            return self._session_call(connection_id=connection_id, session=session)
 
-            if existing_session:
-                existing_session = json.loads(existing_session)
-                user = existing_session.get("user", {})
+        return self._email_password_call(
+            connection_id=connection_id, email=email, password=password
+        )
 
-                return {"user": user, "tokens": {"auth": session}}
+    def _session_call(self, connection_id: str, session: str):
+        existing_session = self._redis_client.hget("user:sessions", session)
 
+        if not existing_session:
+            return {"reason": "Invalid credentials"}
+
+        self._redis_client.hdel("user:sessions", session)
+
+        existing_session = json.loads(existing_session)
+        user = existing_session.get("user", {})
+        new_session = "".join(
+            random.SystemRandom().choice(string.ascii_uppercase + string.digits)
+            for _ in range(16)
+        )
+
+        self._redis_client.hset(
+            "connections", connection_id, json.dumps({"user": user})
+        )
+        self._redis_client.sadd(f"users:{user['user_id']}", connection_id)
+        self._redis_client.hset(
+            "user:sessions", new_session, json.dumps({"user": user})
+        )
+
+        return {"user": user, "tokens": {"session": new_session}}
+
+    def _email_password_call(self, connection_id: str, email: str, password: str):
         user = None
         password_hash = hashlib.sha512(password.encode("utf-8")).hexdigest()
 
