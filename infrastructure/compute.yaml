@@ -368,7 +368,7 @@ Resources:
       Architectures:
         - arm64
       MemorySize: 128
-      Timeout: 100
+      Timeout: 10
       Description: Handles connections
       VpcConfig:
         SubnetIds:
@@ -386,8 +386,13 @@ Resources:
         Minify: true
         Target: es2020
         Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
         EntryPoints:
           - main.ts
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
   ConnectionsFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -406,7 +411,7 @@ Resources:
       Architectures:
         - arm64
       MemorySize: 256
-      Timeout: 100
+      Timeout: 10
       Description: Handles users
       VpcConfig:
         SubnetIds:
@@ -441,7 +446,7 @@ Resources:
       Architectures:
         - arm64
       MemorySize: 256
-      Timeout: 100
+      Timeout: 10
       Description: Handles projects
       VpcConfig:
         SubnetIds:
@@ -464,8 +469,13 @@ Resources:
         Minify: true
         Target: es2020
         Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
         EntryPoints:
           - main.ts
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
   ProjectsFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -484,7 +494,7 @@ Resources:
       Architectures:
         - arm64
       MemorySize: 256
-      Timeout: 100
+      Timeout: 10
       Description: Handles visualisations
       VpcConfig:
         SubnetIds:
@@ -507,8 +517,13 @@ Resources:
         Minify: true
         Target: es2020
         Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
         EntryPoints:
           - main.ts
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
   VisualisationsFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -527,7 +542,7 @@ Resources:
       Architectures:
         - arm64
       MemorySize: 512
-      Timeout: 100
+      Timeout: 10
       Description: Handles data
       VpcConfig:
         SubnetIds:
@@ -550,8 +565,13 @@ Resources:
         Minify: true
         Target: es2020
         Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
         EntryPoints:
           - main.ts
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
   DataFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
