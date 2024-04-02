@@ -8,7 +8,7 @@
 .text-field {
     padding: 1rem;
     border: 1px solid var(--light-color);
-    border-radius: calc(var(--default-border-radius) / 2);
+    border-radius: calc(var(--m-border-radius) / 2);
     background: var(--lighter-color);
     color: var(--dark-color);
 }
@@ -16,10 +16,14 @@
 .button {
     padding: 1rem;
     border: 1px solid var(--light-color);
-    border-radius: calc(var(--default-border-radius) / 2);
+    border-radius: calc(var(--m-border-radius) / 2);
     background: var(--lighter-color);
-    color: var(--black-color);
+    color: var(--dark-color);
     width: 100%;
+}
+
+.button:active:not(:disabled) {
+    background: var(--medium-color);
 }
 
 .button:disabled {

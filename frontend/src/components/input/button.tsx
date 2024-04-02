@@ -2,14 +2,14 @@ import { MouseEvent } from 'react'
 import './input.css'
 
 interface Props {
-    onClick: () => void
+    onClick?: () => void
     disabled?: boolean
     children?: string | React.ReactNode
 }
 
 export const Button: React.FC<Props> = ({ onClick, disabled, children }) => {
     const onClickInterceptor = (event: MouseEvent) => {
-        onClick()
+        onClick?.()
     }
 
     return (

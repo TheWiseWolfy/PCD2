@@ -15,7 +15,6 @@ export const List: FC<Props> = ({ children }) => {
     return <>
         {
             children.map((child, index) => {
-                console.log({ child, index })
                 let type: ListItemType = 'first'
 
                 if (index === children.length - 1 && children.length === 2) {
@@ -26,7 +25,7 @@ export const List: FC<Props> = ({ children }) => {
                     type = 'middle'
                 }
 
-                return <ListItem key={window.crypto.randomUUID()} type={type}>{child}</ListItem>
+                return <ListItem key={index} type={type}>{child}</ListItem>
             })
         }
     </>
