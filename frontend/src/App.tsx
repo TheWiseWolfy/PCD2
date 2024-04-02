@@ -10,6 +10,7 @@ import { DataContextProvider } from './reducer/data/context';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router/router';
 import { Notifications } from './components/notifications/notifications';
+import { Root } from './pages/root/root';
 
 export const App = () => {
   const websocket = useWebSockets('wss://2n8nbnrly9.execute-api.eu-central-1.amazonaws.com/Production')

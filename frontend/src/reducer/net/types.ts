@@ -1,5 +1,5 @@
 export type NetState = {
-    connected: boolean
+    connected: undefined | boolean
 }
 
 export type NetConnectedAction = { type: 'net-connected' }

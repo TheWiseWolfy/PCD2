@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuthenticated } from "../../hooks/useAuthenticated"
 import { ProjectsContext } from "../../reducer/projects/context"
-import { PageState } from "../../common/page/types"
+import { PageState } from "../../components/page/types"
 
 export const useCreateProjectPageLogic = () => {
     const [projectsState, projectsDispatch] = useContext(ProjectsContext)
@@ -23,8 +22,6 @@ export const useCreateProjectPageLogic = () => {
         navigate(`/app/projects`)
     }
     
-    useAuthenticated()
-
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);
         setDescriptionValid(description.length < 257);

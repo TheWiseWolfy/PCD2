@@ -104,8 +104,6 @@ const useWebsocketManager = (
             socket.current.addEventListener('close', handleClose)
             socket.current.addEventListener('error', handleError)
             socket.current.addEventListener('message', handleMessage);
-
-            setConnected(true)
         },
         []
     )
@@ -161,8 +159,6 @@ const useWebsocketManager = (
         socket.current.addEventListener('close', handleClose)
         socket.current.addEventListener('error', handleError)
         socket.current.addEventListener('message', handleMessage)
-
-        setConnected(true)
     }, [])
 }
 

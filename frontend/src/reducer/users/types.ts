@@ -6,7 +6,7 @@ export type User = {
 }
 
 export type Tokens = {
-    auth: string
+    session: string
 }
 
 export type UsersError = {
@@ -18,9 +18,11 @@ export type UsersState = {
     login: {
         fetching: boolean
         error: null | string
-        isAuthenticated: boolean
-        tokens: null | Tokens
-        data: null | User
+        data: {
+            isAuthenticated: boolean
+            user: null | User
+            tokens: null | Tokens
+        }
     }
     createUser: {
         fetching: boolean
@@ -32,9 +34,9 @@ export type UsersState = {
 export type UsersHydrateAction = { type: 'hydrate' }
 export type UsersHydrateSuccessfulAction = { type: 'hydrate-successful', data: UsersState }
 export type UsersHydrateFailedAction = { type: 'hydrate-failed' }
-export type UsersLoginAction = { type: 'login', data: { email: string, password: string } | { auth: string } }
+export type UsersLoginAction = { type: 'login', data: { email: string, password: string } | { session: string } }
 export type UsersLoginResetAction = { type: 'login-reset' }
-export type UsersLoginSuccessAction = { type: 'login-success', data: User, tokens: Tokens }
+export type UsersLoginSuccessAction = { type: 'login-success', data: { user: User, tokens: Tokens } }
 export type UsersLoginFailedAction = { type: 'login-failed', data: string }
 export type UsersCreateUserAction = { type: 'create-user', data: { name: string, email: string, password: string } }
 export type UsersCreateUserResetAction = { type: 'create-user-reset' }

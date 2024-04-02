@@ -2,8 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UsersContext } from "../../reducer/users/context";
 import { NotificationsContext } from "../../reducer/notifications/context";
-import { useNotAuthenticated } from "../../hooks/useAuthenticated";
-import { PageState } from "../../common/page/types";
+import { PageState } from "../../components/page/types";
 
 export const useLoginLogic = () => {
     const [usersState, usersDispatch] = useContext(UsersContext);
@@ -20,10 +19,8 @@ export const useLoginLogic = () => {
     };
 
     const onGoToCreateUserClick = () => {
-        navigate('/create-user');
+        navigate('/register');
     };
-
-    useNotAuthenticated();
 
     useEffect(() => {
         switch (pageState) {
@@ -74,8 +71,10 @@ export const useLoginLogic = () => {
         setEmail,
         password,
         setPassword,
-        fetching: usersState.login.fetching,
+
+        fetching: pageState === PageState.Fetching,
         disabled,
+
         onSubmit,
         onGoToCreateUserClick
     };

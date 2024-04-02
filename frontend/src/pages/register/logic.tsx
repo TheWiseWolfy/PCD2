@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { UsersContext } from "../../reducer/users/context";
 import { NotificationsContext } from "../../reducer/notifications/context";
-import { useNotAuthenticated } from "../../hooks/useAuthenticated";
 import { useNavigate } from "react-router-dom";
-import { PageState } from "../../common/page/types";
+import { PageState } from "../../components/page/types";
 
 export const useRegisterLogic = () => {
     const [usersState, usersDispatch] = useContext(UsersContext);
@@ -26,8 +25,6 @@ export const useRegisterLogic = () => {
     const onGoToLoginClick = () => {
         navigate('/login');
     };
-
-    useNotAuthenticated();
 
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);

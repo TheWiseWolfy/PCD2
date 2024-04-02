@@ -9,9 +9,11 @@ export const usersInitialState: UsersState = ({
     login: {
         fetching: false,
         error: null,
-        isAuthenticated: false,
-        tokens: null,
-        data: null
+        data: {
+            isAuthenticated: false,
+            user: null,
+            tokens: null
+        }
     },
     createUser: {
         fetching: false,
@@ -67,9 +69,12 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
                     ...state.login,
                     fetching: false,
                     error: null,
-                    isAuthenticated: true,
-                    tokens: action.tokens,
-                    data: action.data
+                    data: {
+                        ...state.login.data,
+                        isAuthenticated: true,
+                        tokens: action.data.tokens,
+                        data: action.data.user
+                    }
                 }
             }
         case 'login-failed':
@@ -79,9 +84,12 @@ export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, act
                     ...state.login,
                     fetching: false,
                     error: action.data,
-                    isAuthenticated: false,
-                    tokens: null,
-                    data: null
+                    data: {
+                        ...state.login.data,
+                        isAuthenticated: false,
+                        tokens: null,
+                        data: null
+                    }
                 }
             }
         case 'create-user':
@@ -163,7 +171,7 @@ const login =
                     return dispatch({ type: 'login-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'login-success', data: result.user, tokens: result.tokens })
+                dispatch({ type: 'login-success', data: { user: result.user, tokens: result.tokens } })
             } catch (error) {
                 dispatch({ type: 'login-failed', data: (error as Error).message })
             }
@@ -171,14 +179,22 @@ const login =
 
 
 const loginSuccessful: ReducerSideEffect<React.Reducer<UsersState, UsersActions>, UsersLoginSuccessAction> = async (state, action, dispatch) => {
+    const updatedUserState: UsersState = {
+        ...state,
+        login: {
+            fetching: false,
+            error: null,
+            data: {
+                isAuthenticated: false,
+                user: action.data.user,
+                tokens: action.data.tokens,
+            }
+        }
+    }
+
     localStorage.setItem(
         'auth-reducer',
-        JSON.stringify({
-            ...state,
-            isAuthenticated: true,
-            user: action.data,
-            tokens: action.tokens
-        })
+        JSON.stringify(updatedUserState)
     )
 }
 

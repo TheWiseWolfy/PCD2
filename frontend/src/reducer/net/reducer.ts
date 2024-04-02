@@ -2,7 +2,7 @@ import React from 'react'
 import { NetActions, NetState } from './types'
 
 export const netInitialState: NetState = ({
-    connected: false
+    connected: undefined
 })
 
 export const netReducer: React.Reducer<NetState, NetActions> = (state, action) => {
