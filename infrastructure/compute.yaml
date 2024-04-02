@@ -359,6 +359,8 @@ Resources:
       DeploymentId: !Ref Deployment
       ApiId: !Ref ApiGateway
 
+
+
   ConnectionsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -380,6 +382,10 @@ Resources:
         Variables:
           REDIS_HOST: !Ref RedisHost
           REDIS_PORT: !Ref RedisPort
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonAPIGatewayInvokeFullAccess
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -428,6 +434,10 @@ Resources:
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonAPIGatewayInvokeFullAccess
   UsersFunctionPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
@@ -463,6 +473,10 @@ Resources:
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonAPIGatewayInvokeFullAccess
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -511,6 +525,10 @@ Resources:
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonAPIGatewayInvokeFullAccess
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -559,6 +577,10 @@ Resources:
           DATABASE_DATABASE: !Ref DatabaseDatabase
           DATABASE_USERNAME: !Ref DatabaseUsername
           DATABASE_PASSWORD: !Ref DatabasePassword
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonAPIGatewayInvokeFullAccess
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
