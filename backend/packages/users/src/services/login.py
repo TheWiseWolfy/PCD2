@@ -56,4 +56,4 @@ class LoginService(BaseService):
         self._redis_client.sadd(f"users:{user['user_id']}", connection_id)
         self._redis_client.hset("user:sessions", session, json.dumps({"user": user}))
 
-        return {"user": user, "tokens": {"auth": session}}
+        return {"user": user, "tokens": {"session": session}}

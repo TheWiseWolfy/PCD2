@@ -22,8 +22,13 @@ class Response(t.Generic[T]):
             or self.request_id is not None
             or self.data is not None
         ):
-            result["data"] = json.dumps(
-                {"action": self.action, "requestId": self.request_id, "data": self.data}
+            result["body"] = json.dumps(
+                {
+                    "requestId": self.request_id,
+                    "action": self.action,
+                    "data": self.data,
+                },
+                separators=(",", ":"),
             )
 
         return result
@@ -32,10 +37,11 @@ class Response(t.Generic[T]):
         return json.dumps(
             {
                 "statusCode": self.status_code,
-                "data": {
+                "body": {
                     "action": self.action,
                     "requestId": self.request_id,
                     "data": json.dumps(self.data),
                 },
-            }
+            },
+            separators=(",", ":"),
         )
