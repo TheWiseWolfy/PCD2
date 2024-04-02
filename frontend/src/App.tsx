@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import './App.css';
 import { useWebSockets } from './hooks/useWebSockets';
 import { NetContextProvider } from './reducer/net/context';
@@ -10,7 +9,6 @@ import { DataContextProvider } from './reducer/data/context';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router/router';
 import { Notifications } from './components/notifications/notifications';
-import { Root } from './pages/root/root';
 
 export const App = () => {
   const websocket = useWebSockets('wss://2n8nbnrly9.execute-api.eu-central-1.amazonaws.com/Production')
