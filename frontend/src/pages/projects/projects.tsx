@@ -28,8 +28,6 @@ export const Projects: React.FC = () => {
         }
     }, [])
 
-    console.log({ projectsState })
-
     return (
         <Page centered={true}>
             <Card>

@@ -4,16 +4,23 @@ import { UsersContext } from "../../reducer/users/context"
 import { VisualisationsContext } from "../../reducer/visualisations/context"
 import { ProjectsContext } from "../../reducer/projects/context"
 import { DataContext } from "../../reducer/data/context"
+import { Page } from "../../components/page/page"
+import { Overlay } from "../../components/overlay/overlay"
+import { Spin } from "../../components/animate/spin"
+import { Image } from "../../components/image/image"
+import { NetContext } from "../../reducer/net/context"
 
 export const Root: React.FC = () => {
     const navigate = useNavigate()
+    const [netState,] = useContext(NetContext)
     const [usersState, usersDispatch] = useContext(UsersContext)
     const [projectsState, projectsDispatch] = useContext(ProjectsContext)
     const [visualisationsState, visualisationsDispatch] = useContext(VisualisationsContext)
     const [dataState, dataDispatch] = useContext(DataContext)
 
     useEffect(() => {
-        if (usersState.loading) {
+        if (!netState.connected) {
+        } else if (usersState.loading) {
             usersDispatch({ type: 'hydrate' })
         } else if (projectsState.loading) {
             projectsDispatch({ type: 'hydrate' })
@@ -28,7 +35,15 @@ export const Root: React.FC = () => {
         } else if (usersState.isAuthenticated) {
             navigate('/app')
         }
-    }, [usersState, projectsState, visualisationsState, dataState])
+    }, [netState, usersState, projectsState, visualisationsState, dataState])
 
-    return <></>
+    return (
+        <Page centered>
+            <Overlay type="transparent">
+                <Spin>
+                    <Image id="gear" />
+                </Spin>
+            </Overlay>
+        </Page>
+    )
 }

@@ -102,7 +102,7 @@ const login =
 
                 dispatch({ type: 'login-success', user: result.user, tokens: result.tokens })
             } catch (error) {
-                dispatch({ type: 'login-failed', error: error as string })
+                dispatch({ type: 'login-failed', error: (error as Error).message })
             }
         }
 

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { Page } from "../../components/page/page"
 import { UsersContext } from "../../reducer/users/context"
+import { NotificationsContext } from "../../reducer/notifications/context"
 import { Card } from "../../components/card/card"
 import { H1 } from "../../components/typography/h1"
 import { TextField } from "../../components/input/textfield"
@@ -10,12 +11,12 @@ import { Spin } from "../../components/animate/spin"
 import { useNotAuthenticated } from "../../hooks/useAuthenticated"
 import { Form } from "../../components/input/form"
 import { useNavigate } from "react-router-dom"
-import { P } from "../../components/typography/p"
 import { List } from "../../components/list/list"
 import { Spacing } from "../../components/spacing/spacing"
 
 export const Login: React.FC = () => {
     const [usersState, usersDispatch] = useContext(UsersContext)
+    const [, notificationsDispatch] = useContext(NotificationsContext)
     const [disabled, setDisabled] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -41,6 +42,19 @@ export const Login: React.FC = () => {
         }
     }, [usersState.isAuthenticated])
 
+    useEffect(() => {
+        if (!usersState.fetching && usersState.error) {
+            notificationsDispatch({
+                type: 'notifications-add',
+                notification: {
+                    type: 'negative',
+                    title: 'Login error',
+                    description: usersState.error
+                }
+            })
+        }
+    }, [usersState.fetching, usersState.error])
+
     return (
         <Page centered={true}>
             <Card>
@@ -51,10 +65,14 @@ export const Login: React.FC = () => {
                         <TextField value={password} onChange={setPassword} placeholder="Password" masked />
                     </List>
                     <Spacing spacing="m" />
-                    <Button onClick={onSubmit} disabled={disabled}>
-                        {!usersState.fetching ? 'Submit' : <Spin><Image id="gear" /></Spin>}
+                    <Button disabled={disabled}>
+                        {!usersState.fetching
+                            ? 'Submit'
+                            : <Spin>
+                                <Image id="gear" />
+                            </Spin>
+                        }
                     </Button>
-                    {usersState.error && <P>{usersState.error}</P>}
                 </Form>
             </Card>
         </Page>
