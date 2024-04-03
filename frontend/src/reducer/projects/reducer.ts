@@ -132,9 +132,20 @@ export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (s
                     error: null
                 }
             }
-        case 'create-project-success':
+        case 'create-project-success': {
+            const existingProjectIndex = state.getProjects.data.findIndex(item => item.project_id === action.data.project_id)
             return {
                 ...state,
+                getProjects: {
+                    ...state.getProjects,
+                    data: existingProjectIndex === -1
+                        ? [action.data]
+                        : [
+                            ...state.getProjects.data.slice(0, existingProjectIndex),
+                            action.data,
+                            ...state.getProjects.data.slice(existingProjectIndex + 1)
+                        ]
+                },
                 createProject: {
                     ...state.createProject,
                     fetching: false,
@@ -142,6 +153,7 @@ export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (s
                     data: action.data
                 }
             }
+        }
         case 'create-project-failed':
             return {
                 ...state,
@@ -230,11 +242,11 @@ const create =
                 const result = await websocket.request<{ project: Project } | ProjectsError>('projects-create', action.data)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'get-project-failed', data: result.reason })
+                    return dispatch({ type: 'create-project-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'get-project-success', data: result.project })
+                dispatch({ type: 'create-project-success', data: result.project })
             } catch (error) {
-                dispatch({ type: 'get-project-failed', data: error as string })
+                dispatch({ type: 'create-project-failed', data: error as string })
             }
         }

@@ -4,6 +4,7 @@ export type Visualisation = {
     project_id: string
     name: string
     description: string
+    fn: string
 }
 
 export type VisualisationsError = {
@@ -12,21 +13,35 @@ export type VisualisationsError = {
 
 export type VisualisationsState = {
     loading: boolean
-    initial: boolean
-    fetching: boolean
-    error: null | string
-    visualisations: Visualisation[]
+    getAllVisualisations: {
+        fetching: boolean
+        error: null | string
+        data: Visualisation[]
+    }
+    getVisualisation: {
+        fetching: boolean
+        error: null | string
+        data: Visualisation | null
+    }
+    createVisualisation: {
+        fetching: boolean
+        error: null | string
+        data: Visualisation | null
+    }
 }
 
 export type VisualisationsHydrateAction = { type: 'hydrate' }
 export type VisualisationsHydrateSuccessfulAction = { type: 'hydrate-successful', data: VisualisationsState }
 export type VisualisationsHydrateFailedAction = { type: 'hydrate-failed' }
-export type VisualisationsGetAllAction = { type: 'visualisations-get-all' }
-export type VisualisationsGetAllSuccessAction = { type: 'visualisations-get-all-success', data: Visualisation[] }
-export type VisualisationsGetAllFailedAction = { type: 'visualisations-get-all-failed', data: string }
-export type VisualisationsGetAction = { type: 'visualisations-get', data: { id: string } }
-export type VisualisationsGetSuccessAction = { type: 'visualisations-get-success', data: Visualisation }
-export type VisualisationsGetFailedAction = { type: 'visualisations-get-failed', data: string }
+export type VisualisationsGetAllAction = { type: 'get-all-visualisations' }
+export type VisualisationsGetAllSuccessAction = { type: 'get-all-visualisations-success', data: Visualisation[] }
+export type VisualisationsGetAllFailedAction = { type: 'get-all-visualisations-failed', data: string }
+export type VisualisationsGetAction = { type: 'get-visualisation', data: { visualisationId: string } }
+export type VisualisationsGetSuccessAction = { type: 'get-visualisation-success', data: Visualisation }
+export type VisualisationsGetFailedAction = { type: 'get-visualisation-failed', data: string }
+export type VisualisationsCreateAction = { type: 'create-visualisation', data: { name: string, description: string, fn: string } }
+export type VisualisationsCreateSuccessAction = { type: 'create-visualisation-success', data: Visualisation }
+export type VisualisationsCreateFailedAction = { type: 'create-visualisation-failed', data: string }
 export type VisualisationsActions =
     | VisualisationsHydrateAction
     | VisualisationsHydrateSuccessfulAction
@@ -36,4 +51,7 @@ export type VisualisationsActions =
     | VisualisationsGetAllFailedAction
     | VisualisationsGetAction
     | VisualisationsGetSuccessAction
-    | VisualisationsGetFailedAction 
+    | VisualisationsGetFailedAction
+    | VisualisationsCreateAction
+    | VisualisationsCreateSuccessAction
+    | VisualisationsCreateFailedAction

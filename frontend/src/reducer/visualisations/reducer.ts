@@ -6,10 +6,21 @@ import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
 export const visualisationsInitialState: VisualisationsState = ({
     loading: true,
-    initial: true,
-    fetching: false,
-    error: null,
-    visualisations: []
+    getAllVisualisations: {
+        fetching: false,
+        error: null,
+        data: []
+    },
+    getVisualisation: {
+        fetching: false,
+        error: null,
+        data: null
+    },
+    createVisualisation: {
+        fetching: false,
+        error: null,
+        data: null
+    }
 })
 
 export const visualisationsReducer: React.Reducer<VisualisationsState, VisualisationsActions> = (state, action) => {
@@ -18,60 +29,149 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
             return {
                 ...action.data,
                 loading: false,
-                fetching: false
+                getAllVisualisations: {
+                    ...action.data.getAllVisualisations,
+                    fetching: false,
+                    error: null
+                },
+                getVisualisation: {
+                    ...action.data.getVisualisation,
+                    fetching: false,
+                    error: null
+                },
+                createVisualisation: {
+                    ...action.data.createVisualisation,
+                    fetching: false,
+                    error: null
+                }
             }
         case 'hydrate-failed':
             return {
                 ...state,
                 loading: false,
-                fetching: false
+                getAllVisualisations: {
+                    ...state.getAllVisualisations,
+                    fetching: false,
+                    error: null
+                },
+                getVisualisation: {
+                    ...state.getVisualisation,
+                    fetching: false,
+                    error: null
+                },
+                createVisualisation: {
+                    ...state.createVisualisation,
+                    fetching: false,
+                    error: null
+                }
             }
-        case 'visualisations-get-all':
+        case 'get-all-visualisations':
             return {
                 ...state,
-                fetching: true,
-                error: null
+                getAllVisualisations: {
+                    ...state.getAllVisualisations,
+                    fetching: true,
+                    error: null
+                },
             }
-        case 'visualisations-get-all-success':
+        case 'get-all-visualisations-success':
             return {
                 ...state,
-                initial: false,
-                fetching: false,
-                error: null,
-                visualisations: action.data
+                getAllVisualisations: {
+                    ...state.getAllVisualisations,
+                    fetching: false,
+                    error: null,
+                    visualisations: action.data
+                },
             }
-        case 'visualisations-get-all-failed':
+        case 'get-all-visualisations-failed':
             return {
                 ...state,
-                fetching: false,
-                error: action.data,
+                getAllVisualisations: {
+                    ...state.getAllVisualisations,
+                    fetching: false,
+                    error: action.data,
+                },
             }
-        case 'visualisations-get':
+        case 'get-visualisation':
             return {
                 ...state,
-                fetching: true,
-                error: null
+                getVisualisation: {
+                    ...state.getVisualisation,
+                    fetching: true,
+                    error: null
+                },
             }
-        case 'visualisations-get-success': {
-            const existingProjectIndex = state.visualisations.findIndex(item => item.visualisation_id === action.data.visualisation_id)
+        case 'get-visualisation-success': {
+            const existingVisualisationIndex = state.getAllVisualisations.data.findIndex(item => item.visualisation_id === action.data.visualisation_id)
             return {
                 ...state,
-                fetching: false,
-                error: null,
-                visualisations: existingProjectIndex === -1
-                    ? [action.data]
-                    : [
-                        ...state.visualisations.slice(0, existingProjectIndex),
-                        action.data,
-                        ...state.visualisations.slice(existingProjectIndex + 1)
-                    ]
+                getAllVisualisations: {
+                    ...state.getAllVisualisations,
+                    data: existingVisualisationIndex === -1
+                        ? [action.data]
+                        : [
+                            ...state.getAllVisualisations.data.slice(0, existingVisualisationIndex),
+                            action.data,
+                            ...state.getAllVisualisations.data.slice(existingVisualisationIndex + 1)
+                        ]
+                },
+                getVisualisation: {
+                    ...state.getVisualisation,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                },
             }
         }
-        case 'visualisations-get-failed':
+        case 'get-visualisation-failed':
             return {
                 ...state,
-                fetching: false,
-                error: state.error
+                getVisualisation: {
+                    ...state.getVisualisation,
+                    fetching: false,
+                    error: action.data
+                },
+            }
+        case 'create-visualisation':
+            return {
+                ...state,
+                createVisualisation: {
+                    ...state.createVisualisation,
+                    fetching: true,
+                    error: null
+                },
+            }
+        case 'create-visualisation-success': {
+            const existingVisualisationIndex = state.getAllVisualisations.data.findIndex(item => item.visualisation_id === action.data.visualisation_id)
+            return {
+                ...state,
+                getAllVisualisations: {
+                    ...state.getAllVisualisations,
+                    data: existingVisualisationIndex === -1
+                        ? [action.data]
+                        : [
+                            ...state.getAllVisualisations.data.slice(0, existingVisualisationIndex),
+                            action.data,
+                            ...state.getAllVisualisations.data.slice(existingVisualisationIndex + 1)
+                        ]
+                },
+                createVisualisation: {
+                    ...state.createVisualisation,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                },
+            }
+        }
+        case 'create-visualisation-failed':
+            return {
+                ...state,
+                createVisualisation: {
+                    ...state.createVisualisation,
+                    fetching: false,
+                    error: action.data
+                },
             }
         default:
             return state
@@ -80,16 +180,16 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
 
 export const visualisationsSideEffects =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>> => {
-        const boundGet = get(websocket)
         const boundGetAll = getAll(websocket)
+        const boundGet = get(websocket)
 
         return (state, action, dispatch) => {
             switch (action.type) {
                 case 'hydrate':
                     return hydrate(state, action, dispatch)
-                case 'visualisations-get-all':
+                case 'get-all-visualisations':
                     return boundGetAll(state, action, dispatch)
-                case 'visualisations-get':
+                case 'get-visualisation':
                     return boundGet(state, action, dispatch)
             }
         }
@@ -114,15 +214,15 @@ const getAll =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsGetAllAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ visualisations: Visualisation[] } | VisualisationsError>('visualisations-get-all', undefined)
+                const result = await websocket.request<{ visualisations: Visualisation[] } | VisualisationsError>('get-all-visualisations', undefined)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'visualisations-get-all-failed', data: result.reason })
+                    return dispatch({ type: 'get-all-visualisations-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'visualisations-get-all-success', data: result.visualisations })
+                dispatch({ type: 'get-all-visualisations-success', data: result.visualisations })
             } catch (error) {
-                dispatch({ type: 'visualisations-get-all-failed', data: error as string })
+                dispatch({ type: 'get-all-visualisations-failed', data: error as string })
             }
         }
 
@@ -130,15 +230,15 @@ const get =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsGetAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ project: Visualisation } | VisualisationsError>('visualisations-get', { projectId: action.data })
+                const result = await websocket.request<{ visualisation: Visualisation } | VisualisationsError>('get-visualisation', action.data)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'visualisations-get-failed', data: result.reason })
+                    return dispatch({ type: 'get-visualisation-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'visualisations-get-success', data: result.project })
+                dispatch({ type: 'get-visualisation-success', data: result.visualisation })
             } catch (error) {
-                dispatch({ type: 'visualisations-get-failed', data: error as string })
+                dispatch({ type: 'get-visualisation-failed', data: error as string })
             }
         }
 

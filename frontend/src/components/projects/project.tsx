@@ -17,7 +17,7 @@ export const Project: React.FC<Props> = ({ projectId, name, description }) => {
     const navigate = useNavigate()
 
     const onClick = () => {
-        navigate(`/app/projects/${projectId}`)
+        navigate(`/app/projects/${projectId}/visualisations`)
     }
 
     return (

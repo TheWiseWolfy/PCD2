@@ -1,33 +1,37 @@
 import { useContext, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { ProjectsContext } from "../../reducer/projects/context"
+import { useNavigate, useParams } from "react-router-dom"
+import { VisualisationsContext } from "../../reducer/visualisations/context"
 import { PageState } from "../../components/page/types"
 import { NotificationsContext } from "../../reducer/notifications/context"
 
-export const useCreateProjectPageLogic = () => {
+export const useCreateVisualisationPageLogic = () => {
     const [, notificationsDispatch] = useContext(NotificationsContext);
-    const [projectsState, projectsDispatch] = useContext(ProjectsContext)
+    const [visualisationsState, visualisationsDispatch] = useContext(VisualisationsContext)
     const [pageState, setPageState] = useState<PageState>(PageState.Initial)
     const [disabled, setDisabled] = useState(false);
     const [name, setName] = useState('')
     const [nameValid, setNameValid] = useState(true)
+    const [fn, setFn] = useState('')
+    const [fnValid, setFnValid] = useState(true)
     const [description, setDescription] = useState('')
     const [descriptionValid, setDescriptionValid] = useState(true)
     const navigate = useNavigate()
+    const params = useParams()
     
     const onSubmit = () => {
-        projectsDispatch({ type: 'create-project', data: { name, description } });
+        visualisationsDispatch({ type: 'create-visualisation', data: { name, description, fn } });
         setPageState(PageState.Fetching)
     };
 
-    const onGoToProjectsList = () => {
-        navigate(`/app/projects`)
+    const onGoToVisualisationsList = () => {
+        navigate(`/app/projects/${params.projectId}/visualisations`)
     }
     
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);
         setDescriptionValid(description.length < 257);
-    }, [name, description]);
+        setFnValid(true); // TODO: update
+    }, [name, description, fn]);
 
     useEffect(() => {
         switch (pageState) {
@@ -41,8 +45,8 @@ export const useCreateProjectPageLogic = () => {
                     type: 'notifications-add',
                     data: {
                         type: 'negative',
-                        title: 'Project creation error',
-                        description: projectsState.createProject.error || ''
+                        title: 'Visualisation creation error',
+                        description: visualisationsState.createVisualisation.error || ''
                     }
                 })
                 break
@@ -52,11 +56,11 @@ export const useCreateProjectPageLogic = () => {
                     type: 'notifications-add',
                     data: {
                         type: 'positive',
-                        title: 'Project creation succeeded',
+                        title: 'Visualisation creation succeeded',
                         description: 'Redirecting...'
                     }
                 })
-                navigate('/app/projects');
+                navigate('/app/visualisations');
                 break
             default:
                 setDisabled(false)
@@ -66,27 +70,30 @@ export const useCreateProjectPageLogic = () => {
 
     useEffect(() => {
         if (pageState !== PageState.Initial) {
-            if (!projectsState.createProject.fetching && projectsState.createProject.error) {
+            if (!visualisationsState.createVisualisation.fetching && visualisationsState.createVisualisation.error) {
                 setPageState(PageState.Failed);
-            } else if (!projectsState.createProject.fetching && !projectsState.createProject.error && projectsState.createProject.data) {
+            } else if (!visualisationsState.createVisualisation.fetching && !visualisationsState.createVisualisation.error && visualisationsState.createVisualisation.data) {
                 setPageState(PageState.Successful);
             }
         }
-    }, [pageState, projectsState.createProject]);
+    }, [pageState, visualisationsState.createVisualisation]);
 
     return {
         name,
         setName,
         description,
         setDescription,
+        fn,
+        setFn,
         
         fetching: pageState === PageState.Fetching,
         disabled,
 
         nameValid,
         descriptionValid,
+        fnValid,
 
         onSubmit,
-        onGoToProjectsList,
+        onGoToVisualisationsList,
     }
 }

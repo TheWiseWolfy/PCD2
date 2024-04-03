@@ -74,7 +74,7 @@ export const useRegisterLogic = () => {
                 setPageState(PageState.Successful);
             }
         }
-    }, [usersState.createUser]);
+    }, [pageState, usersState.createUser]);
 
     return {
         email,
