@@ -30,24 +30,15 @@ class LoginService(BaseService):
         if not existing_session:
             return {"reason": "Invalid credentials"}
 
-        self._redis_client.hdel("user:sessions", session)
-
         existing_session = json.loads(existing_session)
         user = existing_session.get("user", {})
-        new_session = "".join(
-            random.SystemRandom().choice(string.ascii_uppercase + string.digits)
-            for _ in range(16)
-        )
 
         self._redis_client.hset(
             "connections", connection_id, json.dumps({"user": user})
         )
         self._redis_client.sadd(f"users:{user['user_id']}", connection_id)
-        self._redis_client.hset(
-            "user:sessions", new_session, json.dumps({"user": user})
-        )
 
-        return {"user": user, "tokens": {"session": new_session}}
+        return {"user": user, "tokens": {"session": session}}
 
     def _email_password_call(self, connection_id: str, email: str, password: str):
         user = None
