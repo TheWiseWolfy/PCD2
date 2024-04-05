@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { PageState } from "../../components/page/types"
 import { NotificationsContext } from "../../reducer/notifications/context"
-import { ProjectsContext } from "../../reducer/projects/context"
+import { TokensContext } from "../../reducer/tokens/context"
 
-export const useCreateProjectPageLogic = () => {
+export const useCreateTokenPageLogic = () => {
     const [, notificationsDispatch] = useContext(NotificationsContext);
-    const [projectsState, projectsDispatch] = useContext(ProjectsContext)
+    const [tokensState, tokensDispatch] = useContext(TokensContext)
     const [pageState, setPageState] = useState<PageState>(PageState.Initial)
     const [disabled, setDisabled] = useState(true);
     const [name, setName] = useState('')
@@ -14,14 +14,15 @@ export const useCreateProjectPageLogic = () => {
     const [description, setDescription] = useState('')
     const [descriptionValid, setDescriptionValid] = useState(true)
     const navigate = useNavigate()
+    const params = useParams()
     
     const onSubmit = () => {
-        projectsDispatch({ type: 'create-project', data: { name, description } });
+        tokensDispatch({ type: 'create-token', data: { projectId: params.projectId!, name, description } });
         setPageState(PageState.Fetching)
     };
 
-    const onGoToProjectsList = () => {
-        navigate(`/app/projects`)
+    const onGoToTokensList = () => {
+        navigate(`/app/projects/${params.projectId}/tokens`)
     }
     
     useEffect(() => {
@@ -49,8 +50,8 @@ export const useCreateProjectPageLogic = () => {
                     type: 'notifications-add',
                     data: {
                         type: 'negative',
-                        title: 'Project creation error',
-                        description: projectsState.createProject.error || ''
+                        title: 'Token creation error',
+                        description: tokensState.createToken.error || ''
                     }
                 })
                 break
@@ -60,11 +61,11 @@ export const useCreateProjectPageLogic = () => {
                     type: 'notifications-add',
                     data: {
                         type: 'positive',
-                        title: 'Project creation succeeded',
+                        title: 'Token creation succeeded',
                         description: 'Redirecting...'
                     }
                 })
-                onGoToProjectsList()
+                onGoToTokensList()
                 break
             default:
                 setDisabled(false)
@@ -74,13 +75,13 @@ export const useCreateProjectPageLogic = () => {
 
     useEffect(() => {
         if (pageState !== PageState.Initial) {
-            if (!projectsState.createProject.fetching && projectsState.createProject.error) {
+            if (!tokensState.createToken.fetching && tokensState.createToken.error) {
                 setPageState(PageState.Failed);
-            } else if (!projectsState.createProject.fetching && !projectsState.createProject.error && projectsState.createProject.data) {
+            } else if (!tokensState.createToken.fetching && !tokensState.createToken.error && tokensState.createToken.data) {
                 setPageState(PageState.Successful);
             }
         }
-    }, [pageState, projectsState.createProject]);
+    }, [pageState, tokensState.createToken]);
 
     return {
         name,
@@ -95,6 +96,6 @@ export const useCreateProjectPageLogic = () => {
         descriptionValid,
 
         onSubmit,
-        onGoToProjectsList,
+        onGoToTokensList,
     }
 }

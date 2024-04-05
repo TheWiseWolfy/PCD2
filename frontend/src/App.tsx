@@ -9,6 +9,7 @@ import { DataContextProvider } from './reducer/data/context';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router/router';
 import { Notifications } from './components/notifications/notifications';
+import { TokensContextProvider } from './reducer/tokens/context';
 
 export const App = () => {
   const websocket = useWebSockets('wss://2n8nbnrly9.execute-api.eu-central-1.amazonaws.com/Production')
@@ -18,12 +19,14 @@ export const App = () => {
       <NotificationsContextProvider>
         <UsersContextProvider websocket={websocket}>
           <ProjectsContextProvider websocket={websocket}>
-            <VisualisationsContextProvider websocket={websocket}>
-              <DataContextProvider websocket={websocket}>
-                <RouterProvider router={router} />
-                <Notifications />
-              </DataContextProvider>
-            </VisualisationsContextProvider>
+            <TokensContextProvider websocket={websocket}>
+              <VisualisationsContextProvider websocket={websocket}>
+                <DataContextProvider websocket={websocket}>
+                  <RouterProvider router={router} />
+                  <Notifications />
+                </DataContextProvider>
+              </VisualisationsContextProvider>
+            </TokensContextProvider>
           </ProjectsContextProvider>
         </UsersContextProvider>
       </NotificationsContextProvider>

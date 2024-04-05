@@ -7,6 +7,7 @@ import { Spacing } from '../spacing/spacing';
 import { Image } from '../image/image';
 import { CardCenteredElement } from '../card/cardCenteredElement';
 import { CardSpaceElement } from '../card/cardSpaceElement';
+import { ButtonRow } from '../input/buttonRow';
 
 interface Props {
     projectId: string;
@@ -15,9 +16,10 @@ interface Props {
     description: string;
 
     onGoToProject(): void
+    onGoToProjectTokens(): void
 }
 
-export const Project: React.FC<Props> = ({ projectId, name, description, onGoToProject }) => {
+export const Project: React.FC<Props> = ({ projectId, name, description, onGoToProject, onGoToProjectTokens }) => {
     return (
         <Card width={384}>
             <H3>{name}</H3>
@@ -28,7 +30,10 @@ export const Project: React.FC<Props> = ({ projectId, name, description, onGoToP
             <P>{description}</P>
             <Spacing spacing='s' />
             <CardSpaceElement />
-            <Button onClick={onGoToProject}>Visit</Button>
+            <ButtonRow>
+                <Button onClick={onGoToProject}>Visit</Button>
+                <Button onClick={onGoToProjectTokens}>Manage tokens</Button>
+            </ButtonRow>
         </Card>
     );
 };

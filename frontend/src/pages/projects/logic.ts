@@ -17,6 +17,10 @@ export const useProjectsPageLogic = () => {
         navigate(`/app/projects/${projectId}/visualisations`);
     };
 
+    const onGoToProjectTokens = (projectId: string) => () => {
+        navigate(`/app/projects/${projectId}/tokens`);
+    };
+
     useEffect(() => {
         switch (pageState) {
             case PageState.Initial:
@@ -36,6 +40,7 @@ export const useProjectsPageLogic = () => {
         projects: projectsState.getProjects.data,
 
         onGoToCreateProject,
-        onGoToProject
+        onGoToProject,
+        onGoToProjectTokens
     }
 }

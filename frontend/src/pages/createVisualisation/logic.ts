@@ -34,6 +34,15 @@ export const useCreateVisualisationPageLogic = () => {
     }, [name, description, fn]);
 
     useEffect(() => {
+        if (nameValid && descriptionValid && fnValid) {
+            setDisabled(false)
+        } else {
+            setDisabled(true)
+        }
+    }, [nameValid, descriptionValid, fnValid])
+
+
+    useEffect(() => {
         switch (pageState) {
             case PageState.Loading:
             case PageState.Fetching:
@@ -60,7 +69,7 @@ export const useCreateVisualisationPageLogic = () => {
                         description: 'Redirecting...'
                     }
                 })
-                navigate('/app/visualisations');
+                onGoToVisualisationsList()
                 break
             default:
                 setDisabled(false)

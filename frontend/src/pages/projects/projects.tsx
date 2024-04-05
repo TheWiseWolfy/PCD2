@@ -29,6 +29,7 @@ export const Projects: React.FC = () => {
                                         name={project.name}
                                         description={project.description}
                                         onGoToProject={logic.onGoToProject(project.project_id)}
+                                        onGoToProjectTokens={logic.onGoToProjectTokens(project.project_id)}
                                     />
                                 ))
                             }

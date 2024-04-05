@@ -8,6 +8,8 @@ import { App } from "../pages/app/app";
 import { Visualisations } from "../pages/visualisations/visualisations";
 import { CreateVisualisation } from "../pages/createVisualisation/createVisualisation";
 import { NotFound } from "../pages/notFound/notFound";
+import { Tokens } from "../pages/tokens/tokens";
+import { CreateToken } from "../pages/createToken/createToken";
 
 export const router = createBrowserRouter([
     {
@@ -37,6 +39,14 @@ export const router = createBrowserRouter([
             {
                 path: '/app/projects/create',
                 element: <CreateProject />
+            },
+            {
+                path: '/app/projects/:projectId/tokens',
+                element: <Tokens />
+            },
+            {
+                path: '/app/projects/:projectId/tokens/create',
+                element: <CreateToken />
             },
             {
                 path: '/app/projects/:projectId/visualisations',

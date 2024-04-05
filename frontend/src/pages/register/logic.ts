@@ -67,7 +67,7 @@ export const useRegisterLogic = () => {
                         description: 'Navigating back to login page'
                     }
                 })
-                navigate('/login');
+                onGoToLoginClick()
                 break
             default:
                 setDisabled(false)
