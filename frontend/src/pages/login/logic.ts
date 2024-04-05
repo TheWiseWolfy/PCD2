@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UsersContext } from "../../reducer/users/context";
-import { NotificationsContext } from "../../reducer/notifications/context";
 import { PageState } from "../../components/page/types";
+import { NotificationsContext } from "../../reducer/notifications/context";
+import { UsersContext } from "../../reducer/users/context";
 
 export const useLoginLogic = () => {
     const [usersState, usersDispatch] = useContext(UsersContext);

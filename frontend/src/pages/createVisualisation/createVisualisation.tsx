@@ -1,14 +1,16 @@
-import { Page } from "../../components/page/page"
-import { Card } from "../../components/card/card"
-import { H1 } from "../../components/typography/h1"
-import { Button } from "../../components/input/button"
-import { useCreateVisualisationPageLogic } from "./logic"
-import { List } from "../../components/list/list"
-import { TextField } from "../../components/input/textfield"
-import { Spacing } from "../../components/spacing/spacing"
-import { Image } from "../../components/image/image"
-import { Spin } from "../../components/animate/spin"
 import { Form } from "react-router-dom"
+import { Spin } from "../../components/animate/spin"
+import { Card } from "../../components/card/card"
+import { Header } from "../../components/header/header"
+import { HeaderActionSlot } from "../../components/header/headerActionsSlot"
+import { Image } from "../../components/image/image"
+import { Button } from "../../components/input/button"
+import { TextField } from "../../components/input/textfield"
+import { List } from "../../components/list/list"
+import { Page } from "../../components/page/page"
+import { Spacing } from "../../components/spacing/spacing"
+import { H1 } from "../../components/typography/h1"
+import { useCreateVisualisationPageLogic } from "./logic"
 
 
 export const CreateVisualisation: React.FC = () => {
@@ -16,7 +18,14 @@ export const CreateVisualisation: React.FC = () => {
 
     return (
         <Page centered={true}>
-            <Card>
+            <Header left={
+                <HeaderActionSlot>
+                    <Button onClick={logic.onGoToVisualisationsList}>
+                        <Image id="back" />
+                    </Button>
+                </HeaderActionSlot>
+            } />
+            <Card width={384}>
                 <Form onSubmit={logic.onSubmit}>
                     <H1>Create visualisation</H1>
                     <List>
@@ -31,10 +40,6 @@ export const CreateVisualisation: React.FC = () => {
                                 <Image id="gear" />
                             </Spin>
                         }
-                    </Button>
-                    <Spacing spacing="xs" />
-                    <Button onClick={logic.onGoToVisualisationsList}>
-                        Go back
                     </Button>
                 </Form>
             </Card>

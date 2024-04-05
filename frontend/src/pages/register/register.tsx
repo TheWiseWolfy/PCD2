@@ -1,13 +1,15 @@
-import { Page } from "../../components/page/page"
-import { Card } from "../../components/card/card"
-import { H1 } from "../../components/typography/h1"
-import { TextField } from "../../components/input/textfield"
-import { Button } from "../../components/input/button"
-import { Image } from "../../components/image/image"
 import { Spin } from "../../components/animate/spin"
+import { Card } from "../../components/card/card"
+import { Header } from "../../components/header/header"
+import { HeaderActionSlot } from "../../components/header/headerActionsSlot"
+import { Image } from "../../components/image/image"
+import { Button } from "../../components/input/button"
 import { Form } from "../../components/input/form"
+import { TextField } from "../../components/input/textfield"
 import { List } from "../../components/list/list"
+import { Page } from "../../components/page/page"
 import { Spacing } from "../../components/spacing/spacing"
+import { H1 } from "../../components/typography/h1"
 import { useRegisterLogic } from "./logic"
 
 export const Register: React.FC = () => {
@@ -15,6 +17,13 @@ export const Register: React.FC = () => {
 
     return (
         <Page centered={true}>
+            <Header left={
+                <HeaderActionSlot>
+                    <Button onClick={logic.onGoToLoginClick}>
+                        <Image id="back" size="m" />
+                    </Button>
+                </HeaderActionSlot>
+            } />
             <Card>
                 <Form onSubmit={logic.onSubmit}>
                     <H1>Create user</H1>
@@ -31,10 +40,6 @@ export const Register: React.FC = () => {
                                 <Image id="gear" />
                             </Spin>
                         }
-                    </Button>
-                    <Spacing spacing="xs" />
-                    <Button onClick={logic.onGoToLoginClick}>
-                        Go back
                     </Button>
                 </Form>
             </Card>

@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { VisualisationsContext } from "../../reducer/visualisations/context"
 import { PageState } from "../../components/page/types"
 import { NotificationsContext } from "../../reducer/notifications/context"
+import { VisualisationsContext } from "../../reducer/visualisations/context"
 
 export const useCreateVisualisationPageLogic = () => {
     const [, notificationsDispatch] = useContext(NotificationsContext);

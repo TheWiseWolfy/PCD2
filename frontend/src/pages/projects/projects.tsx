@@ -1,30 +1,20 @@
-import { Page } from "../../components/page/page";
-import { Card } from "../../components/card/card";
-import { H1 } from "../../components/typography/h1";
-import { Project } from "../../components/projects/project";
-import { Button } from "../../components/input/button";
-import { useProjectsPageLogic } from "./logic";
-import { Spacing } from "../../components/spacing/spacing";
 import { CardList } from "../../components/card/cardList";
-import { H3 } from "../../components/typography/h3";
-import { Image } from "../../components/image/image";
-
+import { Header } from "../../components/header/header";
+import { Page } from "../../components/page/page";
+import { AddMoreProjects } from "../../components/projects/addMoreProjects";
+import { NewProject } from "../../components/projects/newProject";
+import { Project } from "../../components/projects/project";
+import { useProjectsPageLogic } from "./logic";
 
 export const Projects: React.FC = () => {
     const logic = useProjectsPageLogic()
 
     return (
         <Page centered={true}>
+            <Header />
             {
                 logic.projects.length === 0 && (
-                    <>
-                        <Card width={192} noBorder noShadow centered>
-                            <H1>No project found</H1>
-                            <Image id="newProject" />
-                            <Spacing spacing="m" />
-                            <Button onClick={logic.onGoToCreateProject}>Create a project</Button>
-                        </Card>
-                    </>
+                    <NewProject onGoToCreateProject={logic.onGoToCreateProject} />
                 )
             }
             {
@@ -33,19 +23,17 @@ export const Projects: React.FC = () => {
                         <>
                             {
                                 logic.projects.map(project => (
-                                    <Project 
+                                    <Project
                                         projectId={project.project_id}
                                         userId={project.user_id}
                                         name={project.name}
                                         description={project.description}
+                                        onGoToProject={logic.onGoToProject(project.project_id)}
                                     />
                                 ))
                             }
+                            <AddMoreProjects onGoToCreateProject={logic.onGoToCreateProject} />
                         </>
-                        <Card width={128} centered>
-                            <H3>Need more?</H3>
-                            <Button onClick={logic.onGoToCreateProject}>Add more</Button>
-                        </Card>
                     </CardList>
                 )
             }

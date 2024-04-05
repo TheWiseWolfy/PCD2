@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { VisualisationsContext } from "../../reducer/visualisations/context";
 import { PageState } from "../../components/page/types";
+import { VisualisationsContext } from "../../reducer/visualisations/context";
 
 
 export const useVisualisationsPageLogic = () => {
@@ -14,7 +14,7 @@ export const useVisualisationsPageLogic = () => {
         navigate(`/app/projects/${params.projectId}/visualisations/create`);
     };
 
-    const onGoToProjects = () =>  {
+    const onGoToProjectsList = () =>  {
         navigate('/app/projects')
     }
 
@@ -37,6 +37,6 @@ export const useVisualisationsPageLogic = () => {
         visualisations: visualisationsState.getAllVisualisations.data,
 
         onGoToCreateVisualisation,
-        onGoToProjects
+        onGoToProjectsList
     }
 }

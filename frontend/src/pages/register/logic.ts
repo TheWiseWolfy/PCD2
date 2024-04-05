@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from "react";
-import { UsersContext } from "../../reducer/users/context";
-import { NotificationsContext } from "../../reducer/notifications/context";
 import { useNavigate } from "react-router-dom";
 import { PageState } from "../../components/page/types";
+import { NotificationsContext } from "../../reducer/notifications/context";
+import { UsersContext } from "../../reducer/users/context";
 
 export const useRegisterLogic = () => {
     const [usersState, usersDispatch] = useContext(UsersContext);
     const [, notificationsDispatch] = useContext(NotificationsContext);
     const [pageState, setPageState] = useState<PageState>(PageState.Initial)
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [name, setName] = useState('');
     const [nameValid, setNameValid] = useState(true);
     const [email, setEmail] = useState('');
@@ -27,10 +27,18 @@ export const useRegisterLogic = () => {
     };
 
     useEffect(() => {
-        setNameValid(name.length > 0 && name.length < 65);
+        setNameValid(name.length > 2 && name.length < 65);
         setEmailValid(/.+?@.+?\..+?/.test(email) && email.length < 65);
         setPasswordValid(password.length > 7 && password.length < 65);
     }, [email, name, password]);
+
+    useEffect(() => {
+        if (nameValid && emailValid && passwordValid) {
+            setDisabled(false)
+        } else {
+            setDisabled(true)
+        }
+    }, [nameValid, emailValid, passwordValid])
 
     useEffect(() => {
         switch (pageState) {

@@ -12,8 +12,17 @@
 }
 
 .card-centered {
-    justify-content: space-between;
     align-items: center;
+}
+
+.card-centered-element {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-space-element {
+    flex: 1;
 }
 
 .card-column {

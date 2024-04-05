@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ProjectsContext } from "../../reducer/projects/context";
 import { PageState } from "../../components/page/types";
+import { ProjectsContext } from "../../reducer/projects/context";
 
 
 export const useProjectsPageLogic = () => {
@@ -14,7 +14,7 @@ export const useProjectsPageLogic = () => {
     }
 
     const onGoToProject = (projectId: string) => () => {
-        navigate(`/app/projects/${projectId}/statistics`);
+        navigate(`/app/projects/${projectId}/visualisations`);
     };
 
     useEffect(() => {

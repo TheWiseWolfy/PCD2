@@ -22,6 +22,10 @@ export const router = createBrowserRouter([
         element: <PrivateRoutes />,
         children: [
             {
+                path: '/',
+                element: <App />
+            },
+            {
                 path: '/*',
                 element: <App />
             },

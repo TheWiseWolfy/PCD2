@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { ProjectsContext } from "../../reducer/projects/context"
 import { PageState } from "../../components/page/types"
 import { NotificationsContext } from "../../reducer/notifications/context"
+import { ProjectsContext } from "../../reducer/projects/context"
 
 export const useCreateProjectPageLogic = () => {
     const [, notificationsDispatch] = useContext(NotificationsContext);
     const [projectsState, projectsDispatch] = useContext(ProjectsContext)
     const [pageState, setPageState] = useState<PageState>(PageState.Initial)
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [name, setName] = useState('')
     const [nameValid, setNameValid] = useState(true)
     const [description, setDescription] = useState('')
@@ -28,6 +28,14 @@ export const useCreateProjectPageLogic = () => {
         setNameValid(name.length > 0 && name.length < 65);
         setDescriptionValid(description.length < 257);
     }, [name, description]);
+
+    useEffect(() => {
+        if (nameValid && descriptionValid) {
+            setDisabled(false)
+        } else {
+            setDisabled(true)
+        }
+    }, [nameValid, descriptionValid])
 
     useEffect(() => {
         switch (pageState) {
