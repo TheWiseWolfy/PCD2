@@ -13,12 +13,12 @@ interface Props {
 export const AddMoreProjects: FC<Props> = ({ onGoToCreateProject }) => {
     return (
         <Card width={384} centered noShadow>
-            <CardSpaceElement />
             <H3>Need more?</H3>
+            <CardSpaceElement />
             <Image id="newProject" size="xl" scaleFactor={5} />
             <Spacing spacing="m" />
-            <Button onClick={onGoToCreateProject}>Add more</Button>
             <CardSpaceElement />
+            <Button onClick={onGoToCreateProject}>Add more</Button>
         </Card>
     )
 }

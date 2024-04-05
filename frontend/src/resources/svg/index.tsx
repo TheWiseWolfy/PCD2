@@ -5,6 +5,7 @@ import { ReactComponent as project } from './project.svg'
 import { ReactComponent as chart } from './chart.svg'
 import { ReactComponent as back } from './back.svg'
 import { ReactComponent as logout } from './logout.svg'
+import { ReactComponent as wind } from './wind.svg'
 
 const wrapper = (Element: React.FunctionComponent<React.SVGProps<SVGSVGElement> & {
     title?: string | undefined;
@@ -20,4 +21,5 @@ export const svg = {
     chart: wrapper(chart, '0 0 24 24'),
     back: wrapper(back, '0 0 24 24'),
     logout: wrapper(logout, '0 0 24 24'),
+    wind: wrapper(wind, '0 0 24 24'),
 }

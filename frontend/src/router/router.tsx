@@ -7,6 +7,7 @@ import { PrivateRoutes } from "../components/router/privateRoutes";
 import { App } from "../pages/app/app";
 import { Visualisations } from "../pages/visualisations/visualisations";
 import { CreateVisualisation } from "../pages/createVisualisation/createVisualisation";
+import { NotFound } from "../pages/notFound/notFound";
 
 export const router = createBrowserRouter([
     {
@@ -26,8 +27,8 @@ export const router = createBrowserRouter([
                 element: <App />
             },
             {
-                path: '/*',
-                element: <App />
+                path: '*',
+                element: <NotFound />
             },
             {
                 path: '/app/projects',
