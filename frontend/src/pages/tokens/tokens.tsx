@@ -33,6 +33,7 @@ export const Tokens: React.FC = () => {
                             {
                                 logic.tokens.map(token => (
                                     <Token
+                                        key={token.token_id}
                                         tokenId={token.token_id}
                                         projectId={token.project_id}
                                         name={token.name}

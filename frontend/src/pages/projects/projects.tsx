@@ -24,6 +24,7 @@ export const Projects: React.FC = () => {
                             {
                                 logic.projects.map(project => (
                                     <Project
+                                        key={project.project_id}
                                         projectId={project.project_id}
                                         userId={project.user_id}
                                         name={project.name}
