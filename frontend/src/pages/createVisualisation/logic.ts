@@ -8,7 +8,7 @@ export const useCreateVisualisationPageLogic = () => {
     const [, notificationsDispatch] = useContext(NotificationsContext);
     const [visualisationsState, visualisationsDispatch] = useContext(VisualisationsContext)
     const [pageState, setPageState] = useState<PageState>(PageState.Initial)
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [name, setName] = useState('')
     const [nameValid, setNameValid] = useState(true)
     const [fn, setFn] = useState('')

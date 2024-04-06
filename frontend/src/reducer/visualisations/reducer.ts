@@ -1,5 +1,5 @@
 import React from 'react'
-import { VisualisationsActions, VisualisationsError, VisualisationsHydrateAction, VisualisationsState, Visualisation, VisualisationsGetAction, VisualisationsGetAllAction } from './types'
+import { VisualisationsActions, VisualisationsError, VisualisationsHydrateAction, VisualisationsState, Visualisation, VisualisationsGetAction, VisualisationsGetAllAction, VisualisationsCreateAction } from './types'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
@@ -182,6 +182,7 @@ export const visualisationsSideEffects =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>> => {
         const boundGetAll = getAll(websocket)
         const boundGet = get(websocket)
+        const boundCreate = create(websocket)
 
         return (state, action, dispatch) => {
             switch (action.type) {
@@ -191,6 +192,8 @@ export const visualisationsSideEffects =
                     return boundGetAll(state, action, dispatch)
                 case 'get-visualisation':
                     return boundGet(state, action, dispatch)
+                case 'create-visualisation':
+                    return boundCreate(state, action, dispatch)
             }
         }
     }
@@ -214,7 +217,7 @@ const getAll =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsGetAllAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ visualisations: Visualisation[] } | VisualisationsError>('get-all-visualisations', undefined)
+                const result = await websocket.request<{ visualisations: Visualisation[] } | VisualisationsError>('get-all-visualisations', action.data)
 
                 if ('reason' in result) {
                     return dispatch({ type: 'get-all-visualisations-failed', data: result.reason })
@@ -242,6 +245,20 @@ const get =
             }
         }
 
+const create =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateAction> =>
+        async (state, action, dispatch) => {
+            try {
+                const result = await websocket.request<{ visualisation: Visualisation } | VisualisationsError>('create-visualisation', action.data)
 
+                if ('reason' in result) {
+                    return dispatch({ type: 'create-visualisation-failed', data: result.reason })
+                }
+
+                dispatch({ type: 'create-visualisation-success', data: result.visualisation })
+            } catch (error) {
+                dispatch({ type: 'create-visualisation-failed', data: error as string })
+            }
+        }
 
 

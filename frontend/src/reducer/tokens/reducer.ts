@@ -207,7 +207,7 @@ const getAll =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<TokensState, TokensActions>, TokensGetAllAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ tokens: Token[] } | TokensError>('tokens-get-all', undefined)
+                const result = await websocket.request<{ tokens: Token[] } | TokensError>('tokens-get-all', action.data)
 
                 if ('reason' in result) {
                     return dispatch({ type: 'get-all-tokens-failed', data: result.reason })

@@ -8,6 +8,7 @@ import { Image } from '../image/image';
 import { CardCenteredElement } from '../card/cardCenteredElement';
 import { CardSpaceElement } from '../card/cardSpaceElement';
 import { ButtonRow } from '../input/buttonRow';
+import { H6 } from '../typography/h6';
 
 interface Props {
     projectId: string;
@@ -27,7 +28,12 @@ export const Project: React.FC<Props> = ({ projectId, name, description, onGoToP
                 <Image id="project" size="xl" scaleFactor={5} />
             </CardCenteredElement>
             <Spacing spacing="m" />
-            <P>{description}</P>
+            {description && (
+                <>
+                    <H6>Description:</H6>
+                    <P>{description}</P>
+                </>
+            )}
             <Spacing spacing='s' />
             <CardSpaceElement />
             <ButtonRow>

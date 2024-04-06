@@ -6,6 +6,7 @@ import { Image } from '../image/image';
 import { Spacing } from '../spacing/spacing';
 import { H3 } from "../typography/h3";
 import { P } from "../typography/p";
+import { H6 } from '../typography/h6';
 
 interface Props {
     tokenId: string
@@ -23,7 +24,13 @@ export const Token: React.FC<Props> = ({ name, description, token }) => {
                 <Image id="key" size="xl" scaleFactor={5} />
             </CardCenteredElement>
             <Spacing spacing="m" />
-            <P>{description}</P>
+            {description && (
+                <>
+                    <H6>Description:</H6>
+                    <P>{description}</P>
+                </>
+            )}
+            <H6>Token:</H6>
             <P>{token}</P>
             <CardSpaceElement />
         </Card>
