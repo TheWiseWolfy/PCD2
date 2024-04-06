@@ -38,7 +38,7 @@ const call = (self: Self): LoginService['call'] => async (input) => {
         WHERE t.token_id = $1 AND t.project_id = $2
     `, [tokenId, projectId])
 
-    if (tokens.rows.length === 0) {
+    if (!tokens.rows[0]) {
         return {
             reason: 'Not found'
         }

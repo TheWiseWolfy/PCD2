@@ -48,7 +48,7 @@ const call = (self: Self): GetAllService['call'] => async (input) => {
         WHERE p.project_id = $1 AND p.user_id = $2
     `, [projectId, userId])
 
-    if (projects.rows.length === 0) {
+    if (!projects.rows[0]) {
         return {
             reason: 'Not found'
         }
