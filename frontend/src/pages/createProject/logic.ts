@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { PageState } from "../../components/page/types"
 import { NotificationsContext } from "../../reducer/notifications/context"
@@ -15,14 +15,14 @@ export const useCreateProjectPageLogic = () => {
     const [descriptionValid, setDescriptionValid] = useState(true)
     const navigate = useNavigate()
     
-    const onSubmit = () => {
+    const onSubmit = useCallback(() => {
         projectsDispatch({ type: 'create-project', data: { name, description } });
         setPageState(PageState.Fetching)
-    };
+    }, [name, description, projectsDispatch])
 
-    const onGoToProjectsList = () => {
+    const onGoToProjectsList = useCallback(() => {
         navigate(`/app/projects`)
-    }
+    }, [navigate])
     
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);
@@ -70,7 +70,7 @@ export const useCreateProjectPageLogic = () => {
                 setDisabled(false)
                 break
         }
-    }, [pageState])
+    }, [pageState, projectsState.createProject.error, notificationsDispatch, onGoToProjectsList])
 
     useEffect(() => {
         if (pageState !== PageState.Initial) {

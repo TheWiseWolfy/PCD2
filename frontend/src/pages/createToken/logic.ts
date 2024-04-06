@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { PageState } from "../../components/page/types"
 import { NotificationsContext } from "../../reducer/notifications/context"
@@ -16,14 +16,14 @@ export const useCreateTokenPageLogic = () => {
     const navigate = useNavigate()
     const params = useParams()
     
-    const onSubmit = () => {
+    const onSubmit = useCallback(() => {
         tokensDispatch({ type: 'create-token', data: { projectId: params.projectId!, name, description } });
         setPageState(PageState.Fetching)
-    };
+    }, [params, name, description, tokensDispatch])
 
-    const onGoToTokensList = () => {
+    const onGoToTokensList = useCallback(() => {
         navigate(`/app/projects/${params.projectId}/tokens`)
-    }
+    }, [params, navigate])
     
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);
@@ -71,7 +71,7 @@ export const useCreateTokenPageLogic = () => {
                 setDisabled(false)
                 break
         }
-    }, [pageState])
+    }, [pageState, tokensState.createToken.error, notificationsDispatch, onGoToTokensList])
 
     useEffect(() => {
         if (pageState !== PageState.Initial) {

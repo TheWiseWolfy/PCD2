@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageState } from "../../components/page/types";
 import { TokensContext } from "../../reducer/tokens/context";
@@ -10,13 +10,13 @@ export const useTokensPageLogic = () => {
     const navigate = useNavigate();
     const params = useParams()
 
-    const onGoToCreateProjectToken = () =>  {
+    const onGoToCreateProjectToken = useCallback(() =>  {
         navigate(`/app/projects/${params.projectId}/tokens/create`)
-    }
+    }, [params, navigate])
 
-    const onGoToProjectsList = () => {
+    const onGoToProjectsList = useCallback(() => {
         navigate(`/app/projects`);
-    };
+    }, [navigate])
 
     useEffect(() => {
         switch (pageState) {
@@ -31,7 +31,7 @@ export const useTokensPageLogic = () => {
             default:
                 break
         }
-    }, [pageState])
+    }, [pageState, params, tokensDispatch])
 
     return {
         tokens: tokensState.getTokens.data,

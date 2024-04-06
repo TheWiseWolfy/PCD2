@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { PageState } from "../../components/page/types"
 import { NotificationsContext } from "../../reducer/notifications/context"
@@ -18,14 +18,14 @@ export const useCreateVisualisationPageLogic = () => {
     const navigate = useNavigate()
     const params = useParams()
     
-    const onSubmit = () => {
+    const onSubmit = useCallback(() => {
         visualisationsDispatch({ type: 'create-visualisation', data: { name, description, fn } });
         setPageState(PageState.Fetching)
-    };
+    }, [name, description, fn, visualisationsDispatch])
 
-    const onGoToVisualisationsList = () => {
+    const onGoToVisualisationsList = useCallback(() => {
         navigate(`/app/projects/${params.projectId}/visualisations`)
-    }
+    }, [params, navigate])
     
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);
@@ -75,7 +75,7 @@ export const useCreateVisualisationPageLogic = () => {
                 setDisabled(false)
                 break
         }
-    }, [pageState])
+    }, [pageState, visualisationsState.createVisualisation.error, notificationsDispatch, onGoToVisualisationsList])
 
     useEffect(() => {
         if (pageState !== PageState.Initial) {

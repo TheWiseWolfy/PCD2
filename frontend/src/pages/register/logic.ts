@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageState } from "../../components/page/types";
 import { NotificationsContext } from "../../reducer/notifications/context";
@@ -17,14 +17,14 @@ export const useRegisterLogic = () => {
     const [passwordValid, setPasswordValid] = useState(true);
     const navigate = useNavigate();
 
-    const onSubmit = () => {
+    const onSubmit = useCallback(() => {
         usersDispatch({ type: 'create-user', data: { email, name, password } });
         setPageState(PageState.Fetching)
-    };
+    }, [email, name, password, usersDispatch])
 
-    const onGoToLoginClick = () => {
+    const onGoToLoginClick = useCallback(() => {
         navigate('/login');
-    };
+    }, [navigate])
 
     useEffect(() => {
         setNameValid(name.length > 2 && name.length < 65);
@@ -72,7 +72,7 @@ export const useRegisterLogic = () => {
             default:
                 setDisabled(false)
         }
-    }, [pageState])
+    }, [pageState, usersState.createUser.error, notificationsDispatch, onGoToLoginClick])
 
     useEffect(() => {
         if (pageState !== PageState.Initial) {
