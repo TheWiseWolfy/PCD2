@@ -1,27 +1,23 @@
 
 import redis from 'redis'
 import pg from 'pg'
-import aws from 'aws-sdk'
 import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
     projectId: string
     visualisationId: string
-    value: number
 }
 
-interface CreateService extends BaseService<Input, any> { }
+interface UnsubscribeService extends BaseService<Input, any> { }
 
 type Self = {
-    callbackAPIClient: aws.ApiGatewayManagementApi
     redisClient: redis.RedisClientType
     postgresClient: pg.Pool
 }
 
-export const makeCreateService = (callbackAPIClient: aws.ApiGatewayManagementApi, redisClient: redis.RedisClientType, postgresClient: pg.Pool): CreateService => {
+export const makeUnsubscribeService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): UnsubscribeService => {
     const self: Self = {
-        callbackAPIClient,
         redisClient,
         postgresClient
     }
@@ -31,11 +27,10 @@ export const makeCreateService = (callbackAPIClient: aws.ApiGatewayManagementApi
     }
 }
 
-const call = (self: Self): CreateService['call'] => async (input) => {
+const call = (self: Self): UnsubscribeService['call'] => async (input) => {
     const connectionId = input.connectionId
     const projectId = input.projectId
     const visualisationId = input.visualisationId
-    const value = input.value
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)
@@ -62,31 +57,10 @@ const call = (self: Self): CreateService['call'] => async (input) => {
         }
     }
 
-    const data = await self.postgresClient.query(`
-        INSERT INTO data (visualisation_id, value, timestamp)
-        VALUES ($1, $2, $3)
-        RETURNING *
-    `, [visualisationId, String(value), new Date().toISOString()])
-
-    const connectionIds = await self.redisClient.SMEMBERS(`subscriptions:resources:data:${visualisationId}`)
-
-    for await (const connectionId of connectionIds) {
-        if (connection === input.connectionId) {
-            continue
-        }
-
-        await self.callbackAPIClient.postToConnection({
-            ConnectionId: connectionId,
-            Data: JSON.stringify({
-                action: "data-created",
-                data: {
-                    data: data.rows[0]
-                }
-            })
-        }).promise()
-    }
+    await self.redisClient.SREM(`subscriptions:resources:data:${visualisationId}`, connectionId)
+    await self.redisClient.SREM(`subscriptions:connections:data:${connectionId}`, visualisationId)
 
     return {
-        data: data.rows[0]
+        subscribed: false
     }
 }
