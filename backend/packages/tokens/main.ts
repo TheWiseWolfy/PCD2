@@ -1,17 +1,21 @@
+import aws from 'aws-sdk'
+import pg from 'pg'
 import process from 'process'
 import * as redis from 'redis'
-import pg from 'pg'
-import aws from 'aws-sdk'
-import { makeGetService } from './src/services/get'
-import { makeGetAllService } from './src/services/getAll'
-import { makeCreateService } from './src/services/create'
+import { makeCreateRoute } from './src/routes/create'
 import { makeGetRoute } from './src/routes/get'
 import { makeGetAllRoute } from './src/routes/getAll'
-import { makeCreateRoute } from './src/routes/create'
-import { makeRouter } from './src/utils/router'
-import { makeLogger } from './src/utils/logger'
-import { makeLoginService } from './src/services/login'
 import { makeLoginRoute } from './src/routes/login'
+import { makeSubscribeRoute } from './src/routes/subscribe'
+import { makeUnsubscribeRoute } from './src/routes/unsubscribe'
+import { makeCreateService } from './src/services/create'
+import { makeGetService } from './src/services/get'
+import { makeGetAllService } from './src/services/getAll'
+import { makeLoginService } from './src/services/login'
+import { makeSubscribeService } from './src/services/subscribe'
+import { makeUnsubscribeService } from './src/services/unsubscribe'
+import { makeLogger } from './src/utils/logger'
+import { makeRouter } from './src/utils/router'
 
 export const handler = async (event: any, _context: any) => {
     const REDIS_HOST = process.env['REDIS_HOST']
@@ -40,17 +44,23 @@ export const handler = async (event: any, _context: any) => {
     const getService = makeGetService(redisClient, postgresClient)
     const getAllService = makeGetAllService(redisClient, postgresClient)
     const createService = makeCreateService(callbackAPIClient, redisClient, postgresClient)
+    const subscribeService = makeSubscribeService(redisClient, postgresClient)
+    const unsubscribeService = makeUnsubscribeService(redisClient, postgresClient)
     const loginService = makeLoginService(redisClient, postgresClient)
 
     const getRoute = makeGetRoute(getService)
     const getAllRoute = makeGetAllRoute(getAllService)
     const createRoute = makeCreateRoute(createService)
+    const subscribeRoute = makeSubscribeRoute(subscribeService)
+    const unsubscribeRoute = makeUnsubscribeRoute(unsubscribeService)
     const loginRoute = makeLoginRoute(loginService)
 
     const router = makeRouter(logger)
     router.register('tokens-get', getRoute)
     router.register('tokens-get-all', getAllRoute)
     router.register('tokens-create', createRoute)
+    router.register('tokens-create-subscribe', subscribeRoute)
+    router.register('tokens-create-unsubscribe', unsubscribeRoute)
     router.register('tokens-login', loginRoute)
 
     const response = await router.call(event)

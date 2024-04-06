@@ -88,7 +88,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
         }
     }
 
-    const connectionIds = await self.redisClient.SMEMBERS(`users:${userId}`)
+    const connectionIds = await self.redisClient.SMEMBERS(`subscriptions:resources:tokens:${projectId}`)
 
     for await (const connectionId of connectionIds) {
         if (connection === input.connectionId) {
