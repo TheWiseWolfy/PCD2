@@ -43,7 +43,7 @@ export const createVisualisationSubscribeFailedHandler = (
 export const createVisualisationSubscribeSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateSubscribeAction> =>
     async (state, action, dispatch) => {
         try {
-            const result = await websocket.subscribe<{ visualisation: Visualisation } | VisualisationsError, VisualisationsCreateSubscribeAction['data']>('visualisations-create-subscribe', action.data, (message) => {
+            const result = await websocket.subscribe<{ visualisation: Visualisation } | VisualisationsError, VisualisationsCreateSubscribeAction['data']>('visualisations-create', action.data, (message) => {
                 if ('reason' in message) {
                     return
                 }

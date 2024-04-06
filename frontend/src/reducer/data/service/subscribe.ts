@@ -35,7 +35,7 @@ export const createDataSubscribeSideEffect =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>, DataCreateSubscribeAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.subscribe<{ data: Data } | DataError, DataCreateSubscribeAction['data']>('data-create-subscribe', action.data, (message) => {
+                const result = await websocket.subscribe<{ data: Data } | DataError, DataCreateSubscribeAction['data']>('data-create', action.data, (message) => {
                     if ('reason' in message) {
                         return
                     }

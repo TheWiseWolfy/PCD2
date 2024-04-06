@@ -34,7 +34,7 @@ export const createProjectSubscribeFailedHandler = (state: ProjectsState, action
 export const subscribe = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsCreateSubscribeAction> =>
     async (state, action, dispatch) => {
         try {
-            const result = await websocket.subscribe<{ project: Project}  | ProjectsError>('projects-create-subscribe', null, (message) => {
+            const result = await websocket.subscribe<{ project: Project}  | ProjectsError>('projects-create', null, (message) => {
                 if ('reason' in message) {
                     return
                 }

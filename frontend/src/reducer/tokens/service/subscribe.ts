@@ -37,7 +37,7 @@ export const createTokenSubscribeFailedHandler = (state: TokensState, action: To
 export const createTokenSubscribeSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<TokensState, TokensActions>, TokensCreateSubscribeAction> =>
     async (state, action, dispatch) => {
         try {
-            const result = await websocket.subscribe<{ token: Token } | TokensError, TokensCreateSubscribeAction['data']>('tokens-create-subscribe', action.data, (message) => {
+            const result = await websocket.subscribe<{ token: Token } | TokensError, TokensCreateSubscribeAction['data']>('tokens-create', action.data, (message) => {
                 if ('reason' in message) {
                     return
                 }
