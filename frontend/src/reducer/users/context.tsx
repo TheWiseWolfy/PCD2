@@ -1,6 +1,7 @@
 import React, { createContext } from "react";
 import { UsersActions, UsersState } from "./types";
-import { usersInitialState, usersReducer, usersSideEffects } from "./reducer";
+import { usersInitialState, usersSideEffects } from "./reducer";
+import { usersReducer } from './reducer';
 import { useReducerWithSideEffects } from "../../hooks/useReducerWithSideEffects";
 import { ManagedWebSocket } from "../../hooks/useWebSockets";
 

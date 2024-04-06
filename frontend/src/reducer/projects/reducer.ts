@@ -4,7 +4,7 @@ import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { createProjectSideEffect, createProjectFailedHandler, createProjectHandler, createProjectSuccessHandler } from './service/create'
 import { getProjectFailedHandler, getProjectHandler, getProjectSideEffect, getProjectSuccessHandler } from './service/get'
 import { getAllProjectsFailedHandler, getAllProjectsHandler, getAllProjectsSideEffect, getAllProjectsSuccessHandler } from './service/getAll'
-import { hydrateFailedHandler, hydrateHandler } from './service/hydrate'
+import { hydrateFailedHandler, hydrateSuccessHandler } from './service/hydrate'
 import { createProjectSubscribeFailedHandler, createProjectSubscribeHandler, createProjectSubscribeSuccessHandler, subscribe } from './service/subscribe'
 import { createProjectUnsubscribeFailedHandler, createProjectUnsubscribeHandler, createProjectUnsubscribeSuccessHandler, unsubscribe } from './service/unsubscribe'
 import { ProjectsActions, ProjectsState } from './types'
@@ -42,7 +42,7 @@ export const projectsInitialState: ProjectsState = ({
 export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (state, action) => {
     switch (action.type) {
         case 'hydrate-successful':
-            return hydrateHandler(action)
+            return hydrateSuccessHandler(action)
         case 'hydrate-failed':
             return hydrateFailedHandler(state)
         case 'get-all-projects':

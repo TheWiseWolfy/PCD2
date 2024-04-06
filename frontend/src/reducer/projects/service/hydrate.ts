@@ -2,7 +2,7 @@ import React from "react";
 import { ReducerSideEffect } from "../../../hooks/useReducerWithSideEffects";
 import { ProjectsState, ProjectsHydrateSuccessfulAction, ProjectsActions, ProjectsHydrateAction } from "../types";
 
-export const hydrateHandler = (action: ProjectsHydrateSuccessfulAction): ProjectsState => ({
+export const hydrateSuccessHandler = (action: ProjectsHydrateSuccessfulAction): ProjectsState => ({
     ...action.data,
     loading: false,
     getProjects: {
