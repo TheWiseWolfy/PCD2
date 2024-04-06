@@ -2,6 +2,7 @@ import { Spin } from "../../components/animate/spin"
 import { Card } from "../../components/card/card"
 import { Image } from "../../components/image/image"
 import { Button } from "../../components/input/button"
+import { ButtonRow } from "../../components/input/buttonRow"
 import { Form } from "../../components/input/form"
 import { TextField } from "../../components/input/textfield"
 import { List } from "../../components/list/list"
@@ -15,7 +16,7 @@ export const Login: React.FC = () => {
 
     return (
         <Page centered={true}>
-            <Card>
+            <Card width={384}>
                 <Form onSubmit={logic.onSubmit}>
                     <H1>Login</H1>
                     <List>
@@ -23,18 +24,19 @@ export const Login: React.FC = () => {
                         <TextField value={logic.password} onChange={logic.setPassword} placeholder="Password" masked />
                     </List>
                     <Spacing spacing="m" />
-                    <Button disabled={logic.disabled}>
-                        {!logic.fetching
-                            ? 'Submit'
-                            : <Spin>
-                                <Image id="gear" />
-                            </Spin>
-                        }
-                    </Button>
-                    <Spacing spacing="xs" />
-                    <Button onClick={logic.onGoToCreateUserClick}>
-                        Create user
-                    </Button>
+                    <ButtonRow>
+                        <Button disabled={logic.disabled}>
+                            {!logic.fetching
+                                ? 'Submit'
+                                : <Spin>
+                                    <Image id="gear" />
+                                </Spin>
+                            }
+                        </Button>
+                        <Button onClick={logic.onGoToCreateUserClick}>
+                            Create user
+                        </Button>
+                    </ButtonRow>
                 </Form>
             </Card>
         </Page>
