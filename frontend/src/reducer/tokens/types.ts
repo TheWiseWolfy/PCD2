@@ -1,3 +1,4 @@
+import { Subscription } from "../../hooks/useWebSockets"
 
 export type Token = {
     token_id: string
@@ -28,6 +29,15 @@ export type TokensState = {
         error: null | string
         data: Token | null
     }
+    createTokensSubscribe: {
+        fetching: boolean
+        error: null | string
+        data: Record<string, Subscription>
+    }
+    createTokensUnsubscribe: {
+        fetching: boolean
+        error: null | string
+    }
 }
 
 export type TokensHydrateAction = { type: 'hydrate' }
@@ -42,6 +52,12 @@ export type TokensGetFailedAction = { type: 'get-token-failed', data: string }
 export type TokensCreateAction = { type: 'create-token', data: { projectId: string, name: string, description: string } }
 export type TokensCreateSuccessAction = { type: 'create-token-success', data: Token }
 export type TokensCreateFailedAction = { type: 'create-token-failed', data: string }
+export type TokensCreateSubscribeAction = { type: 'create-token-subscribe', data: { projectId: string } }
+export type TokensCreateSubscribeSuccessAction = { type: 'create-token-subscribe-success', data: { projectId: string, subscription: Subscription } }
+export type TokensCreateSubscribeFailedAction = { type: 'create-token-subscribe-failed', data: string }
+export type TokensCreateUnsubscribeAction = { type: 'create-token-unsubscribe', data: { projectId: string } }
+export type TokensCreateUnsubscribeSuccessAction = { type: 'create-token-unsubscribe-success', data: { projectId: string } }
+export type TokensCreateUnsubscribeFailedAction = { type: 'create-token-unsubscribe-failed', data: string }
 export type TokensActions =
     | TokensHydrateAction
     | TokensHydrateSuccessfulAction
@@ -55,3 +71,9 @@ export type TokensActions =
     | TokensCreateAction
     | TokensCreateSuccessAction
     | TokensCreateFailedAction
+    | TokensCreateSubscribeAction
+    | TokensCreateSubscribeSuccessAction
+    | TokensCreateSubscribeFailedAction
+    | TokensCreateUnsubscribeAction
+    | TokensCreateUnsubscribeSuccessAction
+    | TokensCreateUnsubscribeFailedAction

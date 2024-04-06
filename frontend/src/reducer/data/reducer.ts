@@ -1,15 +1,30 @@
 import React from 'react'
-import { DataActions, DataError, DataHydrateAction, DataState, Data, DataGetAction, DataCreateAction } from './types'
+import { DataActions, DataError, DataHydrateAction, DataState, Data, DataGetAction, DataCreateAction, DataCreateSubscribeAction, DataCreateUnsubscribeAction } from './types'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
 
 export const dataInitialState: DataState = ({
     loading: true,
-    initial: true,
-    fetching: false,
-    error: null,
-    data: []
+    getData: {
+        fetching: false,
+        error: null,
+        data: []
+    },
+    createData: {
+        fetching: false,
+        error: null,
+        data: null
+    },
+    createDataSubscribe: {
+        fetching: false,
+        error: null,
+        data: {}
+    },
+    createDataUnsubscribe: {
+        fetching: false,
+        error: null
+    }
 })
 
 export const dataReducer: React.Reducer<DataState, DataActions> = (state, action) => {
@@ -18,52 +33,105 @@ export const dataReducer: React.Reducer<DataState, DataActions> = (state, action
             return {
                 ...action.data,
                 loading: false,
-                fetching: false
+                getData: {
+                    ...action.data.getData,
+                    fetching: false,
+                    error: null
+                },
+                createData: {
+                    ...action.data.createData,
+                    fetching: false,
+                    error: null
+                }
             }
         case 'hydrate-failed':
             return {
                 ...state,
                 loading: false,
-                fetching: false
+                getData: {
+                    ...state.getData,
+                    fetching: false,
+                    error: null
+                },
+                createData: {
+                    ...state.createData,
+                    fetching: false,
+                    error: null
+                }
             }
-        case 'data-create':
+        case 'get-all-data':
             return {
                 ...state,
-                fetching: true,
-                error: null
+                getData: {
+                    ...state.getData,
+                    fetching: true,
+                    error: null
+                }
             }
-        case 'data-create-success':
+        case 'get-all-data-success':
             return {
                 ...state,
-                fetching: false,
-                error: null,
-                data: [...state.data, action.data]
+                getData: {
+                    ...state.getData,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                }
             }
-        case 'data-create-failed':
+        case 'get-all-data-failed':
             return {
                 ...state,
-                fetching: false,
-                error: state.error
+                getData: {
+                    ...state.getData,
+                    fetching: false,
+                    error: action.data
+                }
             }
-        case 'data-get':
+        case 'create-data':
             return {
                 ...state,
-                fetching: true,
-                error: null
+                createData: {
+                    ...state.createData,
+                    fetching: true,
+                    error: null
+                }
             }
-        case 'data-get-success':
+        case 'create-data-success': {
+            const existingDataIndex = state.getData.data.findIndex(item =>
+                item.project_id === action.data.project_id &&
+                item.visualisation_id === action.data.visualisation_id &&
+                item.timestamp === action.data.timestamp &&
+                item.value === action.data.value
+            )
+
             return {
                 ...state,
-                initial: true,
-                fetching: false,
-                error: null,
-                data: action.data
+                getData: {
+                    ...state.getData,
+                    data: existingDataIndex === -1
+                        ? [action.data]
+                        : [
+                            ...state.getData.data.slice(0, existingDataIndex),
+                            action.data,
+                            ...state.getData.data.slice(existingDataIndex + 1)
+                        ]
+                },
+                createData: {
+                    ...state.createData,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                }
             }
-        case 'data-get-failed':
+        }
+        case 'create-data-failed':
             return {
                 ...state,
-                fetching: false,
-                error: state.error
+                createData: {
+                    ...state.createData,
+                    fetching: false,
+                    error: action.data
+                }
             }
         default:
             return state
@@ -74,15 +142,21 @@ export const dataSideEffects =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>> => {
         const boundGet = get(websocket)
         const boundCreate = create(websocket)
+        const boundSubscribe = subscribe(websocket)
+        const boundUnsubscribe = unsubscribe(websocket)
 
         return (state, action, dispatch) => {
             switch (action.type) {
                 case 'hydrate':
                     return hydrate(state, action, dispatch)
-                case 'data-get':
+                case 'get-all-data':
                     return boundGet(state, action, dispatch)
-                case 'data-create':
+                case 'create-data':
                     return boundCreate(state, action, dispatch)
+                case 'create-data-subscribe':
+                    return boundSubscribe(state, action, dispatch)
+                case 'create-data-unsubscribe':
+                    return boundUnsubscribe(state, action, dispatch)
             }
         }
     }
@@ -105,15 +179,15 @@ const get =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>, DataGetAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ data: Data[] } | DataError>('data-get', { projectId: action.data.projectId })
+                const result = await websocket.request<{ data: Data[] } | DataError>('get-all-data', { projectId: action.data.projectId })
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'data-get-failed', data: result.reason })
+                    return dispatch({ type: 'get-all-data-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'data-get-success', data: result.data })
+                dispatch({ type: 'get-all-data-success', data: result.data })
             } catch (error) {
-                dispatch({ type: 'data-get-failed', data: error as string })
+                dispatch({ type: 'get-all-data-failed', data: error as string })
             }
         }
 
@@ -122,18 +196,46 @@ const create =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>, DataCreateAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ data: Data } | DataError>('data-create', action.data)
+                const result = await websocket.request<{ data: Data } | DataError>('create-data', action.data)
 
                 if ('reason' in result) {
-                    return dispatch({ type: 'data-create-failed', data: result.reason })
+                    return dispatch({ type: 'create-data-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'data-create-success', data: result.data })
+                dispatch({ type: 'create-data-success', data: result.data })
             } catch (error) {
-                dispatch({ type: 'data-create-failed', data: error as string })
+                dispatch({ type: 'create-data-failed', data: error as string })
             }
         }
 
+const subscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>, DataCreateSubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                const result = await websocket.subscribe<{ data: Data } | DataError, DataCreateSubscribeAction['data']>('data-create-subscribe', action.data, (message) => {
+                    if ('reason' in message) {
+                        return
+                    }
+
+                    dispatch({ type: 'create-data-success', data: message.data })
+                })
+
+                dispatch({ type: 'create-data-subscribe-success', data: { visualisationId: action.data.visualisationId, subscription: result } })
+            } catch (error) {
+                dispatch({ type: 'create-data-subscribe-failed', data: error as string })
+            }
+        }
+
+const unsubscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>, DataCreateUnsubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                await state.createDataSubscribe.data[action.data.visualisationId]?.unsubscribe()
+                dispatch({ type: 'create-data-unsubscribe-success', data: { visualisationId: action.data.visualisationId } })
+            } catch (error) {
+                dispatch({ type: 'create-data-unsubscribe-failed', data: error as string })
+            }
+        }
 
 
 

@@ -1,3 +1,4 @@
+import { Subscription } from "../../hooks/useWebSockets"
 
 export type Visualisation = {
     visualisation_id: string
@@ -28,6 +29,15 @@ export type VisualisationsState = {
         error: null | string
         data: Visualisation | null
     }
+    createVisualisationsSubscribe: {
+        fetching: boolean
+        error: null | string
+        data: Record<string, Subscription>
+    }
+    createVisualisationsUnsubscribe: {
+        fetching: boolean
+        error: null | string
+    }
 }
 
 export type VisualisationsHydrateAction = { type: 'hydrate' }
@@ -42,6 +52,12 @@ export type VisualisationsGetFailedAction = { type: 'get-visualisation-failed', 
 export type VisualisationsCreateAction = { type: 'create-visualisation', data: { name: string, description: string, fn: string } }
 export type VisualisationsCreateSuccessAction = { type: 'create-visualisation-success', data: Visualisation }
 export type VisualisationsCreateFailedAction = { type: 'create-visualisation-failed', data: string }
+export type VisualisationsCreateSubscribeAction = { type: 'create-visualisation-subscribe', data: { projectId: string } }
+export type VisualisationsCreateSubscribeSuccessAction = { type: 'create-visualisation-subscribe-success', data: { projectId: string, subscription: Subscription } }
+export type VisualisationsCreateSubscribeFailedAction = { type: 'create-visualisation-subscribe-failed', data: string }
+export type VisualisationsCreateUnsubscribeAction = { type: 'create-visualisation-unsubscribe', data: { projectId: string } }
+export type VisualisationsCreateUnsubscribeSuccessAction = { type: 'create-visualisation-unsubscribe-success', data: { projectId: string } }
+export type VisualisationsCreateUnsubscribeFailedAction = { type: 'create-visualisation-unsubscribe-failed', data: string }
 export type VisualisationsActions =
     | VisualisationsHydrateAction
     | VisualisationsHydrateSuccessfulAction
@@ -55,3 +71,9 @@ export type VisualisationsActions =
     | VisualisationsCreateAction
     | VisualisationsCreateSuccessAction
     | VisualisationsCreateFailedAction
+    | VisualisationsCreateSubscribeAction
+    | VisualisationsCreateSubscribeSuccessAction
+    | VisualisationsCreateSubscribeFailedAction
+    | VisualisationsCreateUnsubscribeAction
+    | VisualisationsCreateUnsubscribeSuccessAction
+    | VisualisationsCreateUnsubscribeFailedAction

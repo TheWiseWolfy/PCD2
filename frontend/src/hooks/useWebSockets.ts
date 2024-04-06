@@ -9,15 +9,15 @@ type Message<T> = {
 }
 type PlainListener<T> = (data: T) => void
 
-type Subscription = {
-    unsubscribe(): void
+export type Subscription = {
+    unsubscribe(): Promise<void>
 }
 
 export type ManagedWebSocket = {
     connected: boolean
     request<R, T = unknown>(action: string, data: T): Promise<R>,
     publish<T>(action: string, data: T): void,
-    subscribe<T>(action: string, callback: PlainListener<T>): Subscription
+    subscribe<T, U = null>(action: string, data: U, callback: PlainListener<T>): Promise<Subscription>
 }
 
 export const useWebSockets = (url: string): ManagedWebSocket => {
@@ -59,7 +59,7 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
         }))
     }
 
-    const subscribe = <T>(action: string, callback: PlainListener<T>) => {
+    const subscribe = async <T, U = null>(action: string, data: U, callback: PlainListener<T>) => {
         if (!socket.current || !opened.current) {
             throw new Error('Socket not connected')
         }
@@ -71,11 +71,7 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
             plainListeners.current[action] = [callback]
         }
 
-        socket.current.send(JSON.stringify({
-            action: `${action}-subscribe`,
-            requestId: undefined,
-            data: null
-        }))
+        await request(`${action}-subscribe`, data || null)
 
         return {
             unsubscribe: unsubscribe(
@@ -85,16 +81,12 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
         }
     }
 
-    const unsubscribe = <T>(action: string, callback: PlainListener<T>) => () => {
+    const unsubscribe = <T>(action: string, callback: PlainListener<T>) => async () => {
         if (!socket.current || !opened.current) {
             throw new Error('Socket not connected')
         }
 
-        socket.current.send(JSON.stringify({
-            action: `${action}-unsubscribe`,
-            requestId: undefined,
-            data: null
-        }))
+        await request(`${action}-unsubscribe`, null)
 
         const index = plainListeners.current[action].findIndex(entry => entry === callback)
 

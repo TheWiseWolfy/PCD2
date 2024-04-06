@@ -1,5 +1,5 @@
 import React from 'react'
-import { VisualisationsActions, VisualisationsError, VisualisationsHydrateAction, VisualisationsState, Visualisation, VisualisationsGetAction, VisualisationsGetAllAction, VisualisationsCreateAction } from './types'
+import { VisualisationsActions, VisualisationsError, VisualisationsHydrateAction, VisualisationsState, Visualisation, VisualisationsGetAction, VisualisationsGetAllAction, VisualisationsCreateAction, VisualisationsCreateSubscribeAction, VisualisationsCreateUnsubscribeAction } from './types'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
@@ -20,7 +20,16 @@ export const visualisationsInitialState: VisualisationsState = ({
         fetching: false,
         error: null,
         data: null
-    }
+    },
+    createVisualisationsSubscribe: {
+        fetching: false,
+        error: null,
+        data: {}
+    },
+    createVisualisationsUnsubscribe: {
+        fetching: false,
+        error: null,
+    },
 })
 
 export const visualisationsReducer: React.Reducer<VisualisationsState, VisualisationsActions> = (state, action) => {
@@ -173,6 +182,72 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
                     error: action.data
                 },
             }
+        case 'create-visualisation-subscribe':
+            return {
+                ...state,
+                createVisualisationsSubscribe: {
+                    ...state.createVisualisationsSubscribe,
+                    fetching: true,
+                    error: null
+                }
+            }
+        case 'create-visualisation-subscribe-success':
+            return {
+                ...state,
+                createVisualisationsSubscribe: {
+                    ...state.createVisualisationsSubscribe,
+                    fetching: false,
+                    error: null,
+                    data: {
+                        ...state.createVisualisationsSubscribe.data,
+                        [action.data.projectId]: action.data.subscription
+                    }
+                }
+            }
+        case 'create-visualisation-subscribe-failed':
+            return {
+                ...state,
+                createVisualisationsSubscribe: {
+                    ...state.createVisualisationsSubscribe,
+                    fetching: false,
+                    error: action.data
+                }
+            }
+        case 'create-visualisation-unsubscribe':
+            return {
+                ...state,
+                createVisualisationsUnsubscribe: {
+                    ...state.createVisualisationsUnsubscribe,
+                    fetching: true,
+                    error: null
+                }
+            }
+        case 'create-visualisation-unsubscribe-success': {
+            const copy = { ...state.createVisualisationsSubscribe.data }
+            delete copy[action.data.projectId]
+
+            return {
+                ...state,
+                createVisualisationsSubscribe: {
+                    ...state.createVisualisationsSubscribe,
+                    data: copy
+                },
+                createVisualisationsUnsubscribe: {
+                    ...state.createVisualisationsUnsubscribe,
+                    fetching: false,
+                    error: null,
+                }
+            }
+        }
+        case 'create-visualisation-unsubscribe-failed':
+            return {
+                ...state,
+                createVisualisationsUnsubscribe: {
+                    ...state.createVisualisationsUnsubscribe,
+                    fetching: false,
+                    error: action.data
+                }
+            }
         default:
             return state
     }
@@ -183,6 +258,8 @@ export const visualisationsSideEffects =
         const boundGetAll = getAll(websocket)
         const boundGet = get(websocket)
         const boundCreate = create(websocket)
+        const boundSubscribe = subscribe(websocket)
+        const boundUnsubscribe = unsubscribe(websocket)
 
         return (state, action, dispatch) => {
             switch (action.type) {
@@ -194,6 +271,10 @@ export const visualisationsSideEffects =
                     return boundGet(state, action, dispatch)
                 case 'create-visualisation':
                     return boundCreate(state, action, dispatch)
+                case 'create-visualisation-subscribe':
+                    return boundSubscribe(state, action, dispatch)
+                case 'create-visualisation-unsubscribe':
+                    return boundUnsubscribe(state, action, dispatch)
             }
         }
     }
@@ -261,4 +342,33 @@ const create =
             }
         }
 
+const subscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateSubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                const result = await websocket.subscribe<{ visualisation: Visualisation } | VisualisationsError, VisualisationsCreateSubscribeAction['data']>('visualisations-create-subscribe', action.data, (message) => {
+                    if ('reason' in message) {
+                        return
+                    }
+
+                    dispatch({ type: 'create-visualisation-success', data: message.visualisation })
+                })
+
+                dispatch({ type: 'create-visualisation-subscribe-success', data: { projectId: action.data.projectId, subscription: result } })
+            } catch (error) {
+                dispatch({ type: 'create-visualisation-subscribe-failed', data: error as string })
+            }
+        }
+
+
+const unsubscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateUnsubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                await state.createVisualisationsSubscribe.data[action.data.projectId]?.unsubscribe()
+                dispatch({ type: 'create-visualisation-unsubscribe-success', data: { projectId: action.data.projectId } })
+            } catch (error) {
+                dispatch({ type: 'create-visualisation-unsubscribe-failed', data: error as string })
+            }
+        }
 

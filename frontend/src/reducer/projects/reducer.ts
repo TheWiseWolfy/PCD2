@@ -1,5 +1,5 @@
 import React from 'react'
-import { ProjectsActions, ProjectsError, ProjectsHydrateAction, ProjectsState, Project, ProjectsGetAction, ProjectsGetAllAction, ProjectsCreateAction } from './types'
+import { ProjectsActions, ProjectsError, ProjectsHydrateAction, ProjectsState, Project, ProjectsGetAction, ProjectsGetAllAction, ProjectsCreateAction, ProjectsCreateSubscribeAction, ProjectsCreateUnsubscribeAction } from './types'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
@@ -20,6 +20,15 @@ export const projectsInitialState: ProjectsState = ({
         fetching: false,
         error: null,
         data: null
+    },
+    createProjectsSubscribe: {
+        fetching: false,
+        error: null,
+        data: null
+    },
+    createProjectsUnsubscribe: {
+        fetching: false,
+        error: null
     }
 })
 
@@ -163,6 +172,61 @@ export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (s
                     error: action.data
                 }
             }
+        case 'create-project-subscribe':
+            return {
+                ...state,
+                createProjectsSubscribe: {
+                    ...state.createProjectsSubscribe,
+                    fetching: true,
+                    error: null
+                }
+            }
+        case 'create-project-subscribe-success':
+            return {
+                ...state,
+                createProjectsSubscribe: {
+                    ...state.createProjectsSubscribe,
+                    fetching: false,
+                    error: null,
+                    data: action.data
+                }
+            }
+        case 'create-project-subscribe-failed':
+            return {
+                ...state,
+                createProjectsSubscribe: {
+                    ...state.createProjectsSubscribe,
+                    fetching: false,
+                    error: action.data
+                }
+            }
+        case 'create-project-unsubscribe':
+            return {
+                ...state,
+                createProjectsUnsubscribe: {
+                    ...state.createProjectsUnsubscribe,
+                    fetching: true,
+                    error: null
+                }
+            }
+        case 'create-project-unsubscribe-success':
+            return {
+                ...state,
+                createProjectsUnsubscribe: {
+                    ...state.createProjectsUnsubscribe,
+                    fetching: false,
+                    error: null,
+                }
+            }
+        case 'create-project-unsubscribe-failed':
+            return {
+                ...state,
+                createProjectsUnsubscribe: {
+                    ...state.createProjectsUnsubscribe,
+                    fetching: false,
+                    error: action.data
+                }
+            }
         default:
             return state
     }
@@ -173,6 +237,8 @@ export const projectsSideEffects =
         const boundGetAll = getAll(websocket)
         const boundGet = get(websocket)
         const boundCreate = create(websocket)
+        const boundSubscribe = subscribe(websocket)
+        const boundUnsubscribe = unsubscribe(websocket)
 
         return (state, action, dispatch) => {
             switch (action.type) {
@@ -184,6 +250,10 @@ export const projectsSideEffects =
                     return boundGet(state, action, dispatch)
                 case 'create-project':
                     return boundCreate(state, action, dispatch)
+                case 'create-project-subscribe':
+                    return boundSubscribe(state, action, dispatch)
+                case 'create-project-unsubscribe':
+                    return boundUnsubscribe(state, action, dispatch)
             }
         }
     }
@@ -248,5 +318,35 @@ const create =
                 dispatch({ type: 'create-project-success', data: result.project })
             } catch (error) {
                 dispatch({ type: 'create-project-failed', data: error as string })
+            }
+        }
+
+const subscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsCreateSubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                const result = await websocket.subscribe<{ project: Project } | ProjectsError>('projects-create-subscribe', null, (message) => {
+                    if ('reason' in message) {
+                        return
+                    }
+
+                    dispatch({ type: 'create-project-success', data: message.project })
+                })
+
+                dispatch({ type: 'create-project-subscribe-success', data: result })
+            } catch (error) {
+                dispatch({ type: 'create-project-subscribe-failed', data: error as string })
+            }
+        }
+
+
+const unsubscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsCreateUnsubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                await state.createProjectsSubscribe.data?.unsubscribe()
+                dispatch({ type: 'create-project-unsubscribe-success' })
+            } catch (error) {
+                dispatch({ type: 'create-project-unsubscribe-failed', data: error as string })
             }
         }

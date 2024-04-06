@@ -30,7 +30,7 @@ export const Statistics: React.FC = () => {
 
     // useEffect(() => {
     //     if (project && dataState.initial) {
-    //         dispatchData({ type: 'data-get', data: { projectId: project.project_id } })
+    //         dispatchData({ type: 'get-all-data', data: { projectId: project.project_id } })
     //     }
     // }, [project])
 

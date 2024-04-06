@@ -1,5 +1,5 @@
 import React from 'react'
-import { TokensActions, TokensError, TokensHydrateAction, TokensState, Token, TokensGetAction, TokensGetAllAction, TokensCreateAction } from './types'
+import { TokensActions, TokensError, TokensHydrateAction, TokensState, Token, TokensGetAction, TokensGetAllAction, TokensCreateAction, TokensCreateSubscribeAction, TokensCreateUnsubscribeAction } from './types'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 
@@ -20,6 +20,15 @@ export const tokensInitialState: TokensState = ({
         fetching: false,
         error: null,
         data: null
+    },
+    createTokensSubscribe: {
+        fetching: false,
+        error: null,
+        data: {}
+    },
+    createTokensUnsubscribe: {
+        fetching: false,
+        error: null,
     }
 })
 
@@ -163,6 +172,73 @@ export const tokensReducer: React.Reducer<TokensState, TokensActions> = (state, 
                     error: action.data
                 }
             }
+        case 'create-token-subscribe':
+            return {
+                ...state,
+                createTokensSubscribe: {
+                    ...state.createTokensSubscribe,
+                    fetching: true,
+                    error: null
+                }
+            }
+        case 'create-token-subscribe-success':
+            return {
+                ...state,
+                createTokensSubscribe: {
+                    ...state.createTokensSubscribe,
+                    fetching: false,
+                    error: null,
+                    data: {
+                        ...state.createTokensSubscribe.data,
+                        [action.data.projectId]: action.data.subscription
+                    }
+                }
+            }
+        case 'create-token-subscribe-failed':
+            return {
+                ...state,
+                createTokensSubscribe: {
+                    ...state.createTokensSubscribe,
+                    fetching: false,
+                    error: action.data
+                }
+            }
+
+        case 'create-token-unsubscribe':
+            return {
+                ...state,
+                createTokensUnsubscribe: {
+                    ...state.createTokensUnsubscribe,
+                    fetching: true,
+                    error: null
+                }
+            }
+        case 'create-token-unsubscribe-success': {
+            const copy = { ...state.createTokensSubscribe.data }
+            delete copy[action.data.projectId]
+        
+            return {
+                ...state,
+                createTokensSubscribe: {
+                    ...state.createTokensSubscribe,
+                    data: copy
+                },
+                createTokensUnsubscribe: {
+                    ...state.createTokensUnsubscribe,
+                    fetching: false,
+                    error: null,
+                }
+            }
+        }
+        case 'create-token-unsubscribe-failed':
+            return {
+                ...state,
+                createTokensUnsubscribe: {
+                    ...state.createTokensUnsubscribe,
+                    fetching: false,
+                    error: action.data
+                }
+            }
         default:
             return state
     }
@@ -173,6 +249,8 @@ export const tokensSideEffects =
         const boundGetAll = getAll(websocket)
         const boundGet = get(websocket)
         const boundCreate = create(websocket)
+        const boundSubscribe = subscribe(websocket)
+        const boundUnsubscribe = unsubscribe(websocket)
 
         return (state, action, dispatch) => {
             switch (action.type) {
@@ -184,6 +262,10 @@ export const tokensSideEffects =
                     return boundGet(state, action, dispatch)
                 case 'create-token':
                     return boundCreate(state, action, dispatch)
+                case 'create-token-subscribe':
+                    return boundSubscribe(state, action, dispatch)
+                case 'create-token-unsubscribe':
+                    return boundUnsubscribe(state, action, dispatch)
             }
         }
     }
@@ -248,5 +330,35 @@ const create =
                 dispatch({ type: 'create-token-success', data: result.token })
             } catch (error) {
                 dispatch({ type: 'create-token-failed', data: error as string })
+            }
+        }
+
+const subscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<TokensState, TokensActions>, TokensCreateSubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                const result = await websocket.subscribe<{ token: Token } | TokensError, TokensCreateSubscribeAction['data']>('tokens-create-subscribe', action.data, (message) => {
+                    if ('reason' in message) {
+                        return
+                    }
+
+                    dispatch({ type: 'create-token-success', data: message.token })
+                })
+
+                dispatch({ type: 'create-token-subscribe-success', data: { projectId: action.data.projectId, subscription: result } })
+            } catch (error) {
+                dispatch({ type: 'create-token-subscribe-failed', data: error as string })
+            }
+        }
+
+
+const unsubscribe =
+    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<TokensState, TokensActions>, TokensCreateUnsubscribeAction> =>
+        async (state, action, dispatch) => {
+            try {
+                await state.createTokensSubscribe.data[action.data.projectId]?.unsubscribe()
+                dispatch({ type: 'create-token-unsubscribe-success', data: { projectId: action.data.projectId } })
+            } catch (error) {
+                dispatch({ type: 'create-token-unsubscribe-failed', data: error as string })
             }
         }

@@ -1,3 +1,4 @@
+import { Subscription } from "../../hooks/useWebSockets"
 
 export type Project = {
     project_id: string
@@ -27,6 +28,15 @@ export type ProjectsState = {
         error: null | string
         data: Project | null
     }
+    createProjectsSubscribe: {
+        fetching: boolean
+        error: null | string
+        data: Subscription | null
+    }
+    createProjectsUnsubscribe: {
+        fetching: boolean
+        error: null | string
+    }
 }
 
 export type ProjectsHydrateAction = { type: 'hydrate' }
@@ -41,6 +51,12 @@ export type ProjectsGetFailedAction = { type: 'get-project-failed', data: string
 export type ProjectsCreateAction = { type: 'create-project', data: { name: string, description: string } }
 export type ProjectsCreateSuccessAction = { type: 'create-project-success', data: Project }
 export type ProjectsCreateFailedAction = { type: 'create-project-failed', data: string }
+export type ProjectsCreateSubscribeAction = { type: 'create-project-subscribe' }
+export type ProjectsCreateSubscribeSuccessAction = { type: 'create-project-subscribe-success', data: Subscription }
+export type ProjectsCreateSubscribeFailedAction = { type: 'create-project-subscribe-failed', data: string }
+export type ProjectsCreateUnsubscribeAction = { type: 'create-project-unsubscribe' }
+export type ProjectsCreateUnsubscribeSuccessAction = { type: 'create-project-unsubscribe-success' }
+export type ProjectsCreateUnsubscribeFailedAction = { type: 'create-project-unsubscribe-failed', data: string }
 export type ProjectsActions =
     | ProjectsHydrateAction
     | ProjectsHydrateSuccessfulAction
@@ -54,3 +70,9 @@ export type ProjectsActions =
     | ProjectsCreateAction
     | ProjectsCreateSuccessAction
     | ProjectsCreateFailedAction
+    | ProjectsCreateSubscribeAction
+    | ProjectsCreateSubscribeSuccessAction
+    | ProjectsCreateSubscribeFailedAction
+    | ProjectsCreateUnsubscribeAction
+    | ProjectsCreateUnsubscribeSuccessAction
+    | ProjectsCreateUnsubscribeFailedAction
