@@ -44,6 +44,6 @@ const call = (self: Self): UnsubscribeService['call'] => async (input) => {
     await self.redisClient.SREM(`subscriptions:connections:projects:${connectionId}`, userId)
     
     return {
-        Unsubscribed: true
+        subscribed: false
     }
 }
