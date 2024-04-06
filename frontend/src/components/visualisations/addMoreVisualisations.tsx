@@ -9,7 +9,7 @@ interface Props {
 
 export const AddMoreVisualisations: FC<Props> = ({ onGoToCreateVisualisation }) => {
     return (
-        <Card width={128} centered>
+        <Card width={384} centered>
             <H3>Need more?</H3>
             <Button onClick={onGoToCreateVisualisation}>Add more</Button>
         </Card>

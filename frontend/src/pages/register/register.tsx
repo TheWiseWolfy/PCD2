@@ -24,7 +24,7 @@ export const Register: React.FC = () => {
                     </Button>
                 </HeaderActionSlot>
             } />
-            <Card>
+            <Card width={384}>
                 <Form onSubmit={logic.onSubmit}>
                     <H1>Create user</H1>
                     <List>
