@@ -64,10 +64,10 @@ const call = (self: Self): CreateService['call'] => async (input) => {
     }
 
     const visualisations = await self.postgresClient.query(`
-        INSERT INTO visualisations (user_id, project_id, name, description, fn)
+        INSERT INTO visualisations (project_id, name, description, fn)
         VALUES ($1, $2, $3, $4)
         RETURNING *
-    `, [userId, projectId, name, description, fn])
+    `, [projectId, name, description, fn])
 
     const connectionIds = await self.redisClient.SMEMBERS(`subscriptions:resources:visualisations:${projectId}`)
 
