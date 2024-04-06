@@ -15,41 +15,57 @@ export const useLoadReducers = () => {
     const [dataState, dataDispatch] = useContext(DataContext)
     const [netState,] = useContext(NetContext)
 
-    const run = useCallback(() => {
-        if (areReducersLoaded) {
-            return
-        }
+    const run = useCallback(
+        () => {
+            if (areReducersLoaded) {
+                return
+            }
 
-        if (usersState.loading) {
-            return usersDispatch({ type: 'hydrate' })
-        }
+            if (usersState.loading) {
+                return usersDispatch({ type: 'hydrate' })
+            }
 
-        if (projectsState.loading) {
-            return projectsDispatch({ type: 'hydrate' })
-        }
+            if (projectsState.loading) {
+                return projectsDispatch({ type: 'hydrate' })
+            }
 
-        if (tokensState.loading) {
-            return tokensDispatch({ type: 'hydrate' })
-        }
+            if (tokensState.loading) {
+                return tokensDispatch({ type: 'hydrate' })
+            }
 
-        if (visualisationsState.loading) {
-            return visualisationsDispatch({ type: 'hydrate' })
-        }
+            if (visualisationsState.loading) {
+                return visualisationsDispatch({ type: 'hydrate' })
+            }
 
-        if (dataState.loading) {
-            return dataDispatch({ type: 'hydrate' })
-        }
+            if (dataState.loading) {
+                return dataDispatch({ type: 'hydrate' })
+            }
 
-        if (!netState.connected) {
-            return
-        }
+            if (!netState.connected) {
+                return
+            }
 
-        setAreReducersLoaded(true)
-    }, [areReducersLoaded, usersState, projectsState, visualisationsState, dataState, netState])
+            setAreReducersLoaded(true)
+        },
+        [
+            areReducersLoaded,
+            usersState,
+            usersDispatch,
+            projectsState,
+            projectsDispatch,
+            tokensState,
+            tokensDispatch,
+            visualisationsState,
+            visualisationsDispatch,
+            dataState,
+            dataDispatch,
+            netState
+        ]
+    )
 
     useEffect(
         () => { run() },
-        [areReducersLoaded, usersState, projectsState, visualisationsState, dataState, netState]
+        [run]
     )
 
     return areReducersLoaded

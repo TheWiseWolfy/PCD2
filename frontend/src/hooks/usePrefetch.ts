@@ -17,65 +17,82 @@ export const usePrefetch = (isAuthenticated: boolean) => {
 
     const [isReady, setIsReady] = useState(false)
 
-    const prefetchData = useCallback(() => {
-        if (!isAuthenticated) {
-            return
-        }
-
-        if (
-            projectsState.getProjects.fetching ||
-            tokensState.getTokens.fetching ||
-            visualisationsState.getAllVisualisations.fetching ||
-            dataState.getData.fetching
-        ) {
-            return
-        }
-
-        if (!isProjectsRequested) {
-            projectsDispatch({ type: 'get-all-projects' })
-            projectsDispatch({ type: 'create-project-subscribe' })
-            setIsProjectsRequested(true)
-            return
-        }
-
-        if (!isTokensRequested) {
-            for (const project of projectsState.getProjects.data) {
-                tokensDispatch({ type: 'get-all-tokens', data: { projectId: project.project_id } })
-                tokensDispatch({ type: 'create-token-subscribe', data: { projectId: project.project_id } })
+    const prefetchData = useCallback(
+        () => {
+            if (!isAuthenticated) {
+                return
             }
 
-            setIsTokensRequested(true)
-            return
-        }
-
-        if (!isVisualisationsRequested) {
-            for (const project of projectsState.getProjects.data) {
-                visualisationsDispatch({ type: 'get-all-visualisations', data: { projectId: project.project_id } })
-                visualisationsDispatch({ type: 'create-visualisation-subscribe', data: { projectId: project.project_id } })
+            if (
+                projectsState.getProjects.fetching ||
+                tokensState.getTokens.fetching ||
+                visualisationsState.getAllVisualisations.fetching ||
+                dataState.getData.fetching
+            ) {
+                return
             }
 
-            setIsVisualisationsRequested(true)
-            return
-        }
+            if (!isProjectsRequested) {
+                projectsDispatch({ type: 'get-all-projects' })
+                projectsDispatch({ type: 'create-project-subscribe' })
+                setIsProjectsRequested(true)
+                return
+            }
 
-        if (!isDataRequested) {
-            for (const projectId in visualisationsState.getAllVisualisations.data) {
-                for (const visualisation of visualisationsState.getAllVisualisations.data[projectId]) {
-                    dataDispatch({ type: 'get-all-data', data: { visualisationId: visualisation.visualisation_id } })
-                    dataDispatch({ type: 'create-data-subscribe', data: { visualisationId: visualisation.visualisation_id } })
+            if (!isTokensRequested) {
+                for (const project of projectsState.getProjects.data) {
+                    tokensDispatch({ type: 'get-all-tokens', data: { projectId: project.project_id } })
+                    tokensDispatch({ type: 'create-token-subscribe', data: { projectId: project.project_id } })
                 }
+
+                setIsTokensRequested(true)
+                return
             }
 
-            setIsDataRequested(true)
-            return
-        }
+            if (!isVisualisationsRequested) {
+                for (const project of projectsState.getProjects.data) {
+                    visualisationsDispatch({ type: 'get-all-visualisations', data: { projectId: project.project_id } })
+                    visualisationsDispatch({ type: 'create-visualisation-subscribe', data: { projectId: project.project_id } })
+                }
 
-        setIsReady(true)
-    }, [isAuthenticated, isProjectsRequested, isTokensRequested, isVisualisationsRequested, isDataRequested, projectsState, tokensState, visualisationsState, dataState])
+                setIsVisualisationsRequested(true)
+                return
+            }
+
+            if (!isDataRequested) {
+                for (const projectId in visualisationsState.getAllVisualisations.data) {
+                    for (const visualisation of visualisationsState.getAllVisualisations.data[projectId]) {
+                        dataDispatch({ type: 'get-all-data', data: { visualisationId: visualisation.visualisation_id } })
+                        dataDispatch({ type: 'create-data-subscribe', data: { visualisationId: visualisation.visualisation_id } })
+                    }
+                }
+
+                setIsDataRequested(true)
+                return
+            }
+
+            setIsReady(true)
+        },
+        [
+            isAuthenticated,
+            isProjectsRequested,
+            isTokensRequested,
+            isVisualisationsRequested,
+            isDataRequested,
+            projectsState,
+            projectsDispatch,
+            tokensState,
+            tokensDispatch,
+            visualisationsState,
+            visualisationsDispatch,
+            dataState,
+            dataDispatch
+        ]
+    )
 
     useEffect(() => {
         prefetchData()
-    }, [isAuthenticated, isProjectsRequested, isTokensRequested, isVisualisationsRequested, isDataRequested, projectsState, tokensState, visualisationsState, dataState])
+    }, [prefetchData])
 
     return isReady
 }

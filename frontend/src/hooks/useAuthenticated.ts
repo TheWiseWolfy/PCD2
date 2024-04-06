@@ -23,11 +23,11 @@ export const useAuthenticated = (areReducersLoaded: boolean) => {
         }
 
         usersDispatch({ type: 'login', data: usersState.login.data.tokens })
-    }, [areReducersLoaded, usersState])
+    }, [areReducersLoaded, usersState, usersDispatch, isAuthenticated, setIsAuthenticated])
 
     useEffect(() => {
         checkIfAuthenticated()
-    }, [areReducersLoaded, usersState])
+    }, [checkIfAuthenticated])
 
     return isAuthenticated
 }
