@@ -7,12 +7,17 @@ type Message<T> = {
     requestId: undefined | string
     data: T
 }
+type PlainListener<T> = (data: T) => void
+
+type Subscription = {
+    unsubscribe(): void
+}
 
 export type ManagedWebSocket = {
     connected: boolean
     request<R, T = unknown>(action: string, data: T): Promise<R>,
     publish<T>(action: string, data: T): void,
-    subscribe<T>(action: string, callback: (data: T) => void): void
+    subscribe<T>(action: string, callback: PlainListener<T>): Subscription
 }
 
 export const useWebSockets = (url: string): ManagedWebSocket => {
@@ -22,7 +27,7 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
     const [messages, setMessages] = useState<Record<string, Message<any>[]>>({})
     const [requests, setRequests] = useState<Record<string, Message<any>>>({})
     const requestListeners = useRef<Record<string, DeferredPromise<any>>>({})
-    const plainListeners = useRef<Record<string, (data: any) => void>>({})
+    const plainListeners = useRef<Record<string, PlainListener<any>[]>>({})
 
     const request = async <T, R>(action: string, data: T): Promise<R> => {
         if (!socket.current || !opened.current) {
@@ -54,17 +59,50 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
         }))
     }
 
-    const subscribe = <T>(action: string, callback: (data: T) => void) => {
+    const subscribe = <T>(action: string, callback: PlainListener<T>) => {
         if (!socket.current || !opened.current) {
+            throw new Error('Socket not connected')
+        }
+
+
+        if (plainListeners.current[action]) {
+            plainListeners.current[action].push(callback)
+        } else {
+            plainListeners.current[action] = [callback]
+        }
+
+        socket.current.send(JSON.stringify({
+            action: `${action}-subscribe`,
+            requestId: undefined,
+            data: null
+        }))
+
+        return {
+            unsubscribe: unsubscribe(
+                action,
+                callback,
+            )
+        }
+    }
+
+    const unsubscribe = <T>(action: string, callback: PlainListener<T>) => () => {
+        if (!socket.current || !opened.current) {
+            throw new Error('Socket not connected')
+        }
+
+        socket.current.send(JSON.stringify({
+            action: `${action}-unsubscribe`,
+            requestId: undefined,
+            data: null
+        }))
+
+        const index = plainListeners.current[action].findIndex(entry => entry === callback)
+
+        if (index === -1) {
             return
         }
 
-        plainListeners.current[action] = callback
-        socket.current.send(JSON.stringify({
-            action,
-            requestId: undefined,
-            data: { channel: action }
-        }))
+        plainListeners.current[action].splice(index, 1)
     }
 
     useWebsocketManager(socket, url, opened, setConnected, setRequests, setMessages)
@@ -169,17 +207,17 @@ const useWebSocketMessageQueue = (
     messages: Record<string, Message<any>[]>,
     setMessages: (requests: Record<string, Message<any>[]>) => void,
     requestListeners: { current: Record<string, DeferredPromise<any>> },
-    plainListeners: { current: Record<string, (data: any) => void> }
+    plainListeners: { current: Record<string, PlainListener<any>[]> }
 ) => {
     useEffect(() => {
         if (Object.values(requests).length > 0) {
             const requestsCopy = { ...requests }
 
-            for (const [requestId, message] of Object.entries(requestsCopy)) {
+            for (const [requestId, messageEntry] of Object.entries(requestsCopy)) {
                 const listener = requestListeners.current[requestId]
 
                 if (listener) {
-                    listener.resolve(message.data)
+                    listener.resolve(messageEntry.data)
                 }
 
                 delete requestsCopy[requestId]
@@ -191,11 +229,16 @@ const useWebSocketMessageQueue = (
         if (Object.values(messages).length > 0) {
             const messagesCopy = { ...messages }
 
-            for (const [messageAction, oldMessages] of Object.entries(messagesCopy)) {
-                const listener = plainListeners.current[messageAction]
+            for (const [messageAction, messageEntries] of Object.entries(messagesCopy)) {
+                const listeners = plainListeners.current[messageAction]
 
-                for (const message of oldMessages) {
-                    if (listener) {
+                if (!listeners || listeners.length === 0) {
+                    delete messagesCopy[messageAction]
+                    continue
+                }
+
+                for (const message of messageEntries) {
+                    for (const listener of listeners) {
                         listener(message.data)
                     }
                 }
