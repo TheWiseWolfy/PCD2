@@ -5,8 +5,8 @@ import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
-    projectId: string
     tokenId: string
+    projectId: string
 }
 
 interface GetService extends BaseService<Input, any> { }
@@ -29,8 +29,8 @@ export const makeGetService = (redisClient: redis.RedisClientType, postgresClien
 
 const call = (self: Self): GetService['call'] => async (input) => {
     const connectionId = input.connectionId
-    const projectId = input.projectId
     const tokenId = input.tokenId
+    const projectId = input.projectId
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)

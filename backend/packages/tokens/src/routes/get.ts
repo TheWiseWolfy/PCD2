@@ -4,8 +4,8 @@ import { makeResponse } from '../utils/response'
 
 type Input = {
     connectionId: string
-    projectId: string
     tokenId: string
+    projectId: string
 }
 
 interface GetRoute extends BaseRoute<Input, any> { }
@@ -26,10 +26,10 @@ export const makeGetRoute = (service: BaseService<Input, any>): GetRoute => {
 
 const call = (self: Self): GetRoute['call'] => async (request) => {
     const connectionId = request.connectionId
-    const projectId = request.data.projectId
     const tokenId = request.data.tokenId
+    const projectId = request.data.projectId
 
-    const response = await self.service.call({ connectionId, projectId, tokenId })
+    const response = await self.service.call({ connectionId, tokenId, projectId })
 
     return makeResponse(
         200,
