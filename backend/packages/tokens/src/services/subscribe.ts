@@ -29,7 +29,6 @@ export const makeSubscribeService = (redisClient: redis.RedisClientType, postgre
 
 const call = (self: Self): SubscribeService['call'] => async (input) => {
     const connectionId = input.connectionId
-    const tokenId = input.tokenId
     const projectId = input.projectId
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
@@ -51,18 +50,6 @@ const call = (self: Self): SubscribeService['call'] => async (input) => {
     `, [projectId, userId])
 
     if (!projects.rows[0]) {
-        return {
-            reason: 'Not found'
-        }
-    }
-
-    const tokens = await self.postgresClient.query(`
-        SELECT *
-        FROM tokens t
-        WHERE t.token_id = $1 AND t.project_id = $2
-    `, [tokenId, projectId])
-
-    if (!tokens.rows[0]) {
         return {
             reason: 'Not found'
         }

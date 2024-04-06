@@ -5,7 +5,6 @@ import { makeResponse } from '../utils/response'
 type Input = {
     connectionId: string
     projectId: string
-    visualisationId: string
 }
 
 interface UnsubscribeRoute extends BaseRoute<Input, any> { }
@@ -27,9 +26,8 @@ export const makeUnsubscribeRoute = (service: BaseService<Input, any>): Unsubscr
 const call = (self: Self): UnsubscribeRoute['call'] => async (request) => {
     const connectionId = request.connectionId
     const projectId = request.data.projectId
-    const visualisationId = request.data.visualisationId
 
-    const response = await self.service.call({ connectionId, projectId, visualisationId })
+    const response = await self.service.call({ connectionId, projectId })
 
     return makeResponse(
         200,

@@ -4,7 +4,6 @@ import { makeResponse } from '../utils/response'
 
 type Input = {
     connectionId: string
-    tokenId: string
     projectId: string
 }
 
@@ -26,10 +25,9 @@ export const makeUnsubscribeRoute = (service: BaseService<Input, any>): Unsubscr
 
 const call = (self: Self): UnsubscribeRoute['call'] => async (request) => {
     const connectionId = request.connectionId
-    const tokenId = request.data.tokenId
     const projectId = request.data.projectId
 
-    const response = await self.service.call({ connectionId, tokenId, projectId })
+    const response = await self.service.call({ connectionId, projectId })
 
     return makeResponse(
         200,

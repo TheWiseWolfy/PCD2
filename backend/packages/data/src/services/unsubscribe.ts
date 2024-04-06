@@ -5,7 +5,6 @@ import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
-    projectId: string
     visualisationId: string
 }
 
@@ -29,7 +28,6 @@ export const makeUnsubscribeService = (redisClient: redis.RedisClientType, postg
 
 const call = (self: Self): UnsubscribeService['call'] => async (input) => {
     const connectionId = input.connectionId
-    const projectId = input.projectId
     const visualisationId = input.visualisationId
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
@@ -48,8 +46,8 @@ const call = (self: Self): UnsubscribeService['call'] => async (input) => {
         SELECT *
         FROM projects p
         INNER JOIN visualisations v ON p.project_id = v.project_id
-        WHERE p.project_id = $1 AND p.user_id = $2 AND v.visualisation_id = $3
-    `, [projectId, userId, visualisationId])
+        WHERE p.user_id = $1 AND v.visualisation_id = $2
+    `, [userId, visualisationId])
 
     if (!projectWithVisualisation.rows?.[0]) {
         return {

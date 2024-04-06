@@ -6,7 +6,6 @@ import { BaseService } from '../utils/service'
 type Input = {
     connectionId: string
     projectId: string
-    visualisationId: string
 }
 
 interface SubscribeService extends BaseService<Input, any> { }
@@ -30,7 +29,6 @@ export const makeSubscribeService = (redisClient: redis.RedisClientType, postgre
 const call = (self: Self): SubscribeService['call'] => async (input) => {
     const connectionId = input.connectionId
     const projectId = input.projectId
-    const visualisationId = input.visualisationId
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)
@@ -51,18 +49,6 @@ const call = (self: Self): SubscribeService['call'] => async (input) => {
     `, [projectId, userId])
 
     if (!projects.rows[0]) {
-        return {
-            reason: "Not found"
-        }
-    }
-
-    const visualisations = await self.postgresClient.query(`
-        SELECT *
-        FROM visualisations v
-        WHERE v.visualisationId = $1 AND v.project_id = $2
-    `, [visualisationId, projectId])
-
-    if (!visualisations.rows[0]) {
         return {
             reason: "Not found"
         }
