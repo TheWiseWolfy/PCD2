@@ -1,8 +1,7 @@
 import React, { createContext, useEffect, useReducer } from "react";
-import { NetActions, NetState } from "./types";
-import { netInitialState, netReducer } from "./reducer";
-import { useReducerWithSideEffects } from "../../hooks/useReducerWithSideEffects";
 import { ManagedWebSocket } from "../../hooks/useWebSockets";
+import { netInitialState, netReducer } from "./reducer";
+import { NetActions, NetState } from "./types";
 
 interface Props {
     websocket: ManagedWebSocket,

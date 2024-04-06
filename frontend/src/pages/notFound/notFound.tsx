@@ -7,7 +7,7 @@ import { P } from "../../components/typography/p";
 import { useNotFoundPage } from "./logic";
 
 export const NotFound: FC = () => {
-    const logic = useNotFoundPage()
+    useNotFoundPage()
 
     return (
         <Page centered>

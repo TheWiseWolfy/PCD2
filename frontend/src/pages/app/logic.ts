@@ -6,6 +6,5 @@ export const useAppPageLogic = () => {
 
     useEffect(() => {
         navigate('/app/projects')
-    }, [])
-
+    }, [navigate])
 }
