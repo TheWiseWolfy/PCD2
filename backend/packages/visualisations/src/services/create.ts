@@ -69,7 +69,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
         RETURNING *
     `, [userId, projectId, name, description, fn])
 
-    const connectionIds = await self.redisClient.SMEMBERS(`users:${userId}`)
+    const connectionIds = await self.redisClient.SMEMBERS(`subscriptions:resources:visualisations:${projectId}`)
 
     for await (const connectionId of connectionIds) {
         if (connection === input.connectionId) {
