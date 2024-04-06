@@ -42,7 +42,7 @@ export const createTokenSubscribeSideEffect = (websocket: ManagedWebSocket): Red
                     return
                 }
 
-                dispatch({ type: 'create-token-success', data: message.token })
+                dispatch({ type: 'create-token-success', data: { projectId: message.token.project_id, data: message.token } })
             })
 
             dispatch({ type: 'create-token-subscribe-success', data: { projectId: action.data.projectId, subscription: result } })

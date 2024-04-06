@@ -17,7 +17,10 @@ export const getDataSuccessHandler = (state: DataState, action: DataGetSuccessAc
         ...state.getData,
         fetching: false,
         error: null,
-        data: action.data
+        data: {
+            ...state.getData.data,
+            [action.data.visualisationId]: action.data.data
+        }
     }
 })
 
@@ -34,13 +37,13 @@ export const getDataSideEffect =
     (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<DataState, DataActions>, DataGetAction> =>
         async (state, action, dispatch) => {
             try {
-                const result = await websocket.request<{ data: Data[] } | DataError>('get-all-data', { projectId: action.data.projectId })
+                const result = await websocket.request<{ data: Data[] } | DataError>('data-get-all', { visualisationId: action.data.visualisationId })
 
                 if ('reason' in result) {
                     return dispatch({ type: 'get-all-data-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'get-all-data-success', data: result.data })
+                dispatch({ type: 'get-all-data-success', data: { visualisationId: action.data.visualisationId, data: result.data } })
             } catch (error) {
                 dispatch({ type: 'get-all-data-failed', data: error as string })
             }

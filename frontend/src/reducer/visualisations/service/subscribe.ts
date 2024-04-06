@@ -48,7 +48,7 @@ export const createVisualisationSubscribeSideEffect = (websocket: ManagedWebSock
                     return
                 }
 
-                dispatch({ type: 'create-visualisation-success', data: message.visualisation })
+                dispatch({ type: 'create-visualisation-success', data: { projectId: message.visualisation.project_id, data: message.visualisation } })
             })
 
             dispatch({ type: 'create-visualisation-subscribe-success', data: { projectId: action.data.projectId, subscription: result } })

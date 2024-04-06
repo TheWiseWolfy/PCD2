@@ -18,7 +18,10 @@ export const getAllVisualisationsSuccessHandler = (state: VisualisationsState, a
         ...state.getAllVisualisations,
         fetching: false,
         error: null,
-        data: action.data
+        data: {
+            ...state.getAllVisualisations.data,
+            [action.data.projectId]: action.data.data
+        }
     },
 });
 
@@ -34,13 +37,13 @@ export const getAllVisualisationsFailedHandler = (state: VisualisationsState, ac
 export const getAllVisualisationsSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsGetAllAction> =>
     async (state, action, dispatch) => {
         try {
-            const result = await websocket.request<{ visualisations: Visualisation[]}  | VisualisationsError>('visualisations-get-all', action.data)
+            const result = await websocket.request<{ visualisations: Visualisation[] } | VisualisationsError>('visualisations-get-all', action.data)
 
             if ('reason' in result) {
                 return dispatch({ type: 'get-all-visualisations-failed', data: result.reason })
             }
 
-            dispatch({ type: 'get-all-visualisations-success', data: result.visualisations })
+            dispatch({ type: 'get-all-visualisations-success', data: { projectId: action.data.projectId, data: result.visualisations } })
         } catch (error) {
             dispatch({ type: 'get-all-visualisations-failed', data: error as string })
         }

@@ -12,19 +12,23 @@ export const getTokenHandler = (state: TokensState): TokensState => ({
     }
 });
 
-export const getTokenSuccessHandler = (state: TokensState, action: TokensGetSuccessAction) => {
-    const existingTokenIndex = state.getTokens.data.findIndex(item => item.token_id === action.data.token_id);
+export const getTokenSuccessHandler = (state: TokensState, action: TokensGetSuccessAction): TokensState => {
+    const existingTokenIndex = state.getTokens.data[action.data.project_id].findIndex(item => item.token_id === action.data.token_id);
     return {
         ...state,
         getTokens: {
             ...state.getTokens,
-            data: existingTokenIndex === -1
-                ? [action.data]
-                : [
-                    ...state.getTokens.data.slice(0, existingTokenIndex),
-                    action.data,
-                    ...state.getTokens.data.slice(existingTokenIndex + 1)
-                ]
+            data: {
+                ...state.getTokens.data,
+                [action.data.project_id]:
+                    existingTokenIndex === -1
+                        ? [action.data]
+                        : [
+                            ...state.getTokens.data[action.data.project_id].slice(0, existingTokenIndex),
+                            action.data,
+                            ...state.getTokens.data[action.data.project_id].slice(existingTokenIndex + 1)
+                        ]
+            }
         },
         getToken: {
             ...state.getToken,
@@ -47,7 +51,7 @@ export const getTokenFailedHandler = (state: TokensState, action: TokensGetFaile
 export const getTokenSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<TokensState, TokensActions>, TokensGetAction> =>
     async (state, action, dispatch) => {
         try {
-            const result = await websocket.request<{ token: Token}  | TokensError>('tokens-get', action.data)
+            const result = await websocket.request<{ token: Token } | TokensError>('tokens-get', action.data)
 
             if ('reason' in result) {
                 return dispatch({ type: 'get-token-failed', data: result.reason })

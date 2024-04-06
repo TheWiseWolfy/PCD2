@@ -27,7 +27,10 @@ export const getAllTokensSuccessHandler = (state: TokensState, action: TokensGet
         ...state.getTokens,
         fetching: false,
         error: null,
-        data: action.data
+        data: {
+            ...state.getTokens.data,
+            [action.data.projectId]: action.data.data
+        }
     }
 });
 
@@ -40,7 +43,7 @@ export const getAllTokensSideEffect = (websocket: ManagedWebSocket): ReducerSide
                 return dispatch({ type: 'get-all-tokens-failed', data: result.reason })
             }
 
-            dispatch({ type: 'get-all-tokens-success', data: result.tokens })
+            dispatch({ type: 'get-all-tokens-success', data: { projectId: action.data.projectId, data: result.tokens } })
         } catch (error) {
             dispatch({ type: 'get-all-tokens-failed', data: error as string })
         }

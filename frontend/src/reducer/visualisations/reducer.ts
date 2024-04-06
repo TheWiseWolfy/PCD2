@@ -15,7 +15,7 @@ export const visualisationsInitialState: VisualisationsState = ({
     getAllVisualisations: {
         fetching: false,
         error: null,
-        data: []
+        data: {}
     },
     getVisualisation: {
         fetching: false,

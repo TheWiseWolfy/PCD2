@@ -12,30 +12,31 @@ export const createDataHandler = (state: DataState, action: DataCreateAction): D
 })
 
 export const createDataSuccessHandler = (state: DataState, action: DataCreateSuccessAction): DataState => {
-    const existingDataIndex = state.getData.data.findIndex(item =>
-        item.project_id === action.data.project_id &&
-        item.visualisation_id === action.data.visualisation_id &&
-        item.timestamp === action.data.timestamp &&
-        item.value === action.data.value
-    )
+    const existingDataIndex = state.getData.data[action.data.visualisationId]?.findIndex(item =>
+        item.data_id === action.data.data.data_id
+    ) || -1
 
     return {
         ...state,
         getData: {
             ...state.getData,
-            data: existingDataIndex === -1
-                ? [action.data]
-                : [
-                    ...state.getData.data.slice(0, existingDataIndex),
-                    action.data,
-                    ...state.getData.data.slice(existingDataIndex + 1)
-                ]
+            data: {
+                ...state.getData.data,
+                [action.data.visualisationId]:
+                    existingDataIndex === -1
+                        ? [action.data.data]
+                        : [
+                            ...state.getData.data[action.data.visualisationId].slice(0, existingDataIndex),
+                            action.data.data,
+                            ...state.getData.data[action.data.visualisationId].slice(existingDataIndex + 1)
+                        ]
+            }
         },
         createData: {
             ...state.createData,
             fetching: false,
             error: null,
-            data: action.data
+            data: action.data.data
         }
     }
 }
@@ -59,7 +60,7 @@ export const createDataSideEffect =
                     return dispatch({ type: 'create-data-failed', data: result.reason })
                 }
 
-                dispatch({ type: 'create-data-success', data: result.data })
+                dispatch({ type: 'create-data-success', data: { visualisationId: action.data.visualisationId, data: result.data } })
             } catch (error) {
                 dispatch({ type: 'create-data-failed', data: error as string })
             }

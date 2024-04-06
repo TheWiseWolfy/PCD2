@@ -15,7 +15,7 @@ export const tokensInitialState: TokensState = ({
     getTokens: {
         fetching: false,
         error: null,
-        data: []
+        data: {}
     },
     getToken: {
         fetching: false,

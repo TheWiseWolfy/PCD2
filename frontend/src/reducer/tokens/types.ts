@@ -17,7 +17,7 @@ export type TokensState = {
     getTokens: {
         fetching: boolean
         error: null | string
-        data: Token[]
+        data: Record<string, Token[]>
     }
     getToken: {
         fetching: boolean
@@ -44,13 +44,13 @@ export type TokensHydrateAction = { type: 'hydrate' }
 export type TokensHydrateSuccessfulAction = { type: 'hydrate-success', data: TokensState }
 export type TokensHydrateFailedAction = { type: 'hydrate-failed' }
 export type TokensGetAllAction = { type: 'get-all-tokens', data: { projectId: string } }
-export type TokensGetAllSuccessAction = { type: 'get-all-tokens-success', data: Token[] }
+export type TokensGetAllSuccessAction = { type: 'get-all-tokens-success', data: { projectId: string, data: Token[] } }
 export type TokensGetAllFailedAction = { type: 'get-all-tokens-failed', data: string }
 export type TokensGetAction = { type: 'get-token', data: { projectId: string, tokenId: string } }
 export type TokensGetSuccessAction = { type: 'get-token-success', data: Token }
 export type TokensGetFailedAction = { type: 'get-token-failed', data: string }
 export type TokensCreateAction = { type: 'create-token', data: { projectId: string, name: string, description: string } }
-export type TokensCreateSuccessAction = { type: 'create-token-success', data: Token }
+export type TokensCreateSuccessAction = { type: 'create-token-success', data: { projectId: string, data: Token } }
 export type TokensCreateFailedAction = { type: 'create-token-failed', data: string }
 export type TokensCreateSubscribeAction = { type: 'create-token-subscribe', data: { projectId: string } }
 export type TokensCreateSubscribeSuccessAction = { type: 'create-token-subscribe-success', data: { projectId: string, subscription: Subscription } }

@@ -14,7 +14,7 @@ export const dataInitialState: DataState = ({
     getData: {
         fetching: false,
         error: null,
-        data: []
+        data: {}
     },
     createData: {
         fetching: false,

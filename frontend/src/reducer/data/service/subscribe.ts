@@ -40,7 +40,7 @@ export const createDataSubscribeSideEffect =
                         return
                     }
 
-                    dispatch({ type: 'create-data-success', data: message.data })
+                    dispatch({ type: 'create-data-success', data: { visualisationId: message.data.visualisation_id, data: message.data } })
                 })
 
                 dispatch({ type: 'create-data-subscribe-success', data: { visualisationId: action.data.visualisationId, subscription: result } })
