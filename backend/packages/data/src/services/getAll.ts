@@ -9,14 +9,14 @@ type Input = {
     visualisationId: string
 }
 
-interface GetService extends BaseService<Input, any> { }
+interface GetAllService extends BaseService<Input, any> { }
 
 type Self = {
     redisClient: redis.RedisClientType
     postgresClient: pg.Pool
 }
 
-export const makeGetAllService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetService => {
+export const makeGetAllService = (redisClient: redis.RedisClientType, postgresClient: pg.Pool): GetAllService => {
     const self: Self = {
         redisClient,
         postgresClient
@@ -27,7 +27,7 @@ export const makeGetAllService = (redisClient: redis.RedisClientType, postgresCl
     }
 }
 
-const call = (self: Self): GetService['call'] => async (input) => {
+const call = (self: Self): GetAllService['call'] => async (input) => {
     const connectionId = input.connectionId
     const projectId = input.projectId
     const visualisationId = input.visualisationId

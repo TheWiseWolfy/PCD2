@@ -57,7 +57,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
 
     if (projects.rows.length === 0) {
         return {
-            reason: 'Not authorized'
+            reason: 'Not found'
         }
     }
 

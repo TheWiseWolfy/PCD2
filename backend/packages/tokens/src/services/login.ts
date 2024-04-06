@@ -40,7 +40,7 @@ const call = (self: Self): LoginService['call'] => async (input) => {
 
     if (tokens.rows.length === 0) {
         return {
-            reason: 'Not authorized'
+            reason: 'Not found'
         }
     }
 
