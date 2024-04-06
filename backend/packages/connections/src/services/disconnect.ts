@@ -28,9 +28,14 @@ const call = (self: Self): DisconnectService['call'] => async (input) => {
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)
     const user = connection?.user
+    const project = connection?.project
 
     if (user) {
         await self.redisClient.SREM(`users:${user.user_id}`, connectionId)
+    }
+
+    if (project) {
+        await self.redisClient.SREM(`projects:${project.project_id}`, connectionId)
     }
 
     await self.redisClient.HDEL('connections', connectionId)

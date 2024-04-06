@@ -10,6 +10,8 @@ import { makeGetAllRoute } from './src/routes/getAll'
 import { makeCreateRoute } from './src/routes/create'
 import { makeRouter } from './src/utils/router'
 import { makeLogger } from './src/utils/logger'
+import { makeLoginService } from './src/services/login'
+import { makeLoginRoute } from './src/routes/login'
 
 export const handler = async (event: any, _context: any) => {
     const REDIS_HOST = process.env['REDIS_HOST']
@@ -38,15 +40,18 @@ export const handler = async (event: any, _context: any) => {
     const getService = makeGetService(redisClient, postgresClient)
     const getAllService = makeGetAllService(redisClient, postgresClient)
     const createService = makeCreateService(callbackAPIClient, redisClient, postgresClient)
+    const loginService = makeLoginService(redisClient, postgresClient)
 
     const getRoute = makeGetRoute(getService)
     const getAllRoute = makeGetAllRoute(getAllService)
     const createRoute = makeCreateRoute(createService)
+    const loginRoute = makeLoginRoute(loginService)
 
     const router = makeRouter(logger)
     router.register('tokens-get', getRoute)
     router.register('tokens-get-all', getAllRoute)
     router.register('tokens-create', createRoute)
+    router.register('tokens-login', loginRoute)
 
     const response = await router.call(event)
 

@@ -60,6 +60,8 @@ Resources:
       ProtocolType: WEBSOCKET
       RouteSelectionExpression: "${request.body.action}"
 
+
+
   # DefaultRoute:
   #   Type: AWS::ApiGatewayV2::Route
   #   Properties:
@@ -192,6 +194,17 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref TokensCreateIntegration
+  TokensLoginRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: tokens-login
+      AuthorizationType: NONE
+      OperationName: TokensLoginRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref TokensLoginIntegration
   VisualisationsGetRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -247,6 +260,8 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref DataCreateIntegration
+
+
 
   ConnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
@@ -347,6 +362,15 @@ Resources:
       Description: Tokens create Integration
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
+  TokensLoginIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - TokensFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Tokens login Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
   VisualisationsGetIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn:
@@ -408,6 +432,7 @@ Resources:
       - TokensGetAllIntegration
       - TokensGetIntegration
       - TokensCreateIntegration
+      - TokensLoginIntegration
       - VisualisationsGetAllIntegration
       - VisualisationsGetIntegration
       - VisualisationsCreateIntegration
