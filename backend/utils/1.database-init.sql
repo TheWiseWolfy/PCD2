@@ -55,6 +55,7 @@ CREATE TABLE public.visualisations (
 	project_id uuid NOT NULL,
 	"name" varchar DEFAULT ''::character varying NOT NULL,
 	description varchar DEFAULT ''::character varying NOT NULL,
+	fn varchar DEFAULT 'avg'::character varying NOT NULL,
 	CONSTRAINT visualisations_pk PRIMARY KEY (visualisation_id),
 	CONSTRAINT visualisations_projects_fk FOREIGN KEY (project_id) REFERENCES public.projects(project_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -63,6 +64,29 @@ CREATE TABLE public.visualisations (
 
 ALTER TABLE public.visualisations OWNER TO postgres;
 GRANT ALL ON TABLE public.visualisations TO postgres;
+
+
+-- public.tokens definition
+
+-- Drop table
+
+-- DROP TABLE public.tokens;
+
+CREATE TABLE public.tokens (
+	token_id uuid DEFAULT gen_random_uuid() NOT NULL,
+	project_id uuid NOT NULL,
+	"name" varchar DEFAULT ''::character varying NOT NULL,
+	description varchar DEFAULT ''::character varying NOT NULL,
+	"token" varchar DEFAULT ''::character varying NOT NULL,
+	CONSTRAINT tokens_pk PRIMARY KEY (token_id),
+	CONSTRAINT tokens_unique UNIQUE (token),
+	CONSTRAINT tokens_projects_fk FOREIGN KEY (project_id) REFERENCES public.projects(project_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Permissions
+
+ALTER TABLE public.tokens OWNER TO postgres;
+GRANT ALL ON TABLE public.tokens TO postgres;
 
 
 -- public."data" definition
