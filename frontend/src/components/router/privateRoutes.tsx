@@ -1,42 +1,19 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { FC } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuthenticated } from "../../hooks/useAuthenticated";
 import { useLoadReducers } from "../../hooks/useLoadReducers";
-import { UsersContext } from "../../reducer/users/context";
-import { Page } from "../page/page";
+import { usePrefetch } from "../../hooks/usePrefetch";
 import { Spin } from "../animate/spin";
 import { Image } from "../image/image";
+import { Page } from "../page/page";
 
 export const PrivateRoutes: FC = () => {
     const location = useLocation();
-    const [usersState, usersDispatch] = useContext(UsersContext)
-    const [isReady, setIsReady] = useState(false)
     const areReducersLoaded = useLoadReducers()
+    const isAuthenticated = useAuthenticated(areReducersLoaded)
+    const isReady = usePrefetch(isAuthenticated || false)
 
-    const checkIfAuthenticated = useCallback(() => {
-        if (isReady || !areReducersLoaded) {
-            return
-        }
-
-        if (usersState.login.data.isAuthenticated) {
-            return setIsReady(true)
-        }
-
-        if (!usersState.login.data.tokens?.session) {
-            return setIsReady(true)
-        }
-
-        if (usersState.login.fetching) {
-            return
-        }
-
-        usersDispatch({ type: 'login', data: usersState.login.data.tokens })
-    }, [isReady, areReducersLoaded, usersState])
-
-    useEffect(() => {
-        checkIfAuthenticated()
-    }, [isReady, areReducersLoaded, usersState])
-
-    if (!areReducersLoaded || !isReady) {
+    if (!areReducersLoaded || typeof isAuthenticated !== 'boolean' || (isAuthenticated === true && !isReady)) {
         return (
             <Page centered>
                 <Spin>
@@ -46,7 +23,7 @@ export const PrivateRoutes: FC = () => {
         )
     }
 
-    return usersState.login.data.isAuthenticated
-        ? <Outlet />
+    return isAuthenticated
+        ? <Outlet />    
         : <Navigate to="/login" replace state={{ from: location }} />;
 }
