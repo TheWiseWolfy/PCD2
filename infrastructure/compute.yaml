@@ -159,6 +159,39 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref ProjectsCreateIntegration
+  TokensGetRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: tokens-get
+      AuthorizationType: NONE
+      OperationName: TokensGetIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref TokensGetIntegration
+  TokensGetAllRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: tokens-get-all
+      AuthorizationType: NONE
+      OperationName: TokensGetAllRoute
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref TokensGetAllIntegration
+  TokensCreateRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: tokens-create
+      AuthorizationType: NONE
+      OperationName: TokensCreateIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref TokensCreateIntegration
   VisualisationsGetRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -214,6 +247,7 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref DataCreateIntegration
+
   ConnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn:
@@ -286,6 +320,33 @@ Resources:
       Description: Projects create Integration
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  TokensGetIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - TokensFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Tokens fetch Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
+  TokensGetAllIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - TokensFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Tokens fetch all Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
+  TokensCreateIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - TokensFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Tokens create Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
   VisualisationsGetIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn:
@@ -344,6 +405,9 @@ Resources:
       - ProjectsGetAllIntegration
       - ProjectsGetIntegration
       - ProjectsCreateIntegration
+      - TokensGetAllIntegration
+      - TokensGetIntegration
+      - TokensCreateIntegration
       - VisualisationsGetAllIntegration
       - VisualisationsGetIntegration
       - VisualisationsCreateIntegration
@@ -497,6 +561,58 @@ Resources:
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref ProjectsFunction
+      Principal: apigateway.amazonaws.com
+
+  TokensFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/packages/tokens/
+      Handler: main.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      MemorySize: 512
+      Timeout: 10
+      Description: Handles tokens
+      VpcConfig:
+        SubnetIds:
+          - !Ref VpcSubnetId1
+          - !Ref VpcSubnetId2
+        SecurityGroupIds:
+          - !Ref VpcSecurityGroupId
+      Environment:
+        Variables:
+          REDIS_HOST: !Ref RedisHost
+          REDIS_PORT: !Ref RedisPort
+          DATABASE_HOST: !Ref DatabaseHost
+          DATABASE_PORT: !Ref DatabasePort
+          DATABASE_DATABASE: !Ref DatabaseDatabase
+          DATABASE_USERNAME: !Ref DatabaseUsername
+          DATABASE_PASSWORD: !Ref DatabasePassword
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonAPIGatewayInvokeFullAccess
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        EntryPoints:
+          - main.ts
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
+  TokensFunctionPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - ApiGateway
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref TokensFunction
       Principal: apigateway.amazonaws.com
 
   VisualisationsFunction:
