@@ -1,7 +1,7 @@
 import { ReducerSideEffect } from "../../../hooks/useReducerWithSideEffects"
 import { DataActions, DataHydrateAction, DataHydrateFailedAction, DataHydrateSuccessfulAction, DataState } from "../types"
 
-export const hydrateSuccessfulHandler = (state: DataState, action: DataHydrateSuccessfulAction): DataState => ({
+export const hydrateSuccessHandler = (state: DataState, action: DataHydrateSuccessfulAction): DataState => ({
     ...action.data,
     loading: false,
     getData: {
@@ -39,7 +39,7 @@ export const hydrateSideEffect = (): ReducerSideEffect<React.Reducer<DataState, 
             return dispatch({ type: 'hydrate-failed' })
         }
 
-        dispatch({ type: 'hydrate-successful', data: JSON.parse(data) })
+        dispatch({ type: 'hydrate-success', data: JSON.parse(data) })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }

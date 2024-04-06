@@ -48,7 +48,7 @@ export const hydrateSideEffect = (): ReducerSideEffect<React.Reducer<UsersState,
         const state = JSON.parse(rawState)
         delete state.isAuthenticated
 
-        dispatch({ type: 'hydrate-successful', data: state })
+        dispatch({ type: 'hydrate-success', data: state })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }

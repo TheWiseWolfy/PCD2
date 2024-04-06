@@ -34,7 +34,7 @@ export const visualisationsInitialState: VisualisationsState = ({
 
 export const visualisationsReducer: React.Reducer<VisualisationsState, VisualisationsActions> = (state, action) => {
     switch (action.type) {
-        case 'hydrate-successful':
+        case 'hydrate-success':
             return {
                 ...action.data,
                 loading: false,
@@ -287,7 +287,7 @@ const hydrate: ReducerSideEffect<React.Reducer<VisualisationsState, Visualisatio
             return dispatch({ type: 'hydrate-failed' })
         }
 
-        dispatch({ type: 'hydrate-successful', data: JSON.parse(data) })
+        dispatch({ type: 'hydrate-success', data: JSON.parse(data) })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }

@@ -32,7 +32,7 @@ export type UsersState = {
 }
 
 export type UsersHydrateAction = { type: 'hydrate' }
-export type UsersHydrateSuccessfulAction = { type: 'hydrate-successful', data: UsersState }
+export type UsersHydrateSuccessfulAction = { type: 'hydrate-success', data: UsersState }
 export type UsersHydrateFailedAction = { type: 'hydrate-failed' }
 export type UsersLoginAction = { type: 'login', data: { email: string, password: string } | { session: string } }
 export type UsersLoginResetAction = { type: 'login-reset' }

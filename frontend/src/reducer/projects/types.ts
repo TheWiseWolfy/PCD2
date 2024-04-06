@@ -40,7 +40,7 @@ export type ProjectsState = {
 }
 
 export type ProjectsHydrateAction = { type: 'hydrate' }
-export type ProjectsHydrateSuccessfulAction = { type: 'hydrate-successful', data: ProjectsState }
+export type ProjectsHydrateSuccessfulAction = { type: 'hydrate-success', data: ProjectsState }
 export type ProjectsHydrateFailedAction = { type: 'hydrate-failed' }
 export type ProjectsGetAllAction = { type: 'get-all-projects' }
 export type ProjectsGetAllSuccessAction = { type: 'get-all-projects-success', data: Project[] }

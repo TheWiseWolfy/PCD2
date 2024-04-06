@@ -27,7 +27,7 @@ export const usersInitialState: UsersState = ({
 
 export const usersReducer: React.Reducer<UsersState, UsersActions> = (state, action) => {
     switch (action.type) {
-        case 'hydrate-successful':
+        case 'hydrate-success':
             return hydrateSuccessHandler(action)
         case 'hydrate-failed':
             return hydrateFailedHandler(state)

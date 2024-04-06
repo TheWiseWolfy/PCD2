@@ -3,12 +3,12 @@ import { ReducerSideEffect } from "../../../hooks/useReducerWithSideEffects";
 import { ManagedWebSocket } from "../../../hooks/useWebSockets";
 import { ProjectsState, ProjectsGetSuccessAction, ProjectsGetFailedAction, Project, ProjectsActions, ProjectsError, ProjectsGetAction } from "../types";
 
-export const getProjectFailedHandler = (state: ProjectsState, action: ProjectsGetFailedAction): ProjectsState => ({
+export const getProjectHandler = (state: ProjectsState): ProjectsState => ({
     ...state,
     getProject: {
         ...state.getProject,
-        fetching: false,
-        error: action.data
+        fetching: true,
+        error: null
     }
 });
 
@@ -35,19 +35,19 @@ export function getProjectSuccessHandler(state: ProjectsState, action: ProjectsG
     };
 }
 
-export const getProjectHandler = (state: ProjectsState): ProjectsState => ({
+export const getProjectFailedHandler = (state: ProjectsState, action: ProjectsGetFailedAction): ProjectsState => ({
     ...state,
     getProject: {
         ...state.getProject,
-        fetching: true,
-        error: null
+        fetching: false,
+        error: action.data
     }
 });
 
 export const getProjectSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsGetAction> =>
     async (state, action, dispatch) => {
         try {
-            const result = await websocket.request<{ project: Project}  | ProjectsError>('projects-get', action.data)
+            const result = await websocket.request<{ project: Project } | ProjectsError>('projects-get', action.data)
 
             if ('reason' in result) {
                 return dispatch({ type: 'get-project-failed', data: result.reason })

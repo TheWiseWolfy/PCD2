@@ -40,7 +40,7 @@ export const hydrate: ReducerSideEffect<React.Reducer<ProjectsState, ProjectsAct
             return dispatch({ type: 'hydrate-failed' })
         }
 
-        dispatch({ type: 'hydrate-successful', data: JSON.parse(data) })
+        dispatch({ type: 'hydrate-success', data: JSON.parse(data) })
     } catch {
         dispatch({ type: 'hydrate-failed' })
     }

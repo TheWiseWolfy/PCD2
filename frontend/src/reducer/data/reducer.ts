@@ -3,7 +3,7 @@ import { DataActions, DataError, DataHydrateAction, DataState, Data, DataGetActi
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 import { getDataSideEffect, getDataFailedHandler, getDataHandler, getDataSuccessHandler } from './service/get'
-import { hydrateSideEffect, hydrateFailedHandler, hydrateSuccessfulHandler } from './service/hydrate'
+import { hydrateSideEffect, hydrateFailedHandler, hydrateSuccessHandler } from './service/hydrate'
 import { createDataSideEffect, createDataFailedHandler, createDataHandler, createDataSuccessHandler } from './service/create'
 import { createDataSubscribeHandler, createDataSubscribeSuccessHandler, createDataSubscribeFailedHandler, createDataSubscribeSideEffect } from './service/subscribe'
 import { createDataUnsubscribeHandler, createDataUnsubscribeSuccessHandler, createDataUnsubscribeFailedHandler, createDataUnsubscribeSideEffect } from './service/unsubscribe'
@@ -34,8 +34,8 @@ export const dataInitialState: DataState = ({
 
 export const dataReducer: React.Reducer<DataState, DataActions> = (state, action) => {
     switch (action.type) {
-        case 'hydrate-successful':
-            return hydrateSuccessfulHandler(state, action)
+        case 'hydrate-success':
+            return hydrateSuccessHandler(state, action)
         case 'hydrate-failed':
             return hydrateFailedHandler(state, action)
         case 'get-all-data':

@@ -41,7 +41,7 @@ export type TokensState = {
 }
 
 export type TokensHydrateAction = { type: 'hydrate' }
-export type TokensHydrateSuccessfulAction = { type: 'hydrate-successful', data: TokensState }
+export type TokensHydrateSuccessfulAction = { type: 'hydrate-success', data: TokensState }
 export type TokensHydrateFailedAction = { type: 'hydrate-failed' }
 export type TokensGetAllAction = { type: 'get-all-tokens', data: { projectId: string } }
 export type TokensGetAllSuccessAction = { type: 'get-all-tokens-success', data: Token[] }

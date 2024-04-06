@@ -41,7 +41,7 @@ export type VisualisationsState = {
 }
 
 export type VisualisationsHydrateAction = { type: 'hydrate' }
-export type VisualisationsHydrateSuccessfulAction = { type: 'hydrate-successful', data: VisualisationsState }
+export type VisualisationsHydrateSuccessfulAction = { type: 'hydrate-success', data: VisualisationsState }
 export type VisualisationsHydrateFailedAction = { type: 'hydrate-failed' }
 export type VisualisationsGetAllAction = { type: 'get-all-visualisations', data: { projectId: string } }
 export type VisualisationsGetAllSuccessAction = { type: 'get-all-visualisations-success', data: Visualisation[] }

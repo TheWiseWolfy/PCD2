@@ -41,7 +41,7 @@ export const projectsInitialState: ProjectsState = ({
 
 export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (state, action) => {
     switch (action.type) {
-        case 'hydrate-successful':
+        case 'hydrate-success':
             return hydrateSuccessHandler(action)
         case 'hydrate-failed':
             return hydrateFailedHandler(state)

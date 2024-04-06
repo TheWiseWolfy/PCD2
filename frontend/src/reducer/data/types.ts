@@ -35,7 +35,7 @@ export type DataState = {
 }
 
 export type DataHydrateAction = { type: 'hydrate' }
-export type DataHydrateSuccessfulAction = { type: 'hydrate-successful', data: DataState }
+export type DataHydrateSuccessfulAction = { type: 'hydrate-success', data: DataState }
 export type DataHydrateFailedAction = { type: 'hydrate-failed' }
 export type DataGetAction = { type: 'get-all-data', data: { projectId: string } }
 export type DataGetSuccessAction = { type: 'get-all-data-success', data: Data[] }
