@@ -31,7 +31,7 @@ class Router:
                 status_code=404,
                 action=request.action,
                 request_id=request.request_id,
-                data={},
+                data={"reason": "Not found"},
             )
         else:
             try:

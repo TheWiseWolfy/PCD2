@@ -40,7 +40,7 @@ const call = (self: Self): Router['call'] => async (event) => {
     const routeHandler = self.routes[request.route]
 
     if (!routeHandler) {
-        response = makeResponse(404, request.action, request.requestId, {})
+        response = makeResponse(404, request.action, request.requestId, { "reason": "Not found" })
     } else {
         try {
             response = await routeHandler.call(request)
