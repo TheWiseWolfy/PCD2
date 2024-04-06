@@ -53,12 +53,16 @@ const handleUser = (self: Self): Self['handleUser'] => async (connectionId, user
 
     const visualisationIds = await self.redisClient.SMEMBERS(`subscriptions:connections:data:${connectionId}`)
     const projectIds = await self.redisClient.SMEMBERS(`subscriptions:connections:visualisations:${connectionId}`)
+    const userIds = await self.redisClient.SMEMBERS(`subscriptions:connections:projects:${connectionId}`)
 
     for (const visualisationId of visualisationIds) {
         await self.redisClient.SREM(`subscriptions:resources:data:${visualisationId}`, connectionId)
     }
     for (const projectId of projectIds) {
         await self.redisClient.SREM(`subscriptions:resources:visualisations:${projectId}`, connectionId)
+    }
+    for (const userId of userIds) {
+        await self.redisClient.SREM(`subscriptions:resources:projects:${userId}`, connectionId)
     }
 
     await self.redisClient.DEL(`subscriptions:connections:data:${connectionId}`)
