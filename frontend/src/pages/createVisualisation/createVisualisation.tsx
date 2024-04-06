@@ -5,6 +5,7 @@ import { Header } from "../../components/header/header"
 import { HeaderActionSlot } from "../../components/header/headerActionsSlot"
 import { Image } from "../../components/image/image"
 import { Button } from "../../components/input/button"
+import { Dropdown } from "../../components/input/dropdown"
 import { TextField } from "../../components/input/textfield"
 import { List } from "../../components/list/list"
 import { Page } from "../../components/page/page"
@@ -31,6 +32,11 @@ export const CreateVisualisation: React.FC = () => {
                     <List>
                         <TextField value={logic.name} onChange={logic.setName} placeholder="Name" invalid={!logic.nameValid} />
                         <TextField value={logic.description} onChange={logic.setDescription} placeholder="Description" invalid={!logic.descriptionValid} />
+                        <Dropdown value={logic.fn} onChange={logic.setFn}>
+                            <option value="average">Average</option>
+                            <option value="maximum">Maximum</option>
+                            <option value="minimum">Minimum</option>
+                        </Dropdown>
                     </List>
                     <Spacing spacing="m" />
                     <Button disabled={logic.disabled}>

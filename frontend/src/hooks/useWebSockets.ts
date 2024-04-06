@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { makeDeferredPromise, DeferredPromise } from "../utils/promise"
 import { useTimeout } from "./useTimeout"
 
@@ -138,24 +138,24 @@ const useWebsocketManager = (
         []
     )
 
-    const handleOpen = () => {
+    const handleOpen = useCallback(() => {
         opened.current = true
         setConnected(true)
-    }
+    }, [opened, setConnected])
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         opened.current = false
         setConnected(false)
         interval.start()
-    }
+    }, [opened, setConnected, interval])
 
-    const handleError = () => {
+    const handleError = useCallback(() => {
         opened.current = false
         setConnected(false)
         interval.start()
-    }
+    }, [opened, setConnected, interval])
 
-    const handleMessage = (event: MessageEvent) => {
+    const handleMessage = useCallback((event: MessageEvent) => {
         const message = JSON.parse(event.data) as Message<any>
         const requestId = message.requestId
         const messageAction = message.action
@@ -178,7 +178,7 @@ const useWebsocketManager = (
             messagesCopy[messageAction].push(message)
             return messagesCopy
         })
-    }
+    }, [setMessages, setRequests])
 
     useEffect(() => {
         if (!socket.current) {
@@ -189,7 +189,7 @@ const useWebsocketManager = (
         socket.current.addEventListener('close', handleClose)
         socket.current.addEventListener('error', handleError)
         socket.current.addEventListener('message', handleMessage)
-    }, [])
+    }, [socket, url, handleOpen, handleClose, handleError, handleMessage])
 }
 
 
@@ -240,5 +240,5 @@ const useWebSocketMessageQueue = (
 
             setMessages(messagesCopy)
         }
-    }, [requests, messages])
+    }, [requests, messages, plainListeners, requestListeners, setMessages, setRequests])
 }

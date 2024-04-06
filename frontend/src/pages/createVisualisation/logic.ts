@@ -11,7 +11,7 @@ export const useCreateVisualisationPageLogic = () => {
     const [disabled, setDisabled] = useState(true);
     const [name, setName] = useState('')
     const [nameValid, setNameValid] = useState(true)
-    const [fn, setFn] = useState('')
+    const [fn, setFn] = useState('average')
     const [fnValid, setFnValid] = useState(true)
     const [description, setDescription] = useState('')
     const [descriptionValid, setDescriptionValid] = useState(true)
@@ -19,9 +19,9 @@ export const useCreateVisualisationPageLogic = () => {
     const params = useParams()
     
     const onSubmit = useCallback(() => {
-        visualisationsDispatch({ type: 'create-visualisation', data: { name, description, fn } });
+        visualisationsDispatch({ type: 'create-visualisation', data: { projectId: params.projectId!, name, description, fn } });
         setPageState(PageState.Fetching)
-    }, [name, description, fn, visualisationsDispatch])
+    }, [name, description, fn, params, visualisationsDispatch])
 
     const onGoToVisualisationsList = useCallback(() => {
         navigate(`/app/projects/${params.projectId}/visualisations`)

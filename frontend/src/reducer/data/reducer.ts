@@ -1,12 +1,12 @@
 import React from 'react'
-import { DataActions, DataError, DataHydrateAction, DataState, Data, DataGetAction, DataCreateAction, DataCreateSubscribeAction, DataCreateUnsubscribeAction } from './types'
-import { ManagedWebSocket } from '../../hooks/useWebSockets'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
-import { getDataSideEffect, getDataFailedHandler, getDataHandler, getDataSuccessHandler } from './service/get'
-import { hydrateSideEffect, hydrateFailedHandler, hydrateSuccessHandler } from './service/hydrate'
-import { createDataSideEffect, createDataFailedHandler, createDataHandler, createDataSuccessHandler } from './service/create'
-import { createDataSubscribeHandler, createDataSubscribeSuccessHandler, createDataSubscribeFailedHandler, createDataSubscribeSideEffect } from './service/subscribe'
-import { createDataUnsubscribeHandler, createDataUnsubscribeSuccessHandler, createDataUnsubscribeFailedHandler, createDataUnsubscribeSideEffect } from './service/unsubscribe'
+import { ManagedWebSocket } from '../../hooks/useWebSockets'
+import { createDataFailedHandler, createDataHandler, createDataSideEffect, createDataSuccessHandler } from './service/create'
+import { getDataFailedHandler, getDataHandler, getDataSideEffect, getDataSuccessHandler } from './service/get'
+import { hydrateFailedHandler, hydrateSideEffect, hydrateSuccessHandler } from './service/hydrate'
+import { createDataSubscribeFailedHandler, createDataSubscribeHandler, createDataSubscribeSideEffect, createDataSubscribeSuccessHandler } from './service/subscribe'
+import { createDataUnsubscribeFailedHandler, createDataUnsubscribeHandler, createDataUnsubscribeSideEffect, createDataUnsubscribeSuccessHandler } from './service/unsubscribe'
+import { DataActions, DataState } from './types'
 
 
 export const dataInitialState: DataState = ({

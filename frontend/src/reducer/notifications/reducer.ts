@@ -1,7 +1,7 @@
 import React from 'react'
-import { NotificationsActions, NotificationsAddAction, NotificationsState } from './types'
-import { removeHandler } from './service/remove'
 import { addHandler } from './service/add'
+import { removeHandler } from './service/remove'
+import { NotificationsActions, NotificationsState } from './types'
 
 export const notificationsInitialState: NotificationsState = ({
     notifications: []

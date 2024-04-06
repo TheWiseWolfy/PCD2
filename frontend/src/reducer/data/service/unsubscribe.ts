@@ -1,6 +1,6 @@
 import { ReducerSideEffect } from "../../../hooks/useReducerWithSideEffects"
 import { ManagedWebSocket } from "../../../hooks/useWebSockets"
-import { DataState, DataActions, DataCreateUnsubscribeAction, Data, DataError, DataCreateUnsubscribeSuccessAction, DataCreateUnsubscribeFailedAction } from "../types"
+import { DataActions, DataCreateUnsubscribeAction, DataCreateUnsubscribeFailedAction, DataCreateUnsubscribeSuccessAction, DataState } from "../types"
 
 export const createDataUnsubscribeHandler = (state: DataState, action: DataCreateUnsubscribeAction): DataState => {
     return {
