@@ -1,4 +1,4 @@
-
+import crypto from 'crypto'
 import redis from 'redis'
 import pg from 'pg'
 import aws from 'aws-sdk'
@@ -61,11 +61,32 @@ const call = (self: Self): CreateService['call'] => async (input) => {
         }
     }
 
-    const tokens = await self.postgresClient.query(`
-        INSERT INTO tokens (project_id, name, description)
-        VALUES ($1, $2, $3)
-        RETURNING *
-    `, [projectId, name, description])
+    let unique = false
+    let uniqueTrials = 5
+    let tokens: Awaited<Promise<pg.QueryResult<{}>>>
+
+    while (!unique && uniqueTrials > 0) {
+        try {
+            uniqueTrials--
+
+            const token = crypto.randomBytes(8).toString('base64')
+            tokens = await self.postgresClient.query(`
+                INSERT INTO tokens (project_id, name, description, token)
+                VALUES ($1, $2, $3, $4)
+                RETURNING *
+            `, [projectId, name, description, token])
+            
+            unique = true
+        } catch {
+            unique = false
+        }
+    }
+
+    if (uniqueTrials === 0 || !tokens!) {
+        return {
+            reason: 'Internal server error'
+        }
+    }
 
     const connectionIds = await self.redisClient.SMEMBERS(`users:${userId}`)
 
@@ -79,13 +100,13 @@ const call = (self: Self): CreateService['call'] => async (input) => {
             Data: JSON.stringify({
                 action: "tokens-create",
                 data: {
-                    token: tokens.rows[0]
+                    token: tokens!.rows[0]
                 }
             })
         }).promise()
     }
 
     return {
-        token: tokens.rows[0]
+        token: tokens!.rows[0]
     }
 }

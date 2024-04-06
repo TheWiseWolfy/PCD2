@@ -7,6 +7,7 @@ type Input = {
     projectId: string
     name: string
     description: string
+    fn: string
 }
 
 interface CreateRoute extends BaseRoute<Input, any> { }
@@ -30,8 +31,9 @@ const call = (self: Self): CreateRoute['call'] => async (request) => {
     const projectId = request.data.projectId
     const name = request.data.name
     const description = request.data.description
+    const fn = request.data.fn
 
-    const response = await self.service.call({ connectionId, projectId, name, description })
+    const response = await self.service.call({ connectionId, projectId, name, description, fn })
 
     return makeResponse(
         200,

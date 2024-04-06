@@ -9,6 +9,7 @@ type Input = {
     projectId: string
     name: string
     description: string
+    fn: string
 }
 
 interface CreateService extends BaseService<Input, any> { }
@@ -36,6 +37,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
     const projectId = input.projectId
     const name = input.name
     const description = input.description
+    const fn = input.fn
 
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)
@@ -62,10 +64,10 @@ const call = (self: Self): CreateService['call'] => async (input) => {
     }
 
     const visualisations = await self.postgresClient.query(`
-        INSERT INTO visualisations (user_id, project_id, name, description)
-        VALUES ($1, $2, $3)
+        INSERT INTO visualisations (user_id, project_id, name, description, fn)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
-    `, [userId, projectId, name, description])
+    `, [userId, projectId, name, description, fn])
 
     const connectionIds = await self.redisClient.SMEMBERS(`users:${userId}`)
 
