@@ -46,7 +46,7 @@ class Router:
                     status_code=500,
                     action=request.action,
                     request_id=request.request_id,
-                    data={},
+                    data={"reason": "Internal server error"},
                 )
 
         if not response:

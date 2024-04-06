@@ -53,7 +53,7 @@ const call = (self: Self): Router['call'] => async (event) => {
                 500,
                 request.action,
                 request.requestId,
-                {}
+                { reason: "Internal server error" }
             )
         }
     }
