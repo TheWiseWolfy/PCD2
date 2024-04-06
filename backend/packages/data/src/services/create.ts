@@ -17,14 +17,22 @@ type Self = {
     callbackAPIClient: aws.ApiGatewayManagementApi
     redisClient: redis.RedisClientType
     postgresClient: pg.Pool
+
+    handleUserAuth: (projectId: string, visualisationId: string, user: { user_id: string }) => Promise<any>
+    handleProjectAuth: (visualisationId: string, project: { project_id: string }) => Promise<any>
 }
 
 export const makeCreateService = (callbackAPIClient: aws.ApiGatewayManagementApi, redisClient: redis.RedisClientType, postgresClient: pg.Pool): CreateService => {
     const self: Self = {
         callbackAPIClient,
         redisClient,
-        postgresClient
+        postgresClient,
+
+        handleUserAuth: async () => undefined,
+        handleProjectAuth: async () => undefined
     }
+    self.handleUserAuth = handleUserAuth(self)
+    self.handleProjectAuth = handleProjectAuth(self)
 
     return {
         call: call(self)
@@ -40,25 +48,23 @@ const call = (self: Self): CreateService['call'] => async (input) => {
     const rawConnection = await self.redisClient.HGET("connections", connectionId)
     const connection = rawConnection && JSON.parse(rawConnection)
     const user = connection?.user
+    const project = connection?.project
 
-    if (!user) {
+    if (!user || !project) {
         return {
             reason: 'Not authenticated'
         }
     }
 
-    const userId = user.user_id
-
-    const projectWithVisualisation = await self.postgresClient.query(`
-        SELECT *
-        FROM projects p
-        INNER JOIN visualisations v ON p.project_id = v.project_id
-        WHERE p.project_id = $1 AND p.user_id = $2 AND v.visualisation_id = $3
-    `, [projectId, userId, visualisationId])
-
-    if (!projectWithVisualisation.rows?.[0]) {
+    try {
+        if (user) {
+            await self.handleUserAuth(projectId, visualisationId, user)
+        } else {
+            await self.handleProjectAuth(visualisationId, user)
+        }
+    } catch (err) {
         return {
-            reason: 'Not found'
+            reason: (err as Error).message
         }
     }
 
@@ -88,5 +94,43 @@ const call = (self: Self): CreateService['call'] => async (input) => {
 
     return {
         data: data.rows[0]
+    }
+}
+
+const handleUserAuth = (self: Self): Self['handleUserAuth'] => async (projectId, visualisationId, user) => {
+    if (!user) {
+        throw new Error('Not authenticated')
+    }
+
+    const userId = user.user_id
+
+    const projectWithVisualisation = await self.postgresClient.query(`
+        SELECT *
+        FROM projects p
+        INNER JOIN visualisations v ON p.project_id = v.project_id
+        WHERE p.project_id = $1 AND p.user_id = $2 AND v.visualisation_id = $3
+    `, [projectId, userId, visualisationId])
+
+    if (!projectWithVisualisation.rows[0]) {
+        throw new Error('Not found')
+    }
+}
+
+const handleProjectAuth = (self: Self): Self['handleProjectAuth'] => async (visualisationId, project) => {
+    if (!project) {
+        throw new Error('Not authenticated')
+    }
+
+    const projectId = project.project_id
+
+    const projectWithVisualisation = await self.postgresClient.query(`
+        SELECT *
+        FROM projects p
+        INNER JOIN visualisations v ON p.project_id = v.project_id
+        WHERE p.project_id = $1 AND v.visualisation_id = $2
+    `, [projectId, visualisationId])
+
+    if (!projectWithVisualisation.rows[0]) {
+        throw new Error('Not found')
     }
 }
