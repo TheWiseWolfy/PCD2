@@ -161,6 +161,28 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref ProjectsCreateIntegration
+  ProjectsCreateSubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: projects-create-subscribe
+      AuthorizationType: NONE
+      OperationName: ProjectsCreateSubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref ProjectsCreateSubscribeIntegration
+  ProjectsCreateUnsubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: projects-create-unsubscribe
+      AuthorizationType: NONE
+      OperationName: ProjectsCreateUnsubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref ProjectsCreateUnsubscribeIntegration
   TokensGetRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -194,6 +216,28 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref TokensCreateIntegration
+  TokensCreateSubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: tokens-create-subscribe
+      AuthorizationType: NONE
+      OperationName: TokensCreateSubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref TokensCreateSubscribeIntegration
+  TokensCreateUnsubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: tokens-create-unsubscribe
+      AuthorizationType: NONE
+      OperationName: TokensCreateUnsubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref TokensCreateUnsubscribeIntegration
   TokensLoginRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -238,6 +282,28 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref VisualisationsCreateIntegration
+  VisualisationsCreateSubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: visualisations-create-subscribe
+      AuthorizationType: NONE
+      OperationName: VisualisationsCreateSubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref VisualisationsCreateSubscribeIntegration
+  VisualisationsCreateUnsubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: visualisations-create-unsubscribe
+      AuthorizationType: NONE
+      OperationName: VisualisationsCreateUnsubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref VisualisationsCreateUnsubscribeIntegration
   DataGetAllRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -260,6 +326,28 @@ Resources:
         - "/"
         - - "integrations"
           - !Ref DataCreateIntegration
+  DataCreateSubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: data-create-subscribe
+      AuthorizationType: NONE
+      OperationName: DataCreateSubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref DataCreateSubscribeIntegration
+  DataCreateUnsubscribeRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: data-create-unsubscribe
+      AuthorizationType: NONE
+      OperationName: DataCreateUnsubscribeIntegration
+      Target: !Join
+        - "/"
+        - - "integrations"
+          - !Ref DataCreateUnsubscribeIntegration
 
 
 
@@ -335,6 +423,24 @@ Resources:
       Description: Projects create Integration
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  ProjectsCreateSubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Projects create-subscribe Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
+  ProjectsCreateUnsubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - ProjectsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Projects create-unsubscribe Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProjectsFunction.Arn}/invocations
   TokensGetIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn:
@@ -360,6 +466,24 @@ Resources:
     Properties:
       ApiId: !Ref ApiGateway
       Description: Tokens create Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
+  TokensCreateSubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - TokensFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Tokens create-subscribe Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
+  TokensCreateUnsubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - TokensFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Tokens create-unsubscribe Integration
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokensFunction.Arn}/invocations
   TokensLoginIntegration:
@@ -398,6 +522,24 @@ Resources:
       Description: Visualisations create Integration
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VisualisationsFunction.Arn}/invocations
+  VisualisationsCreateSubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - VisualisationsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Visualisations create-subscribe Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VisualisationsFunction.Arn}/invocations
+  VisualisationsCreateUnsubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - VisualisationsFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Visualisations create-unsubscribe Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VisualisationsFunction.Arn}/invocations
   DataGetAllIntegration:
     Type: AWS::ApiGatewayV2::Integration
     DependsOn:
@@ -416,6 +558,24 @@ Resources:
       Description: Data create Integration
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
+  DataCreateSubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - DataFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Data create-subscribe Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
+  DataCreateUnsubscribeIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - DataFunction
+    Properties:
+      ApiId: !Ref ApiGateway
+      Description: Data create-unsubscribe Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DataFunction.Arn}/invocations
 
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
@@ -429,15 +589,23 @@ Resources:
       - ProjectsGetAllIntegration
       - ProjectsGetIntegration
       - ProjectsCreateIntegration
+      - ProjectsCreateSubscribeIntegration
+      - ProjectsCreateUnsubscribeIntegration
       - TokensGetAllIntegration
       - TokensGetIntegration
       - TokensCreateIntegration
+      - TokensCreateSubscribeIntegration
+      - TokensCreateUnsubscribeIntegration
       - TokensLoginIntegration
       - VisualisationsGetAllIntegration
       - VisualisationsGetIntegration
       - VisualisationsCreateIntegration
+      - VisualisationsCreateSubscribeIntegration
+      - VisualisationsCreateUnsubscribeIntegration
       - DataGetAllIntegration
       - DataCreateIntegration
+      - DataCreateSubscribeIntegration
+      - DataCreateUnsubscribeIntegration
     Properties:
       ApiId: !Ref ApiGateway
   Stage:
