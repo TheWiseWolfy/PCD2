@@ -5,8 +5,8 @@ import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
-    tokenId: string
     projectId: string
+    token: string
 }
 
 interface LoginService extends BaseService<Input, any> { }
@@ -29,18 +29,18 @@ export const makeLoginService = (redisClient: redis.RedisClientType, postgresCli
 
 const call = (self: Self): LoginService['call'] => async (input) => {
     const connectionId = input.connectionId
-    const tokenId = input.tokenId
     const projectId = input.projectId
+    const token = input.token
 
     const tokens = await self.postgresClient.query(`
         SELECT *
         FROM tokens t
-        WHERE t.token_id = $1 AND t.project_id = $2
-    `, [tokenId, projectId])
+        WHERE t.project_id = $1 AND token = $2
+    `, [projectId, token])
 
     if (!tokens.rows[0]) {
         return {
-            reason: 'Not found'
+            reason: 'Not authenticated'
         }
     }
 

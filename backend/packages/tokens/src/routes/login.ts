@@ -4,8 +4,8 @@ import { makeResponse } from '../utils/response'
 
 type Input = {
     connectionId: string
-    tokenId: string
     projectId: string
+    token: string
 }
 
 interface LoginRoute extends BaseRoute<Input, any> { }
@@ -26,10 +26,10 @@ export const makeLoginRoute = (service: BaseService<Input, any>): LoginRoute => 
 
 const call = (self: Self): LoginRoute['call'] => async (request) => {
     const connectionId = request.connectionId
-    const tokenId = request.data.tokenId
     const projectId = request.data.projectId
+    const token = request.data.token
 
-    const response = await self.service.call({ connectionId, tokenId, projectId })
+    const response = await self.service.call({ connectionId, projectId, token })
 
     return makeResponse(
         200,

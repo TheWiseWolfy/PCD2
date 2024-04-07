@@ -6,7 +6,6 @@ import { BaseService } from '../utils/service'
 
 type Input = {
     connectionId: string
-    projectId: string
     visualisationId: string
     value: number
 }
@@ -18,7 +17,7 @@ type Self = {
     redisClient: redis.RedisClientType
     postgresClient: pg.Pool
 
-    handleUserAuth: (projectId: string, visualisationId: string, user: { user_id: string }) => Promise<any>
+    handleUserAuth: (visualisationId: string, user: { user_id: string }) => Promise<any>
     handleProjectAuth: (visualisationId: string, project: { project_id: string }) => Promise<any>
 }
 
@@ -41,7 +40,6 @@ export const makeCreateService = (callbackAPIClient: aws.ApiGatewayManagementApi
 
 const call = (self: Self): CreateService['call'] => async (input) => {
     const connectionId = input.connectionId
-    const projectId = input.projectId
     const visualisationId = input.visualisationId
     const value = input.value
 
@@ -50,7 +48,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
     const user = connection?.user
     const project = connection?.project
 
-    if (!user || !project) {
+    if (!user && !project) {
         return {
             reason: 'Not authenticated'
         }
@@ -58,9 +56,9 @@ const call = (self: Self): CreateService['call'] => async (input) => {
 
     try {
         if (user) {
-            await self.handleUserAuth(projectId, visualisationId, user)
+            await self.handleUserAuth(visualisationId, user)
         } else {
-            await self.handleProjectAuth(visualisationId, user)
+            await self.handleProjectAuth(visualisationId, project)
         }
     } catch (err) {
         return {
@@ -97,7 +95,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
     }
 }
 
-const handleUserAuth = (self: Self): Self['handleUserAuth'] => async (projectId, visualisationId, user) => {
+const handleUserAuth = (self: Self): Self['handleUserAuth'] => async (visualisationId, user) => {
     if (!user) {
         throw new Error('Not authenticated')
     }
@@ -108,8 +106,8 @@ const handleUserAuth = (self: Self): Self['handleUserAuth'] => async (projectId,
         SELECT *
         FROM projects p
         INNER JOIN visualisations v ON p.project_id = v.project_id
-        WHERE p.project_id = $1 AND p.user_id = $2 AND v.visualisation_id = $3
-    `, [projectId, userId, visualisationId])
+        WHERE p.user_id = $1 AND v.visualisation_id = $2
+    `, [userId, visualisationId])
 
     if (!projectWithVisualisation.rows[0]) {
         throw new Error('Not found')
