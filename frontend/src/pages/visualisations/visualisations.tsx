@@ -6,6 +6,7 @@ import { Button } from "../../components/input/button";
 import { Page } from "../../components/page/page";
 import { AddMoreVisualisations } from "../../components/visualisations/addMoreVisualisations";
 import { NewVisualisation } from "../../components/visualisations/newVisualisation";
+import { Visualisation } from "../../components/visualisations/visualisation";
 import { useVisualisationsPageLogic } from "./logic";
 
 
@@ -32,13 +33,14 @@ export const Visualisations: React.FC = () => {
                         <>
                             {
                                 logic.visualisations.map(visualisation => (
-                                    // <Visualisation 
-                                    //     visualisationId={visualisation.visualisation_id}
-                                    //     userId={visualisation.user_id}
-                                    //     name={visualisation.name}
-                                    //     description={visualisation.description}
-                                    // />
-                                    <></>
+                                    <Visualisation 
+                                        key={visualisation.visualisation_id}
+                                        visualisationId={visualisation.visualisation_id}
+                                        name={visualisation.name}
+                                        description={visualisation.description}
+                                        fn={visualisation.fn}
+                                        data={logic.data[visualisation.visualisation_id]}
+                                    />
                                 ))
                             }
                         </>
