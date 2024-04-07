@@ -76,7 +76,7 @@ export const useCreateProjectPageLogic = () => {
         if (pageState !== PageState.Initial) {
             if (!projectsState.createProject.fetching && projectsState.createProject.error) {
                 setPageState(PageState.Failed);
-            } else if (!projectsState.createProject.fetching && !projectsState.createProject.error && projectsState.createProject.data) {
+            } else if (!projectsState.createProject.fetching && !projectsState.createProject.error) {
                 setPageState(PageState.Successful);
             }
         }

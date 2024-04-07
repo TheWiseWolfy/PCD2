@@ -70,6 +70,7 @@ export const createVisualisationUnsubscribeSideEffect = (websocket: ManagedWebSo
         const requestId = window.crypto.randomUUID()
 
         try {
+            dispatch({ type: 'create-visualisation-unsubscribe-started', data: { requestId } })
             await state.subscriptions[action.data.projectId]?.unsubscribe()
             dispatch({ type: 'create-visualisation-unsubscribe-success', data: { requestId, projectId: action.data.projectId } })
         } catch (error) {

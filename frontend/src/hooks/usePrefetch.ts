@@ -40,7 +40,7 @@ export const usePrefetch = (isAuthenticated: boolean) => {
             }
 
             if (!isTokensRequested) {
-                for (const project of projectsState.getProjects.data) {
+                for (const project of projectsState.data) {
                     tokensDispatch({ type: 'get-all-tokens', data: { projectId: project.project_id } })
                     tokensDispatch({ type: 'create-token-subscribe', data: { projectId: project.project_id } })
                 }
@@ -50,7 +50,7 @@ export const usePrefetch = (isAuthenticated: boolean) => {
             }
 
             if (!isVisualisationsRequested) {
-                for (const project of projectsState.getProjects.data) {
+                for (const project of projectsState.data) {
                     visualisationsDispatch({ type: 'get-all-visualisations', data: { projectId: project.project_id } })
                     visualisationsDispatch({ type: 'create-visualisation-subscribe', data: { projectId: project.project_id } })
                 }

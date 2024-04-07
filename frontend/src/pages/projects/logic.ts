@@ -20,7 +20,7 @@ export const useProjectsPageLogic = () => {
     };
 
     return {
-        projects: projectsState.getProjects.data,
+        projects: projectsState.data,
 
         onGoToCreateProject,
         onGoToProject,
