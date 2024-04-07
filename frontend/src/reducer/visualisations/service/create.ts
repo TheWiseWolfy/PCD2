@@ -52,7 +52,6 @@ export const createVisualisationFailedHandler = (state: VisualisationsState, act
 export const createVisualisationSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateAction> =>
     async (state, action, dispatch) => {
         try {
-            console.log('here?')
             const result = await websocket.request<{ visualisation: Visualisation } | VisualisationsError>('visualisations-create', action.data)
 
             if ('reason' in result) {
