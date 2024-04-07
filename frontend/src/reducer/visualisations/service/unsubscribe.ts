@@ -1,7 +1,7 @@
 import React from "react";
 import { ReducerSideEffect } from "../../../hooks/useReducerWithSideEffects";
 import { ManagedWebSocket } from "../../../hooks/useWebSockets";
-import { VisualisationsActions, VisualisationsCreateUnsubscribeAction, VisualisationsCreateUnsubscribeFailedAction, VisualisationsCreateUnsubscribeSuccessAction, VisualisationsState } from "../types";
+import { VisualisationsActions, VisualisationsCreateUnsubscribeAction, VisualisationsCreateUnsubscribeFailedAction, VisualisationsCreateUnsubscribeStartedAction, VisualisationsCreateUnsubscribeSuccessAction, VisualisationsState } from "../types";
 
 export const createVisualisationUnsubscribeHandler = (state: VisualisationsState): VisualisationsState => ({
     ...state,
@@ -12,22 +12,36 @@ export const createVisualisationUnsubscribeHandler = (state: VisualisationsState
     }
 });
 
+export const createVisualisationUnsubscribeStartedHandler = (state: VisualisationsState, action: VisualisationsCreateUnsubscribeStartedAction): VisualisationsState => ({
+    ...state,
+    createVisualisationsUnsubscribe: {
+        ...state.createVisualisationsUnsubscribe,
+        requests: {
+            ...state.createVisualisationsUnsubscribe.requests,
+            [action.data.requestId]: true
+        },
+        fetching: true,
+        error: null
+    }
+});
+
 export const createVisualisationUnsubscribeSuccessHandler = (
     state: VisualisationsState,
     action: VisualisationsCreateUnsubscribeSuccessAction
 ) => {
-    const copy = { ...state.createVisualisationsSubscribe.data };
+    const copy = { ...state.subscriptions };
     delete copy[action.data.projectId];
+
+    const requestsCopy = { ...state.createVisualisationsUnsubscribe.requests }
+    delete requestsCopy[action.data.requestId]
 
     return {
         ...state,
-        createVisualisationsSubscribe: {
-            ...state.createVisualisationsSubscribe,
-            data: copy
-        },
+        subscriptions: copy,
         createVisualisationsUnsubscribe: {
             ...state.createVisualisationsUnsubscribe,
-            fetching: false,
+            requests: requestsCopy,
+            fetching: Object.keys(requestsCopy).length !== 0,
             error: null,
         }
     };
@@ -36,22 +50,30 @@ export const createVisualisationUnsubscribeSuccessHandler = (
 export const createVisualisationUnsubscribeFailedHandler = (
     state: VisualisationsState,
     action: VisualisationsCreateUnsubscribeFailedAction
-): VisualisationsState => ({
-    ...state,
-    createVisualisationsUnsubscribe: {
-        ...state.createVisualisationsUnsubscribe,
-        fetching: false,
-        error: action.data
+): VisualisationsState => {
+    const requestsCopy = { ...state.createVisualisationsUnsubscribe.requests }
+    delete requestsCopy[action.data.requestId]
+
+    return {
+        ...state,
+        createVisualisationsUnsubscribe: {
+            ...state.createVisualisationsUnsubscribe,
+            requests: requestsCopy,
+            fetching: Object.keys(requestsCopy).length !== 0,
+            error: action.data.reason
+        }
     }
-});
+}
 
 export const createVisualisationUnsubscribeSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateUnsubscribeAction> =>
     async (state, action, dispatch) => {
+        const requestId = window.crypto.randomUUID()
+
         try {
-            await state.createVisualisationsSubscribe.data[action.data.projectId]?.unsubscribe()
-            dispatch({ type: 'create-visualisation-unsubscribe-success', data: { projectId: action.data.projectId } })
+            await state.subscriptions[action.data.projectId]?.unsubscribe()
+            dispatch({ type: 'create-visualisation-unsubscribe-success', data: { requestId, projectId: action.data.projectId } })
         } catch (error) {
-            dispatch({ type: 'create-visualisation-unsubscribe-failed', data: error as string })
+            dispatch({ type: 'create-visualisation-unsubscribe-failed', data: { requestId, reason: error as string } })
         }
     }
 

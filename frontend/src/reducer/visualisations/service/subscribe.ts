@@ -1,7 +1,7 @@
 import React from "react";
 import { ReducerSideEffect } from "../../../hooks/useReducerWithSideEffects";
 import { ManagedWebSocket } from "../../../hooks/useWebSockets";
-import { Visualisation, VisualisationsActions, VisualisationsCreateSubscribeAction, VisualisationsCreateSubscribeFailedAction, VisualisationsCreateSubscribeSuccessAction, VisualisationsError, VisualisationsState } from "../types";
+import { Visualisation, VisualisationsActions, VisualisationsCreateSubscribeAction, VisualisationsCreateSubscribeFailedAction, VisualisationsCreateSubscribeStartedAction, VisualisationsCreateSubscribeSuccessAction, VisualisationsError, VisualisationsState } from "../types";
 
 export const createVisualisationSubscribeHandler = (state: VisualisationsState): VisualisationsState => ({
     ...state,
@@ -12,48 +12,77 @@ export const createVisualisationSubscribeHandler = (state: VisualisationsState):
     }
 });
 
-export const createVisualisationSubscribeSuccessHandler = (
-    state: VisualisationsState,
-    action: VisualisationsCreateSubscribeSuccessAction
-): VisualisationsState => ({
+export const createVisualisationSubscribeStartedHandler = (state: VisualisationsState, action: VisualisationsCreateSubscribeStartedAction): VisualisationsState => ({
     ...state,
     createVisualisationsSubscribe: {
         ...state.createVisualisationsSubscribe,
-        fetching: false,
-        error: null,
-        data: {
-            ...state.createVisualisationsSubscribe.data,
-            [action.data.projectId]: action.data.subscription
-        }
+        requests: {
+            ...state.createVisualisationsSubscribe.requests,
+            [action.data.requestId]: true
+        },
+        fetching: true,
+        error: null
     }
 });
+
+export const createVisualisationSubscribeSuccessHandler = (
+    state: VisualisationsState,
+    action: VisualisationsCreateSubscribeSuccessAction
+): VisualisationsState => {
+    const requestsCopy = { ...state.createVisualisationsSubscribe.requests }
+    delete requestsCopy[action.data.requestId]
+
+    return {
+        ...state,
+        subscriptions: {
+            ...state.subscriptions,
+            [action.data.projectId]: action.data.subscription
+        },
+        createVisualisationsSubscribe: {
+            ...state.createVisualisationsSubscribe,
+            requests: requestsCopy,
+            fetching: Object.keys(requestsCopy).length !== 0,
+            error: null,
+        }
+    }
+}
 
 export const createVisualisationSubscribeFailedHandler = (
     state: VisualisationsState,
     action: VisualisationsCreateSubscribeFailedAction
-): VisualisationsState => ({
-    ...state,
-    createVisualisationsSubscribe: {
-        ...state.createVisualisationsSubscribe,
-        fetching: false,
-        error: action.data
+): VisualisationsState => {
+    const requestsCopy = { ...state.createVisualisationsSubscribe.requests }
+    delete requestsCopy[action.data.requestId]
+
+    return {
+        ...state,
+        createVisualisationsSubscribe: {
+            ...state.createVisualisationsSubscribe,
+            requests: requestsCopy,
+            fetching: Object.keys(requestsCopy).length !== 0,
+            error: action.data.reason
+        }
     }
-});
+}
 
 export const createVisualisationSubscribeSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateSubscribeAction> =>
     async (state, action, dispatch) => {
+        const requestId = window.crypto.randomUUID()
+
         try {
+            dispatch({ type: 'create-visualisation-started', data: { requestId } })
+
             const result = await websocket.subscribe<{ visualisation: Visualisation } | VisualisationsError, VisualisationsCreateSubscribeAction['data']>('visualisations-create', action.data, (message) => {
                 if ('reason' in message) {
                     return
                 }
 
-                dispatch({ type: 'create-visualisation-success', data: { projectId: message.visualisation.project_id, data: message.visualisation } })
+                dispatch({ type: 'create-visualisation-success', data: { requestId: '', projectId: message.visualisation.project_id, data: message.visualisation } })
             })
 
-            dispatch({ type: 'create-visualisation-subscribe-success', data: { projectId: action.data.projectId, subscription: result } })
+            dispatch({ type: 'create-visualisation-subscribe-success', data: { requestId, projectId: action.data.projectId, subscription: result } })
         } catch (error) {
-            dispatch({ type: 'create-visualisation-subscribe-failed', data: error as string })
+            dispatch({ type: 'create-visualisation-subscribe-failed', data: { requestId, reason: error as string } })
         }
     }
 

@@ -10,18 +10,35 @@ import {
 export const hydrateSuccessHandler = (action: VisualisationsHydrateSuccessfulAction): VisualisationsState => ({
     ...action.data,
     loading: false,
+    data: action.data.data,
+    subscriptions: {},
     getAllVisualisations: {
         ...action.data.getAllVisualisations,
+        requests: {},
         fetching: false,
         error: null
     },
     getVisualisation: {
         ...action.data.getVisualisation,
+        requests: {},
         fetching: false,
         error: null
     },
     createVisualisation: {
         ...action.data.createVisualisation,
+        requests: {},
+        fetching: false,
+        error: null
+    },
+    createVisualisationsSubscribe: {
+        ...action.data.createVisualisationsSubscribe,
+        requests: {},
+        fetching: false,
+        error: null
+    },
+    createVisualisationsUnsubscribe: {
+        ...action.data.createVisualisationsUnsubscribe,
+        requests: {},
         fetching: false,
         error: null
     }
@@ -30,18 +47,30 @@ export const hydrateSuccessHandler = (action: VisualisationsHydrateSuccessfulAct
 export const hydrateFailedHandler = (state: VisualisationsState): VisualisationsState => ({
     ...state,
     loading: false,
+    data: {},
+    subscriptions: {},
     getAllVisualisations: {
-        ...state.getAllVisualisations,
+        requests: {},
         fetching: false,
         error: null
     },
     getVisualisation: {
-        ...state.getVisualisation,
+        requests: {},
         fetching: false,
         error: null
     },
     createVisualisation: {
-        ...state.createVisualisation,
+        requests: {},
+        fetching: false,
+        error: null
+    },
+    createVisualisationsSubscribe: {
+        requests: {},
+        fetching: false,
+        error: null
+    },
+    createVisualisationsUnsubscribe: {
+        requests: {},
         fetching: false,
         error: null
     }

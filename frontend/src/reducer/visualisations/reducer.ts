@@ -1,38 +1,42 @@
 import React from 'react'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
-import { createVisualisationFailedHandler, createVisualisationHandler, createVisualisationSideEffect, createVisualisationSuccessHandler } from './service/create'
-import { getVisualisationFailedHandler, getVisualisationHandler, getVisualisationSideEffect, getVisualisationSuccessHandler } from './service/get'
-import { getAllVisualisationsFailedHandler, getAllVisualisationsHandler, getAllVisualisationsSideEffect, getAllVisualisationsSuccessHandler } from './service/getAll'
+import { createVisualisationFailedHandler, createVisualisationHandler, createVisualisationSideEffect, createVisualisationStartedHandler, createVisualisationSuccessHandler } from './service/create'
+import { getVisualisationFailedHandler, getVisualisationHandler, getVisualisationSideEffect, getVisualisationStartedHandler, getVisualisationSuccessHandler } from './service/get'
+import { getAllVisualisationsFailedHandler, getAllVisualisationsHandler, getAllVisualisationsSideEffect, getAllVisualisationsStartedHandler, getAllVisualisationsSuccessHandler } from './service/getAll'
 import { hydrate, hydrateFailedHandler, hydrateSuccessHandler } from './service/hydrate'
-import { createVisualisationSubscribeFailedHandler, createVisualisationSubscribeHandler, createVisualisationSubscribeSideEffect, createVisualisationSubscribeSuccessHandler } from './service/subscribe'
-import { createVisualisationUnsubscribeFailedHandler, createVisualisationUnsubscribeHandler, createVisualisationUnsubscribeSideEffect, createVisualisationUnsubscribeSuccessHandler } from './service/unsubscribe'
+import { createVisualisationSubscribeFailedHandler, createVisualisationSubscribeHandler, createVisualisationSubscribeSideEffect, createVisualisationSubscribeStartedHandler, createVisualisationSubscribeSuccessHandler } from './service/subscribe'
+import { createVisualisationUnsubscribeFailedHandler, createVisualisationUnsubscribeHandler, createVisualisationUnsubscribeSideEffect, createVisualisationUnsubscribeStartedHandler, createVisualisationUnsubscribeSuccessHandler } from './service/unsubscribe'
 import { VisualisationsActions, VisualisationsState } from './types'
 
 
 export const visualisationsInitialState: VisualisationsState = ({
     loading: true,
+    subscriptions: {},
+    data: {},
+
     getAllVisualisations: {
+        requests: {},
         fetching: false,
         error: null,
-        data: {}
     },
     getVisualisation: {
+        requests: {},
         fetching: false,
         error: null,
-        data: null
     },
     createVisualisation: {
+        requests: {},
         fetching: false,
         error: null,
-        data: null
     },
     createVisualisationsSubscribe: {
+        requests: {},
         fetching: false,
         error: null,
-        data: {}
     },
     createVisualisationsUnsubscribe: {
+        requests: {},
         fetching: false,
         error: null,
     },
@@ -46,30 +50,40 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
             return hydrateFailedHandler(state)
         case 'get-all-visualisations':
             return getAllVisualisationsHandler(state)
+        case 'get-all-visualisations-started':
+            return getAllVisualisationsStartedHandler(state, action)
         case 'get-all-visualisations-success':
             return getAllVisualisationsSuccessHandler(state, action)
         case 'get-all-visualisations-failed':
             return getAllVisualisationsFailedHandler(state, action)
         case 'get-visualisation':
             return getVisualisationHandler(state)
+        case 'get-visualisation-started':
+            return getVisualisationStartedHandler(state, action)
         case 'get-visualisation-success':
             return getVisualisationSuccessHandler(state, action)
         case 'get-visualisation-failed':
             return getVisualisationFailedHandler(state, action)
         case 'create-visualisation':
             return createVisualisationHandler(state)
+        case 'create-visualisation-started':
+            return createVisualisationStartedHandler(state, action)
         case 'create-visualisation-success':
             return createVisualisationSuccessHandler(state, action)
         case 'create-visualisation-failed':
             return createVisualisationFailedHandler(state, action)
         case 'create-visualisation-subscribe':
             return createVisualisationSubscribeHandler(state)
+        case 'create-visualisation-subscribe-started':
+            return createVisualisationSubscribeStartedHandler(state, action)
         case 'create-visualisation-subscribe-success':
             return createVisualisationSubscribeSuccessHandler(state, action)
         case 'create-visualisation-subscribe-failed':
             return createVisualisationSubscribeFailedHandler(state, action)
         case 'create-visualisation-unsubscribe':
             return createVisualisationUnsubscribeHandler(state)
+        case 'create-visualisation-unsubscribe-started':
+            return createVisualisationUnsubscribeStartedHandler(state, action)
         case 'create-visualisation-unsubscribe-success':
             return createVisualisationUnsubscribeSuccessHandler(state, action)
         case 'create-visualisation-unsubscribe-failed':

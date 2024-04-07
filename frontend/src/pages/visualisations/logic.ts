@@ -19,7 +19,7 @@ export const useVisualisationsPageLogic = () => {
     }, [navigate])
 
     return {
-        visualisations: visualisationsState.getAllVisualisations.data[params.projectId!] || [],
+        visualisations: visualisationsState.data[params.projectId!] || [],
         data: dataState.getData.data || [],
 
         onGoToCreateVisualisation,

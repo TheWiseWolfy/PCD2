@@ -7,6 +7,7 @@ import { Spacing } from "../spacing/spacing";
 import { CardCenteredElement } from "../card/cardCenteredElement";
 import { H6 } from "../typography/h6";
 import { P } from "../typography/p";
+import { Image } from "../image/image";
 
 interface Props {
     visualisationId: string
@@ -19,8 +20,7 @@ interface Props {
 
 export const Visualisation: FC<Props> = ({ visualisationId, name, description, fn, type, data }) => {
     const options = useMemo<ReactApexChart['props']['options']>(() => {
-        
-        const timestamps = (data || []).map(entry => new Date(entry.timestamp))
+        const timestamps = data.map(entry => new Date(entry.timestamp))
 
         return {
             chart: {
@@ -33,7 +33,7 @@ export const Visualisation: FC<Props> = ({ visualisationId, name, description, f
     }, [data, visualisationId])
 
     const series = useMemo<ReactApexChart['props']['series']>(() => {
-        const series = (data || []).map(entry => entry.value)
+        const series = data.map(entry => entry.value)
 
         return [
             {
@@ -47,11 +47,15 @@ export const Visualisation: FC<Props> = ({ visualisationId, name, description, f
         <Card width={384}>
             <H3>{name}</H3>
             <CardCenteredElement>
-                <ReactApexChart
-                    type={(type as ReactApexChart['props']['type']) || 'area'}
-                    options={options}
-                    series={series}
-                />
+                {
+                    !data?.length
+                        ? <Image id="wind" size="xl" scaleFactor={5} />
+                        : <ReactApexChart
+                            type={(type as ReactApexChart['props']['type']) || 'area'}
+                            options={options}
+                            series={series}
+                        />
+                }
             </CardCenteredElement>
             <Spacing spacing="m" />
             {description && (

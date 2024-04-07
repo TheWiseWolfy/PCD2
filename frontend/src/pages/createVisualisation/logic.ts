@@ -81,7 +81,7 @@ export const useCreateVisualisationPageLogic = () => {
         if (pageState !== PageState.Initial) {
             if (!visualisationsState.createVisualisation.fetching && visualisationsState.createVisualisation.error) {
                 setPageState(PageState.Failed);
-            } else if (!visualisationsState.createVisualisation.fetching && !visualisationsState.createVisualisation.error && visualisationsState.createVisualisation.data) {
+            } else if (!visualisationsState.createVisualisation.fetching && !visualisationsState.createVisualisation.error) {
                 setPageState(PageState.Successful);
             }
         }

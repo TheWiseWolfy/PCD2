@@ -6,6 +6,8 @@ import { usePrefetch } from "../../hooks/usePrefetch";
 import { Spin } from "../animate/spin";
 import { Image } from "../image/image";
 import { Page } from "../page/page";
+import { Card } from "../card/card";
+import { H1 } from "../typography/h1";
 
 export const PrivateRoutes: FC = () => {
     const location = useLocation();
@@ -16,9 +18,12 @@ export const PrivateRoutes: FC = () => {
     if (!areReducersLoaded || typeof isAuthenticated !== 'boolean' || (isAuthenticated === true && !isReady)) {
         return (
             <Page centered>
-                <Spin>
-                    <Image id="gear" />
-                </Spin>
+                <Card centered noBorder noShadow>
+                    <Spin>
+                        <Image id="gear" size="xl" scaleFactor={2} />
+                    </Spin>
+                    <H1>Application is loading</H1>
+                </Card>
             </Page>
         )
     }

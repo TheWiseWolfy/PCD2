@@ -60,8 +60,8 @@ export const usePrefetch = (isAuthenticated: boolean) => {
             }
 
             if (!isDataRequested) {
-                for (const projectId in visualisationsState.getAllVisualisations.data) {
-                    for (const visualisation of visualisationsState.getAllVisualisations.data[projectId]) {
+                for (const projectId in visualisationsState.data) {
+                    for (const visualisation of visualisationsState.data[projectId]) {
                         dataDispatch({ type: 'get-all-data', data: { visualisationId: visualisation.visualisation_id } })
                         dataDispatch({ type: 'create-data-subscribe', data: { visualisationId: visualisation.visualisation_id } })
                     }
