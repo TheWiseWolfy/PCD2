@@ -20,24 +20,34 @@ export type ManagedWebSocket = {
     subscribe<T, U = null>(action: string, data: U, callback: PlainListener<T>): Promise<Subscription>
 }
 
-export const useWebSockets = (url: string): ManagedWebSocket => {
-    const socket = useRef<WebSocket>()
-    const opened = useRef<boolean>(false)
-    const [connected, setConnected] = useState(false)
+export const useWebSockets = (url: string, timeout: number): ManagedWebSocket => {
     const [messages, setMessages] = useState<Record<string, Message<any>[]>>({})
     const [requests, setRequests] = useState<Record<string, Message<any>>>({})
-    const requestListeners = useRef<Record<string, DeferredPromise<any>>>({})
-    const plainListeners = useRef<Record<string, PlainListener<any>[]>>({})
+    const [requestListeners, setRequestListeners] = useState<Record<string, DeferredPromise<any>>>({})
+    const [plainListeners, setPlainListeners] = useState<Record<string, PlainListener<any>[]>>({})
+
+    const { socket, connected, connectedRef } = useManagedWebsocket(url, timeout, setRequests, setMessages)
+    useWebSocketMessageQueue(
+        requests,
+        setRequests,
+        messages,
+        setMessages,
+        requestListeners,
+        plainListeners,
+    )
 
     const request = async <T, R>(action: string, data: T): Promise<R> => {
-        if (!socket.current || !opened.current) {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
         const deferredPromise = makeDeferredPromise<R>()
         const requestId = crypto.randomUUID()
 
-        requestListeners.current[requestId] = deferredPromise
+        setRequestListeners((previousValue) => ({
+            ...previousValue,
+            [requestId]: deferredPromise
+        }))
         socket.current.send(JSON.stringify({
             action,
             requestId,
@@ -48,7 +58,7 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
     }
 
     const publish = <T>(action: string, data: T) => {
-        if (!socket.current || !opened.current) {
+        if (!socket.current || !connectedRef.current) {
             return
         }
 
@@ -60,16 +70,18 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
     }
 
     const subscribe = async <T, U = null>(action: string, data: U, callback: PlainListener<T>) => {
-        if (!socket.current || !opened.current) {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
 
-        if (plainListeners.current[action]) {
-            plainListeners.current[action].push(callback)
-        } else {
-            plainListeners.current[action] = [callback]
-        }
+        setPlainListeners(previousValue => ({
+            ...previousValue,
+            [action]: 
+                !previousValue[action]
+                    ? [callback]
+                    : [...previousValue[action], callback]
+        }))
 
         await request(`${action}-subscribe`, data || null)
 
@@ -82,23 +94,26 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
     }
 
     const unsubscribe = <T>(action: string, callback: PlainListener<T>) => async () => {
-        if (!socket.current || !opened.current) {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
         await request(`${action}-unsubscribe`, null)
 
-        const index = plainListeners.current[action].findIndex(entry => entry === callback)
+        const index = plainListeners[action].findIndex(entry => entry === callback)
 
         if (index === -1) {
             return
         }
 
-        plainListeners.current[action].splice(index, 1)
+        setPlainListeners(previousValue => ({
+            ...previousValue,
+            [action]: [
+                ...previousValue[action].slice(0, index),
+                ...previousValue[action].slice(index + 1)
+            ]
+        }))
     }
-
-    useWebsocketManager(socket, url, opened, setConnected, setRequests, setMessages)
-    useWebSocketMessageQueue(requests, setRequests, messages, setMessages, requestListeners, plainListeners)
 
     return {
         connected,
@@ -108,25 +123,26 @@ export const useWebSockets = (url: string): ManagedWebSocket => {
     }
 }
 
-const useWebsocketManager = (
-    socket: { current: undefined | WebSocket },
+const useManagedWebsocket = (
     url: string,
-    opened: { current: boolean },
-    setConnected: (value: boolean) => void,
+    timeout: number,
     setRequests: (callback: (requests: Record<string, Message<any>>) => Record<string, Message<any>>) => void,
     setMessages: (callback: (messages: Record<string, Message<any>[]>) => Record<string, Message<any>[]>) => void
 ) => {
+    const socket = useRef<WebSocket | undefined>()
+    const connectedRef = useRef(false)
+    const [connected, setConnected] = useState(false)
     const interval = useTimeout(
-        5000,
+        timeout,
         () => {
-            if (!socket.current) {
-                return
-            }
+            if (socket.current) {
+                socket.current.close()
 
-            socket.current.removeEventListener('open', handleOpen)
-            socket.current.removeEventListener('close', handleClose)
-            socket.current.removeEventListener('error', handleError)
-            socket.current.removeEventListener('message', handleMessage)
+                socket.current.addEventListener('open', handleOpen)
+                socket.current.addEventListener('close', handleClose)
+                socket.current.addEventListener('error', handleError)
+                socket.current.addEventListener('message', handleMessage);
+            }
 
             socket.current = new WebSocket(url)
 
@@ -139,21 +155,20 @@ const useWebsocketManager = (
     )
 
     const handleOpen = useCallback(() => {
-        opened.current = true
         setConnected(true)
-    }, [opened, setConnected])
+    }, [])
 
     const handleClose = useCallback(() => {
-        opened.current = false
         setConnected(false)
+        interval.end()
         interval.start()
-    }, [opened, setConnected, interval])
+    }, [])
 
     const handleError = useCallback(() => {
-        opened.current = false
         setConnected(false)
+        interval.end()
         interval.start()
-    }, [opened, setConnected, interval])
+    }, [])
 
     const handleMessage = useCallback((event: MessageEvent) => {
         const message = JSON.parse(event.data) as Message<any>
@@ -178,18 +193,22 @@ const useWebsocketManager = (
             messagesCopy[messageAction].push(message)
             return messagesCopy
         })
-    }, [setMessages, setRequests])
+    }, [])
 
     useEffect(() => {
-        if (!socket.current) {
-            socket.current = new WebSocket(url)
-        }
+        socket.current = new WebSocket(url)
 
         socket.current.addEventListener('open', handleOpen)
         socket.current.addEventListener('close', handleClose)
         socket.current.addEventListener('error', handleError)
         socket.current.addEventListener('message', handleMessage)
-    }, [socket, url, handleOpen, handleClose, handleError, handleMessage])
+    }, [])
+
+    useEffect(() => {
+        connectedRef.current = connected
+    }, [connected])
+
+    return { socket, connected, connectedRef }
 }
 
 
@@ -198,15 +217,15 @@ const useWebSocketMessageQueue = (
     setRequests: (requests: Record<string, Message<any>>) => void,
     messages: Record<string, Message<any>[]>,
     setMessages: (requests: Record<string, Message<any>[]>) => void,
-    requestListeners: { current: Record<string, DeferredPromise<any>> },
-    plainListeners: { current: Record<string, PlainListener<any>[]> }
+    requestListeners: Record<string, DeferredPromise<any>>,
+    plainListeners: Record<string, PlainListener<any>[]>
 ) => {
     useEffect(() => {
         if (Object.values(requests).length > 0) {
             const requestsCopy = { ...requests }
 
             for (const [requestId, messageEntry] of Object.entries(requestsCopy)) {
-                const listener = requestListeners.current[requestId]
+                const listener = requestListeners[requestId]
 
                 if (listener) {
                     listener.resolve(messageEntry.data)
@@ -222,7 +241,7 @@ const useWebSocketMessageQueue = (
             const messagesCopy = { ...messages }
 
             for (const [messageAction, messageEntries] of Object.entries(messagesCopy)) {
-                const listeners = plainListeners.current[messageAction]
+                const listeners = plainListeners[messageAction]
 
                 if (!listeners || listeners.length === 0) {
                     delete messagesCopy[messageAction]

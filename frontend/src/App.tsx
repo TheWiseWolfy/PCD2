@@ -12,7 +12,7 @@ import { Notifications } from './components/notifications/notifications';
 import { TokensContextProvider } from './reducer/tokens/context';
 
 export const App = () => {
-  const websocket = useWebSockets('wss://2n8nbnrly9.execute-api.eu-central-1.amazonaws.com/Production')
+  const websocket = useWebSockets('wss://2n8nbnrly9.execute-api.eu-central-1.amazonaws.com/Production', 5000)
 
   return (
     <NetContextProvider websocket={websocket}>
