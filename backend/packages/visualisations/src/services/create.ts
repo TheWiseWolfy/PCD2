@@ -81,7 +81,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
             Data: JSON.stringify({
                 action: "visualisations-create",
                 data: {
-                    project: visualisations.rows[0]
+                    visualisation: visualisations.rows[0]
                 }
             })
         }).promise()
