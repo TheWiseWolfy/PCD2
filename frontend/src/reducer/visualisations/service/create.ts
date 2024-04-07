@@ -13,22 +13,24 @@ export const createVisualisationHandler = (state: VisualisationsState): Visualis
 });
 
 export const createVisualisationSuccessHandler = (state: VisualisationsState, action: VisualisationsCreateSuccessAction): VisualisationsState => {
-    const existingVisualisationIndex = state.getAllVisualisations.data[action.data.projectId].findIndex(item => item.visualisation_id === action.data.data.visualisation_id);
+    const existingVisualisationIndex = state.getAllVisualisations.data[action.data.projectId]?.findIndex(item =>
+        item.visualisation_id === action.data.data.visualisation_id
+    ) || -1;
+    const copy = (state.getAllVisualisations.data[action.data.projectId] || [action.data.data]).slice()
+    
+    if (existingVisualisationIndex === -1) {
+        copy.push(action.data.data)
+    } else {
+        copy.splice(existingVisualisationIndex, 1, action.data.data)
+    }
+
     return {
         ...state,
         getAllVisualisations: {
             ...state.getAllVisualisations,
             data: {
                 ...state.getAllVisualisations.data,
-                [action.data.projectId]:
-                    existingVisualisationIndex === -1
-                        ? [action.data.data]
-                        : [
-                            ...state.getAllVisualisations.data[action.data.projectId].slice(0, existingVisualisationIndex),
-                            action.data.data,
-                            ...state.getAllVisualisations.data[action.data.projectId].slice(existingVisualisationIndex + 1)
-                        ]
-
+                [action.data.projectId]: copy
             }
         },
         createVisualisation: {

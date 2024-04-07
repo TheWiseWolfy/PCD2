@@ -13,18 +13,22 @@ export const createProjectHandler = (state: ProjectsState): ProjectsState => ({
 });
 
 export const createProjectSuccessHandler = (state: ProjectsState, action: ProjectsCreateSuccessAction) => {
-    const existingProjectIndex = state.getProjects.data.findIndex(item => item.project_id === action.data.project_id);
+    const existingProjectIndex = state.getProjects.data?.findIndex(item =>
+        item.project_id === action.data.project_id
+    ) || -1;
+    const copy = (state.getProjects.data || [action.data]).slice()
+
+    if (existingProjectIndex === -1) {
+        copy.push(action.data)
+    } else {
+        copy.splice(existingProjectIndex, 1, action.data)
+    }
+    
     return {
         ...state,
         getProjects: {
             ...state.getProjects,
-            data: existingProjectIndex === -1
-                ? [action.data]
-                : [
-                    ...state.getProjects.data.slice(0, existingProjectIndex),
-                    action.data,
-                    ...state.getProjects.data.slice(existingProjectIndex + 1)
-                ]
+            data: copy
         },
         createProject: {
             ...state.createProject,

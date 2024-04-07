@@ -13,21 +13,24 @@ export const createTokenHandler = (state: TokensState): TokensState => ({
 });
 
 export const createTokenSuccessHandler = (state: TokensState, action: TokensCreateSuccessAction): TokensState => {
-    const existingTokenIndex = state.getTokens.data[action.data.projectId].findIndex(item => item.token_id === action.data.data.token_id);
+    const existingTokenIndex = state.getTokens.data[action.data.projectId]?.findIndex(item =>
+        item.token_id === action.data.data.token_id
+    ) || -1;
+    const copy = (state.getTokens.data[action.data.projectId] || [action.data.data]).slice()
+
+    if (existingTokenIndex === -1) {
+        copy.push(action.data.data)
+    } else {
+        copy.splice(existingTokenIndex, 1, action.data.data)
+    }
+
     return {
         ...state,
         getTokens: {
             ...state.getTokens,
             data: {
                 ...state.getTokens.data,
-                [action.data.projectId]:
-                    existingTokenIndex === -1
-                        ? [action.data.data]
-                        : [
-                            ...state.getTokens.data[action.data.projectId].slice(0, existingTokenIndex),
-                            action.data.data,
-                            ...state.getTokens.data[action.data.projectId].slice(existingTokenIndex + 1)
-                        ]
+                [action.data.projectId]: copy
             }
         },
         createToken: {

@@ -1,12 +1,12 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PageState } from "../../components/page/types";
 import { VisualisationsContext } from "../../reducer/visualisations/context";
+import { DataContext } from "../../reducer/data/context";
 
 
 export const useVisualisationsPageLogic = () => {
-    const [visualisationsState, visualisationsDispatch] = useContext(VisualisationsContext);
-    const [pageState, setPageState] = useState<PageState>(PageState.Initial)
+    const [visualisationsState, ] = useContext(VisualisationsContext);
+    const [dataState, ] = useContext(DataContext);
     const navigate = useNavigate();
     const params = useParams()
 
@@ -18,23 +18,9 @@ export const useVisualisationsPageLogic = () => {
         navigate('/app/projects')
     }, [navigate])
 
-    useEffect(() => {
-        switch (pageState) {
-            case PageState.Initial:
-                visualisationsDispatch({ type: 'get-all-visualisations', data: { projectId: params.projectId! } });
-                setPageState(PageState.Fetching)
-                break
-            case PageState.Failed:
-                break
-            case PageState.Successful:
-                break
-            default:
-                break
-        }
-    }, [pageState, params, visualisationsDispatch])
-
     return {
-        visualisations: visualisationsState.getAllVisualisations.data,
+        visualisations: visualisationsState.getAllVisualisations.data[params.projectId!] || [],
+        data: dataState.getData.data || [],
 
         onGoToCreateVisualisation,
         onGoToProjectsList

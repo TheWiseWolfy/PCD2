@@ -15,6 +15,13 @@ export const createDataSuccessHandler = (state: DataState, action: DataCreateSuc
     const existingDataIndex = state.getData.data[action.data.visualisationId]?.findIndex(item =>
         item.data_id === action.data.data.data_id
     ) || -1
+    const copy = (state.getData.data || [action.data.data])[action.data.visualisationId].slice()
+    
+    if (existingDataIndex === -1) {
+        copy.push(action.data.data)
+    } else {
+        copy.splice(existingDataIndex, 1, action.data.data)
+    }
 
     return {
         ...state,
@@ -22,14 +29,7 @@ export const createDataSuccessHandler = (state: DataState, action: DataCreateSuc
             ...state.getData,
             data: {
                 ...state.getData.data,
-                [action.data.visualisationId]:
-                    existingDataIndex === -1
-                        ? [action.data.data]
-                        : [
-                            ...state.getData.data[action.data.visualisationId].slice(0, existingDataIndex),
-                            action.data.data,
-                            ...state.getData.data[action.data.visualisationId].slice(existingDataIndex + 1)
-                        ]
+                [action.data.visualisationId]: copy
             }
         },
         createData: {

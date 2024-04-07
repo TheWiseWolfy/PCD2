@@ -1,12 +1,10 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PageState } from "../../components/page/types";
 import { TokensContext } from "../../reducer/tokens/context";
 
 
 export const useTokensPageLogic = () => {
-    const [tokensState, tokensDispatch] = useContext(TokensContext);
-    const [pageState, setPageState] = useState<PageState>(PageState.Initial)
+    const [tokensState, ] = useContext(TokensContext);
     const navigate = useNavigate();
     const params = useParams()
 
@@ -18,23 +16,8 @@ export const useTokensPageLogic = () => {
         navigate(`/app/projects`);
     }, [navigate])
 
-    useEffect(() => {
-        switch (pageState) {
-            case PageState.Initial:
-                tokensDispatch({ type: 'get-all-tokens', data: { projectId: params.projectId! } });
-                setPageState(PageState.Fetching)
-                break
-            case PageState.Failed:
-                break
-            case PageState.Successful:
-                break
-            default:
-                break
-        }
-    }, [pageState, params, tokensDispatch])
-
     return {
-        tokens: tokensState.getTokens.data,
+        tokens: tokensState.getTokens.data[params.projectId!],
 
         onGoToCreateProjectToken,
         onGoToProjectsList
