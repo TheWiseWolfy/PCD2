@@ -12,10 +12,9 @@ export const createDataHandler = (state: DataState, action: DataCreateAction): D
 })
 
 export const createDataSuccessHandler = (state: DataState, action: DataCreateSuccessAction): DataState => {
-    const existingDataIndex = state.getData.data[action.data.visualisationId]?.findIndex(item =>
-        item.data_id === action.data.data.data_id
-    ) || -1
-    const copy = (state.getData.data || [action.data.data])[action.data.visualisationId].slice()
+    const original = state.getData.data[action.data.visualisationId] || [action.data.data]
+    const existingDataIndex = original.findIndex(item => item.data_id === action.data.data.data_id);
+    const copy = original.slice()
     
     if (existingDataIndex === -1) {
         copy.push(action.data.data)

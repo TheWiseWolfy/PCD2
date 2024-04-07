@@ -13,10 +13,9 @@ export const createTokenHandler = (state: TokensState): TokensState => ({
 });
 
 export const createTokenSuccessHandler = (state: TokensState, action: TokensCreateSuccessAction): TokensState => {
-    const existingTokenIndex = state.getTokens.data[action.data.projectId]?.findIndex(item =>
-        item.token_id === action.data.data.token_id
-    ) || -1;
-    const copy = (state.getTokens.data[action.data.projectId] || [action.data.data]).slice()
+    const original = state.getTokens.data[action.data.projectId] || [action.data.data]
+    const existingTokenIndex = original.findIndex(item => item.token_id === action.data.data.token_id);
+    const copy = original.slice()
 
     if (existingTokenIndex === -1) {
         copy.push(action.data.data)

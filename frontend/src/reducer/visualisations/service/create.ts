@@ -13,10 +13,9 @@ export const createVisualisationHandler = (state: VisualisationsState): Visualis
 });
 
 export const createVisualisationSuccessHandler = (state: VisualisationsState, action: VisualisationsCreateSuccessAction): VisualisationsState => {
-    const existingVisualisationIndex = state.getAllVisualisations.data[action.data.projectId]?.findIndex(item =>
-        item.visualisation_id === action.data.data.visualisation_id
-    ) || -1;
-    const copy = (state.getAllVisualisations.data[action.data.projectId] || [action.data.data]).slice()
+    const original = state.getAllVisualisations.data[action.data.projectId] || [action.data.data]
+    const existingVisualisationIndex = original.findIndex(item => item.visualisation_id === action.data.data.visualisation_id);
+    const copy = original.slice()
     
     if (existingVisualisationIndex === -1) {
         copy.push(action.data.data)
