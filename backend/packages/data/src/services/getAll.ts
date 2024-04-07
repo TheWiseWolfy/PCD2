@@ -46,7 +46,7 @@ const call = (self: Self): GetAllService['call'] => async (input) => {
         SELECT *
         FROM projects p
         INNER JOIN visualisations v ON p.project_id = v.project_id
-        WHERE p.user_id = $2 AND v.visualisation_id = $3
+        WHERE p.user_id = $1 AND v.visualisation_id = $2
     `, [userId, visualisationId])
 
     if (!projectWithVisualisation.rows?.[0]) {
