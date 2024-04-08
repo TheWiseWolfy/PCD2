@@ -1,7 +1,7 @@
 import React from "react";
 import { ReducerSideEffect } from "../../../hooks/useReducerWithSideEffects";
 import { ManagedWebSocket } from "../../../hooks/useWebSockets";
-import { TokensActions, TokensCreateUnsubscribeAction, TokensCreateUnsubscribeFailedAction, TokensCreateUnsubscribeSuccessAction, TokensState } from "../types";
+import { TokensActions, TokensCreateUnsubscribeAction, TokensCreateUnsubscribeFailedAction, TokensCreateUnsubscribeStartedAction, TokensCreateUnsubscribeSuccessAction, TokensState } from "../types";
 
 export const createTokenUnsubscribeHandler = (state: TokensState): TokensState => ({
     ...state,
@@ -12,40 +12,62 @@ export const createTokenUnsubscribeHandler = (state: TokensState): TokensState =
     }
 });
 
+export const createTokenUnsubscribeStartedHandler = (state: TokensState, action: TokensCreateUnsubscribeStartedAction): TokensState => ({
+    ...state,
+    createTokensUnsubscribe: {
+        ...state.createTokensUnsubscribe,
+        requests: {
+            ...state.createTokensUnsubscribe.requests,
+            [action.data.requestId]: true
+        },
+        fetching: true,
+        error: null
+    }
+});
+
 export const createTokenUnsubscribeSuccessHandler = (state: TokensState, action: TokensCreateUnsubscribeSuccessAction) => {
-    const copy = { ...state.createTokensSubscribe.data };
+    const copy = { ...state.subscriptions };
     delete copy[action.data.projectId];
+    const requestsCopy = { ...state.createTokensSubscribe.requests }
+    delete requestsCopy[action.data.requestId]
 
     return {
         ...state,
-        createTokensSubscribe: {
-            ...state.createTokensSubscribe,
-            data: copy
-        },
+        subscriptions: copy,
         createTokensUnsubscribe: {
             ...state.createTokensUnsubscribe,
-            fetching: false,
+            requests: requestsCopy,
+            fetching: Object.keys(requestsCopy).length !== 0,
             error: null,
         }
     };
 };
 
-export const createTokenUnsubscribeFailedHandler = (state: TokensState, action: TokensCreateUnsubscribeFailedAction): TokensState => ({
-    ...state,
-    createTokensUnsubscribe: {
-        ...state.createTokensUnsubscribe,
-        fetching: false,
-        error: action.data
+export const createTokenUnsubscribeFailedHandler = (state: TokensState, action: TokensCreateUnsubscribeFailedAction): TokensState => {
+    const requestsCopy = { ...state.createTokensSubscribe.requests }
+    delete requestsCopy[action.data.requestId]
+
+    return {
+        ...state,
+        createTokensUnsubscribe: {
+            ...state.createTokensUnsubscribe,
+            requests: requestsCopy,
+            fetching: Object.keys(requestsCopy).length !== 0,
+            error: action.data.reason
+        }
     }
-});
+};
 
 export const createTokenUnsubscribeSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<TokensState, TokensActions>, TokensCreateUnsubscribeAction> =>
     async (state, action, dispatch) => {
+        const requestId = window.crypto.randomUUID()
+
         try {
-            await state.createTokensSubscribe.data[action.data.projectId]?.unsubscribe()
-            dispatch({ type: 'create-token-unsubscribe-success', data: { projectId: action.data.projectId } })
+            dispatch({ type: 'create-token-unsubscribe-started', data: { requestId } })
+            await state.subscriptions[action.data.projectId]?.unsubscribe()
+            dispatch({ type: 'create-token-unsubscribe-success', data: { requestId, projectId: action.data.projectId } })
         } catch (error) {
-            dispatch({ type: 'create-token-unsubscribe-failed', data: error as string })
+            dispatch({ type: 'create-token-unsubscribe-failed', data: { requestId, reason: error as string } })
         }
     }
 

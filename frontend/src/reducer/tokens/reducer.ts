@@ -1,38 +1,41 @@
 import React from 'react'
 import { ReducerSideEffect } from '../../hooks/useReducerWithSideEffects'
 import { ManagedWebSocket } from '../../hooks/useWebSockets'
-import { createTokenFailedHandler, createTokenHandler, createTokenSideEffect, createTokenSuccessHandler } from './service/create'
-import { getTokenFailedHandler, getTokenHandler, getTokenSideEffect, getTokenSuccessHandler } from './service/get'
-import { getAllTokensFailedHandler, getAllTokensHandler, getAllTokensSideEffect, getAllTokensSuccessHandler } from './service/getAll'
+import { createTokenFailedHandler, createTokenHandler, createTokenSideEffect, createTokenStartedHandler, createTokenSuccessHandler } from './service/create'
+import { getTokenFailedHandler, getTokenHandler, getTokenSideEffect, getTokenStartedHandler, getTokenSuccessHandler } from './service/get'
+import { getAllTokensFailedHandler, getAllTokensHandler, getAllTokensSideEffect, getAllTokensStartedHandler, getAllTokensSuccessHandler } from './service/getAll'
 import { hydrateFailedHandler, hydrateSideEffect, hydrateSuccessHandler } from './service/hydrate'
-import { createTokenSubscribeFailedHandler, createTokenSubscribeHandler, createTokenSubscribeSideEffect, createTokenSubscribeSuccessHandler } from './service/subscribe'
-import { createTokenUnsubscribeFailedHandler, createTokenUnsubscribeHandler, createTokenUnsubscribeSideEffect, createTokenUnsubscribeSuccessHandler } from './service/unsubscribe'
+import { createTokenSubscribeFailedHandler, createTokenSubscribeHandler, createTokenSubscribeSideEffect, createTokenSubscribeStartedHandler, createTokenSubscribeSuccessHandler } from './service/subscribe'
+import { createTokenUnsubscribeFailedHandler, createTokenUnsubscribeHandler, createTokenUnsubscribeSideEffect, createTokenUnsubscribeStartedHandler, createTokenUnsubscribeSuccessHandler } from './service/unsubscribe'
 import { TokensActions, TokensState } from './types'
 
 
 export const tokensInitialState: TokensState = ({
     loading: true,
+    subscriptions: {},
+    data: {},
     getTokens: {
+        requests: {},
         fetching: false,
         error: null,
-        data: {}
     },
     getToken: {
+        requests: {},
         fetching: false,
         error: null,
-        data: null
     },
     createToken: {
+        requests: {},
         fetching: false,
         error: null,
-        data: null
     },
     createTokensSubscribe: {
+        requests: {},
         fetching: false,
         error: null,
-        data: {}
     },
     createTokensUnsubscribe: {
+        requests: {},
         fetching: false,
         error: null,
     }
@@ -46,30 +49,40 @@ export const tokensReducer: React.Reducer<TokensState, TokensActions> = (state, 
             return hydrateFailedHandler(state)
         case 'get-all-tokens':
             return getAllTokensHandler(state)
+        case 'get-all-tokens-started':
+            return getAllTokensStartedHandler(state, action)
         case 'get-all-tokens-success':
             return getAllTokensSuccessHandler(state, action)
         case 'get-all-tokens-failed':
             return getAllTokensFailedHandler(state, action)
         case 'get-token':
             return getTokenHandler(state)
+        case 'get-token-started':
+            return getTokenStartedHandler(state, action)
         case 'get-token-success':
             return getTokenSuccessHandler(state, action)
         case 'get-token-failed':
             return getTokenFailedHandler(state, action)
         case 'create-token':
             return createTokenHandler(state)
+        case 'create-token-started':
+            return createTokenStartedHandler(state, action)
         case 'create-token-success':
             return createTokenSuccessHandler(state, action)
         case 'create-token-failed':
             return createTokenFailedHandler(state, action)
         case 'create-token-subscribe':
             return createTokenSubscribeHandler(state)
+        case 'create-token-subscribe-started':
+            return createTokenSubscribeStartedHandler(state, action)
         case 'create-token-subscribe-success':
             return createTokenSubscribeSuccessHandler(state, action)
         case 'create-token-subscribe-failed':
             return createTokenSubscribeFailedHandler(state, action)
         case 'create-token-unsubscribe':
             return createTokenUnsubscribeHandler(state)
+        case 'create-token-unsubscribe-started':
+            return createTokenUnsubscribeStartedHandler(state, action)
         case 'create-token-unsubscribe-success':
             return createTokenUnsubscribeSuccessHandler(state, action)
         case 'create-token-unsubscribe-failed':

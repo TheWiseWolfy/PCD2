@@ -17,7 +17,7 @@ export const useTokensPageLogic = () => {
     }, [navigate])
 
     return {
-        tokens: tokensState.getTokens.data[params.projectId!] || [],
+        tokens: tokensState.data[params.projectId!] || [],
 
         onGoToCreateProjectToken,
         onGoToProjectsList

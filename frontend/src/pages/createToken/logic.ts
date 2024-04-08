@@ -77,7 +77,7 @@ export const useCreateTokenPageLogic = () => {
         if (pageState !== PageState.Initial) {
             if (!tokensState.createToken.fetching && tokensState.createToken.error) {
                 setPageState(PageState.Failed);
-            } else if (!tokensState.createToken.fetching && !tokensState.createToken.error && tokensState.createToken.data) {
+            } else if (!tokensState.createToken.fetching && !tokensState.createToken.error) {
                 setPageState(PageState.Successful);
             }
         }
