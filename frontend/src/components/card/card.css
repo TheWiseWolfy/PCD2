@@ -1,6 +1,8 @@
 .card {
     display: flex;
     padding: 2rem;
+    max-height: 70vh;
+    overflow: scroll;
 }
 
 .card-border {

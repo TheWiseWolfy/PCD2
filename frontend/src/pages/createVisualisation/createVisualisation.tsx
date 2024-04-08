@@ -1,6 +1,7 @@
 import { Form } from "react-router-dom"
 import { Spin } from "../../components/animate/spin"
 import { Card } from "../../components/card/card"
+import { CardCenteredElement } from "../../components/card/cardCenteredElement"
 import { Header } from "../../components/header/header"
 import { HeaderActionSlot } from "../../components/header/headerActionsSlot"
 import { Image } from "../../components/image/image"
@@ -27,6 +28,12 @@ export const CreateVisualisation: React.FC = () => {
                 </HeaderActionSlot>
             } />
             <Card width={384}>
+                <Spacing spacing="m"/>
+                <CardCenteredElement>
+                    <Image id="chart" size="xl" scaleFactor={5} />
+                </CardCenteredElement>
+                <Spacing spacing="m"/>
+
                 <Form onSubmit={logic.onSubmit}>
                     <H1>Create visualisation</H1>
                     <List>

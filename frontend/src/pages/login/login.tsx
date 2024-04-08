@@ -1,5 +1,6 @@
 import { Spin } from "../../components/animate/spin"
 import { Card } from "../../components/card/card"
+import { CardCenteredElement } from "../../components/card/cardCenteredElement"
 import { Image } from "../../components/image/image"
 import { Button } from "../../components/input/button"
 import { ButtonRow } from "../../components/input/buttonRow"
@@ -17,6 +18,11 @@ export const Login: React.FC = () => {
     return (
         <Page centered={true}>
             <Card width={384}>
+                <Spacing spacing="m"/>
+                <CardCenteredElement>
+                    <Image id="user" size="xl" scaleFactor={5} />
+                </CardCenteredElement>
+                <Spacing spacing="m"/>
                 <Form onSubmit={logic.onSubmit}>
                     <H1>Login</H1>
                     <List>

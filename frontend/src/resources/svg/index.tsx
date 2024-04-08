@@ -7,6 +7,7 @@ import { ReactComponent as back } from './back.svg'
 import { ReactComponent as logout } from './logout.svg'
 import { ReactComponent as wind } from './wind.svg'
 import { ReactComponent as key } from './key.svg'
+import { ReactComponent as user } from './user.svg'
 
 const wrapper = (Element: React.FunctionComponent<React.SVGProps<SVGSVGElement> & {
     title?: string | undefined;
@@ -24,4 +25,5 @@ export const svg = {
     logout: wrapper(logout, '0 0 24 24'),
     wind: wrapper(wind, '0 0 24 24'),
     key: wrapper(key, '0 0 24 24'),
+    user: wrapper(user, '0 0 24 24'),
 }
