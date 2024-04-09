@@ -14,7 +14,7 @@ export const Visualisations: React.FC = () => {
     const logic = useVisualisationsPageLogic()
 
     return (
-        <Page centered={true}>
+        <>
             <Header left={
                 <HeaderActionSlot>
                     <Button onClick={logic.onGoToProjectsList}>
@@ -22,32 +22,34 @@ export const Visualisations: React.FC = () => {
                     </Button>
                 </HeaderActionSlot>
             } />
-            {
-                logic.visualisations.length === 0 && (
-                    <NewVisualisation onGoToCreateVisualisation={logic.onGoToCreateVisualisation}/>
-                )
-            }
-            {
-                logic.visualisations.length > 0 && (
-                    <CardList>
-                        <>
-                            {
-                                logic.visualisations.map(visualisation => (
-                                    <Visualisation 
-                                        key={visualisation.visualisation_id}
-                                        visualisationId={visualisation.visualisation_id}
-                                        name={visualisation.name}
-                                        description={visualisation.description}
-                                        fn={visualisation.fn}
-                                        data={logic.data[visualisation.visualisation_id] || []}
-                                    />
-                                ))
-                            }
-                        </>
-                        <AddMoreVisualisations onGoToCreateVisualisation={logic.onGoToCreateVisualisation}/>
-                    </CardList>
-                )
-            }
-        </Page>
-    );
+            <Page centered>
+                {
+                    logic.visualisations.length === 0 && (
+                        <NewVisualisation onGoToCreateVisualisation={logic.onGoToCreateVisualisation} />
+                    )
+                }
+                {
+                    logic.visualisations.length > 0 && (
+                        <CardList>
+                            <>
+                                {
+                                    logic.visualisations.map(visualisation => (
+                                        <Visualisation
+                                            key={visualisation.visualisation_id}
+                                            visualisationId={visualisation.visualisation_id}
+                                            name={visualisation.name}
+                                            description={visualisation.description}
+                                            fn={visualisation.fn}
+                                            data={logic.data[visualisation.visualisation_id] || []}
+                                        />
+                                    ))
+                                }
+                            </>
+                            <AddMoreVisualisations onGoToCreateVisualisation={logic.onGoToCreateVisualisation} />
+                        </CardList>
+                    )
+                }
+            </Page>
+        </>
+    )
 };

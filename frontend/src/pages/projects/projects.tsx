@@ -10,35 +10,37 @@ export const Projects: React.FC = () => {
     const logic = useProjectsPageLogic()
 
     return (
-        <Page centered={true}>
+        <>
             <Header />
-            {
-                logic.projects.length === 0 && (
-                    <NewProject onGoToCreateProject={logic.onGoToCreateProject} />
-                )
-            }
-            {
-                logic.projects.length > 0 && (
-                    <CardList>
-                        <>
-                            {
-                                logic.projects.map(project => (
-                                    <Project
-                                        key={project.project_id}
-                                        projectId={project.project_id}
-                                        userId={project.user_id}
-                                        name={project.name}
-                                        description={project.description}
-                                        onGoToProject={logic.onGoToProject(project.project_id)}
-                                        onGoToProjectTokens={logic.onGoToProjectTokens(project.project_id)}
-                                    />
-                                ))
-                            }
-                            <AddMoreProjects onGoToCreateProject={logic.onGoToCreateProject} />
-                        </>
-                    </CardList>
-                )
-            }
-        </Page>
+            <Page centered>
+                {
+                    logic.projects.length === 0 && (
+                        <NewProject onGoToCreateProject={logic.onGoToCreateProject} />
+                    )
+                }
+                {
+                    logic.projects.length > 0 && (
+                        <CardList>
+                            <>
+                                {
+                                    logic.projects.map(project => (
+                                        <Project
+                                            key={project.project_id}
+                                            projectId={project.project_id}
+                                            userId={project.user_id}
+                                            name={project.name}
+                                            description={project.description}
+                                            onGoToProject={logic.onGoToProject(project.project_id)}
+                                            onGoToProjectTokens={logic.onGoToProjectTokens(project.project_id)}
+                                        />
+                                    ))
+                                }
+                                <AddMoreProjects onGoToCreateProject={logic.onGoToCreateProject} />
+                            </>
+                        </CardList>
+                    )
+                }
+            </Page>
+        </>
     );
 };

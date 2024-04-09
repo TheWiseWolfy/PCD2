@@ -17,7 +17,7 @@ export const Register: React.FC = () => {
     const logic = useRegisterLogic()
 
     return (
-        <Page centered={true}>
+        <>
             <Header left={
                 <HeaderActionSlot>
                     <Button onClick={logic.onGoToLoginClick}>
@@ -25,32 +25,34 @@ export const Register: React.FC = () => {
                     </Button>
                 </HeaderActionSlot>
             } />
-            <Card width={384}>
-                <Spacing spacing="m"/>
-                <CardCenteredElement>
-                    <Image id="user" size="xl" scaleFactor={5} />
-                </CardCenteredElement>
-                <Spacing spacing="m"/>
-
-                <Form onSubmit={logic.onSubmit}>
-                    <H1>Create user</H1>
-                    <List>
-                        <TextField value={logic.name} onChange={logic.setName} placeholder="Name" invalid={!logic.nameValid} />
-                        <TextField value={logic.email} onChange={logic.setEmail} placeholder="Email" invalid={!logic.emailValid} />
-                        <TextField value={logic.password} onChange={logic.setPassword} placeholder="Password" invalid={!logic.passwordValid} masked />
-                    </List>
+            <Page centered>
+                <Card width={384}>
                     <Spacing spacing="m" />
-                    <Button disabled={logic.disabled}>
-                        {!logic.fetching
-                            ? 'Submit'
-                            : <Spin>
-                                <Image id="gear" />
-                            </Spin>
-                        }
-                    </Button>
-                </Form>
-            </Card>
-        </Page>
+                    <CardCenteredElement>
+                        <Image id="user" size="xl" scaleFactor={5} />
+                    </CardCenteredElement>
+                    <Spacing spacing="m" />
+
+                    <Form onSubmit={logic.onSubmit}>
+                        <H1>Create user</H1>
+                        <List>
+                            <TextField value={logic.name} onChange={logic.setName} placeholder="Name" invalid={!logic.nameValid} />
+                            <TextField value={logic.email} onChange={logic.setEmail} placeholder="Email" invalid={!logic.emailValid} />
+                            <TextField value={logic.password} onChange={logic.setPassword} placeholder="Password" invalid={!logic.passwordValid} masked />
+                        </List>
+                        <Spacing spacing="m" />
+                        <Button disabled={logic.disabled}>
+                            {!logic.fetching
+                                ? 'Submit'
+                                : <Spin>
+                                    <Image id="gear" />
+                                </Spin>
+                            }
+                        </Button>
+                    </Form>
+                </Card>
+            </Page>
+        </>
     )
 }
 

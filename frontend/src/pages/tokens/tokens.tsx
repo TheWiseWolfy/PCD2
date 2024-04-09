@@ -13,7 +13,7 @@ export const Tokens: React.FC = () => {
     const logic = useTokensPageLogic()
 
     return (
-        <Page centered={true}>
+        <>
             <Header left={
                 <HeaderActionSlot>
                     <Button onClick={logic.onGoToProjectsList}>
@@ -21,32 +21,34 @@ export const Tokens: React.FC = () => {
                     </Button>
                 </HeaderActionSlot>
             } />
-            {
-                logic.tokens.length === 0 && (
-                    <NewToken onGoToCreateProjectToken={logic.onGoToCreateProjectToken} />
-                )
-            }
-            {
-                logic.tokens.length > 0 && (
-                    <CardList>
-                        <>
-                            {
-                                logic.tokens.map(token => (
-                                    <Token
-                                        key={token.token_id}
-                                        tokenId={token.token_id}
-                                        projectId={token.project_id}
-                                        name={token.name}
-                                        description={token.description}
-                                        token={token.token}
-                                    />
-                                ))
-                            }
-                            <AddMoreTokens onGoToCreateProjectToken={logic.onGoToCreateProjectToken} />
-                        </>
-                    </CardList>
-                )
-            }
-        </Page>
-    );
+            <Page centered>
+                {
+                    logic.tokens.length === 0 && (
+                        <NewToken onGoToCreateProjectToken={logic.onGoToCreateProjectToken} />
+                    )
+                }
+                {
+                    logic.tokens.length > 0 && (
+                        <CardList>
+                            <>
+                                {
+                                    logic.tokens.map(token => (
+                                        <Token
+                                            key={token.token_id}
+                                            tokenId={token.token_id}
+                                            projectId={token.project_id}
+                                            name={token.name}
+                                            description={token.description}
+                                            token={token.token}
+                                        />
+                                    ))
+                                }
+                                <AddMoreTokens onGoToCreateProjectToken={logic.onGoToCreateProjectToken} />
+                            </>
+                        </CardList>
+                    )
+                }
+            </Page>
+        </>
+    )
 };

@@ -18,7 +18,7 @@ export const CreateToken: React.FC = () => {
     const logic = useCreateTokenPageLogic()
 
     return (
-        <Page centered={true}>
+        <>
             <Header left={
                 <HeaderActionSlot>
                     <Button onClick={logic.onGoToTokensList}>
@@ -26,30 +26,32 @@ export const CreateToken: React.FC = () => {
                     </Button>
                 </HeaderActionSlot>
             } />
-            <Card width={384}>
-                <Spacing spacing="m"/>
-                <CardCenteredElement>
-                    <Image id="project" size="xl" scaleFactor={5} />
-                </CardCenteredElement>
-                <Spacing spacing="m"/>
-
-                <Form onSubmit={logic.onSubmit}>
-                    <H1>Create token</H1>
-                    <List>
-                        <TextField value={logic.name} onChange={logic.setName} placeholder="Name" invalid={!logic.nameValid} />
-                        <TextField value={logic.description} onChange={logic.setDescription} placeholder="Description" invalid={!logic.descriptionValid} />
-                    </List>
+            <Page centered>
+                <Card width={384}>
                     <Spacing spacing="m" />
-                    <Button disabled={logic.disabled}>
-                        {!logic.fetching
-                            ? 'Submit'
-                            : <Spin>
-                                <Image id="gear" />
-                            </Spin>
-                        }
-                    </Button>
-                </Form>
-            </Card>
-        </Page>
+                    <CardCenteredElement>
+                        <Image id="project" size="xl" scaleFactor={5} />
+                    </CardCenteredElement>
+                    <Spacing spacing="m" />
+
+                    <Form onSubmit={logic.onSubmit}>
+                        <H1>Create token</H1>
+                        <List>
+                            <TextField value={logic.name} onChange={logic.setName} placeholder="Name" invalid={!logic.nameValid} />
+                            <TextField value={logic.description} onChange={logic.setDescription} placeholder="Description" invalid={!logic.descriptionValid} />
+                        </List>
+                        <Spacing spacing="m" />
+                        <Button disabled={logic.disabled}>
+                            {!logic.fetching
+                                ? 'Submit'
+                                : <Spin>
+                                    <Image id="gear" />
+                                </Spin>
+                            }
+                        </Button>
+                    </Form>
+                </Card>
+            </Page>
+        </>
     )
 }

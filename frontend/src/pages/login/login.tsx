@@ -16,7 +16,7 @@ export const Login: React.FC = () => {
     const logic = useLoginLogic()
 
     return (
-        <Page centered={true}>
+        <Page centered>
             <Card width={384}>
                 <Spacing spacing="m"/>
                 <CardCenteredElement>
