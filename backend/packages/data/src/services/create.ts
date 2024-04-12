@@ -82,7 +82,7 @@ const call = (self: Self): CreateService['call'] => async (input) => {
         await self.callbackAPIClient.postToConnection({
             ConnectionId: connectionId,
             Data: JSON.stringify({
-                action: "data-created",
+                action: "data-create",
                 data: {
                     data: data.rows[0]
                 }
