@@ -20,7 +20,7 @@ interface Props {
 
 export const Visualisation: FC<Props> = ({ visualisationId, name, description, fn, type, data }) => {
     const options = useMemo<ReactApexChart['props']['options']>(() => {
-        const timestamps = data.map(entry => new Date(entry.timestamp))
+        const timestamps = data.map(entry => new Date(entry.timestamp).getTime())
 
         return {
             chart: {
@@ -44,7 +44,7 @@ export const Visualisation: FC<Props> = ({ visualisationId, name, description, f
     }, [data, name])
 
     return (
-        <Card width={384}>
+        <Card width={512}>
             <H3>{name}</H3>
             <CardCenteredElement>
                 {
@@ -54,6 +54,8 @@ export const Visualisation: FC<Props> = ({ visualisationId, name, description, f
                             type={(type as ReactApexChart['props']['type']) || 'area'}
                             options={options}
                             series={series}
+                            height={384}
+                            width={512}
                         />
                 }
             </CardCenteredElement>
