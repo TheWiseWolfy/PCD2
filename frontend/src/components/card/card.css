@@ -51,3 +51,10 @@
 .card-list-row {
     flex-direction: row;
 }
+
+
+@media screen and (max-width: 1000px) {
+    .card-list {
+        justify-content: center;
+    }
+}
