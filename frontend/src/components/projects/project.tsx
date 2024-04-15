@@ -28,6 +28,8 @@ export const Project: React.FC<Props> = ({ projectId, name, description, onGoToP
                 <Image id="project" size="xl" scaleFactor={5} />
             </CardCenteredElement>
             <Spacing spacing="m" />
+            <H6>Project id:</H6>
+            <P>{projectId}</P>
             {description && (
                 <>
                     <H6>Description:</H6>

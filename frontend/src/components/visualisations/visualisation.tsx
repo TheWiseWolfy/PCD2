@@ -60,6 +60,8 @@ export const Visualisation: FC<Props> = ({ visualisationId, name, description, f
                 }
             </CardCenteredElement>
             <Spacing spacing="m" />
+            <H6>Visualisation id:</H6>
+            <P>{visualisationId}</P>
             {description && (
                 <>
                     <H6>Description:</H6>

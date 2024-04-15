@@ -16,7 +16,7 @@ interface Props {
     token: string
 }
 
-export const Token: React.FC<Props> = ({ name, description, token }) => {
+export const Token: React.FC<Props> = ({ tokenId, name, description, token }) => {
     return (
         <Card width={384}>
             <H3>{name}</H3>
@@ -24,6 +24,8 @@ export const Token: React.FC<Props> = ({ name, description, token }) => {
                 <Image id="key" size="xl" scaleFactor={5} />
             </CardCenteredElement>
             <Spacing spacing="m" />
+            <H6>Token id:</H6>
+            <P>{tokenId}</P>
             {description && (
                 <>
                     <H6>Description:</H6>
