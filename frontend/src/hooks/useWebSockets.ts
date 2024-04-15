@@ -59,7 +59,7 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
             internalRequest(requestId, action, data)
         }
     })
-    const { socket, connected } = useManagedWebsocket({
+    const { socket, connected, connectedRef } = useManagedWebsocket({
         url,
         timeout,
         handleOpen: () => {
@@ -71,32 +71,32 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
         },
     })
 
-    const internalRequest = useCallback(<T, R>(requestId: string, action: string, data: T) => {
-        if (!socket || !connected) {
+    const internalRequest = <T, R>(requestId: string, action: string, data: T) => {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
         const existingRequestListener = requestListeners[requestId]
 
         if (existingRequestListener) {
-            socket.send(JSON.stringify(existingRequestListener.request))
+            socket.current.send(JSON.stringify(existingRequestListener.request))
             return existingRequestListener.callback
         }
 
         const request = { requestId, action, data }
         const requestListener = { request, callback: makeDeferredPromise<R>() }
 
-        socket.send(JSON.stringify(request))
-        setRequestListeners({
-            ...requestListeners,
+        socket.current.send(JSON.stringify(request))
+        setRequestListeners(previousValue => ({
+            ...previousValue,
             [requestId]: requestListener
-        })
+        }))
 
         return requestListener.callback
-    }, [socket, connected, requestListeners])
+    }
 
-    const request = useCallback(async <T, R>(action: string, data: T): Promise<R> => {
-        if (!socket || !connected) {
+    const request = async <T, R>(action: string, data: T): Promise<R> => {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
@@ -104,22 +104,22 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
         const requestListener = internalRequest(requestId, action, data)
 
         return requestListener.promise
-    }, [socket, connected])
+    }
 
-    const publish = useCallback(<T>(action: string, data: T) => {
-        if (!socket || !connected) {
+    const publish = <T>(action: string, data: T) => {
+        if (!socket.current || !connectedRef.current) {
             return
         }
 
-        socket.send(JSON.stringify({
+        socket.current.send(JSON.stringify({
             action,
             requestId: undefined,
             data
         }))
-    }, [socket, connected])
+    }
 
-    const internalSubscribe = useCallback(async <T, U = null>(action: string, data: U, callback: SubscriptionCallback<T>) => {
-        if (!socket || !connected) {
+    const internalSubscribe = async <T, U = null>(action: string, data: U, callback: SubscriptionCallback<T>) => {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
@@ -127,10 +127,10 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
         await request(`${action}-subscribe`, data || null)
 
         return subscription
-    }, [socket, connected])
+    }
 
-    const subscribe = useCallback(async <T, U = null>(action: string, data: U, callback: SubscriptionCallback<T>) => {
-        if (!socket || !connected) {
+    const subscribe = async <T, U = null>(action: string, data: U, callback: SubscriptionCallback<T>) => {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
@@ -139,10 +139,10 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
         return {
             unsubscribe: unsubscribe(subscription)
         }
-    }, [socket, connected])
+    }
 
-    const unsubscribe = useCallback(<T, U>(subscription: SubscriptionListener<T, U>) => async () => {
-        if (!socket || !connected) {
+    const unsubscribe = <T, U>(subscription: SubscriptionListener<T, U>) => async () => {
+        if (!socket.current || !connectedRef.current) {
             throw new Error('Socket not connected')
         }
 
@@ -163,7 +163,7 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
                 [subscription.action]: subscriptions
             }
         })
-    }, [socket, connected])
+    }
 
     return {
         connected,
@@ -181,68 +181,69 @@ const useManagedWebsocket = (opts: {
     handleError?: () => void,
     handleMessage?: (event: MessageEvent) => void
 }) => {
-    const [socket, setSocket] = useState<WebSocket | undefined>()
+    const socket = useRef<WebSocket | undefined>()
     const [connected, setConnected] = useState(false)
+    const connectedRef = useRef(false)
 
-    const internalHandleOpen = useCallback(() => {
+    const internalHandleOpen = () => {
         setConnected(true)
         opts.handleOpen?.()
-    }, [])
+    }
 
-    const internalHandleClose = useCallback(() => {
+    const internalHandleClose = () => {
         setConnected(false)
         interval.end()
         interval.start()
         opts.handleClose?.()
-    }, [])
+    }
 
-    const internalHandleError = useCallback(() => {
+    const internalHandleError = () => {
         setConnected(false)
         interval.end()
         interval.start()
         opts.handleError?.()
-    }, [])
+    }
 
-    const internalHandleMessage = useCallback((event: MessageEvent) => {
+    const internalHandleMessage = (event: MessageEvent) => {
         opts.handleMessage?.(event)
-    }, [])
+    }
 
     const interval = useTimeout(
         opts.timeout,
         () => {
-            if (socket) {
-                socket.close()
+            if (socket.current) {
+                socket.current.close()
 
-                socket.addEventListener('open', internalHandleOpen)
-                socket.addEventListener('close', internalHandleClose)
-                socket.addEventListener('error', internalHandleError)
-                socket.addEventListener('message', internalHandleMessage);
+                socket.current.removeEventListener('open', internalHandleOpen)
+                socket.current.removeEventListener('close', internalHandleClose)
+                socket.current.removeEventListener('error', internalHandleError)
+                socket.current.removeEventListener('message', internalHandleMessage);
             }
 
-            const newSocket = new WebSocket(opts.url)
+            socket.current = new WebSocket(opts.url)
 
-            newSocket.addEventListener('open', internalHandleOpen)
-            newSocket.addEventListener('close', internalHandleClose)
-            newSocket.addEventListener('error', internalHandleError)
-            newSocket.addEventListener('message', internalHandleMessage);
-
-            setSocket(newSocket)
+            socket.current.addEventListener('open', internalHandleOpen)
+            socket.current.addEventListener('close', internalHandleClose)
+            socket.current.addEventListener('error', internalHandleError)
+            socket.current.addEventListener('message', internalHandleMessage);
         },
-        [socket, internalHandleOpen, internalHandleClose, internalHandleError, internalHandleMessage]
+        [internalHandleOpen, internalHandleClose, internalHandleError, internalHandleMessage]
     )
 
     useEffect(() => {
-        const newSocket = new WebSocket(opts.url)
+        socket.current = new WebSocket(opts.url)
 
-        newSocket.addEventListener('open', internalHandleOpen)
-        newSocket.addEventListener('close', internalHandleClose)
-        newSocket.addEventListener('error', internalHandleError)
-        newSocket.addEventListener('message', internalHandleMessage);
-
-        setSocket(newSocket)
+        socket.current.addEventListener('open', internalHandleOpen)
+        socket.current.addEventListener('close', internalHandleClose)
+        socket.current.addEventListener('error', internalHandleError)
+        socket.current.addEventListener('message', internalHandleMessage);
     }, [])
 
-    return { socket, connected }
+    useEffect(() => {
+        connectedRef.current = connected
+    }, [connected])
+
+    return { socket, connected, connectedRef }
 }
 
 
