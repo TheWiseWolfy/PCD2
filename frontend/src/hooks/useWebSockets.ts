@@ -16,8 +16,10 @@ type RequestListener<T, U> = {
     callback: DeferredPromise<T>
 }
 type SubscriptionListener<T, U> = {
-    action: string
-    data: U
+    subscription: {
+        action: string
+        data: U
+    },
     callback: SubscriptionCallback<T>
 }
 type SubscriptionCallback<T> = (data: T) => void
@@ -123,10 +125,19 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
             throw new Error('Socket not connected')
         }
 
-        const subscription = { action, data, callback }
+        const subscription = { action, data }
+        const subscriptionListener = { subscription, callback }
+        setSubscriptionListeners(previousValue => ({
+            ...previousValue,
+            [action]:
+                !previousValue[action]
+                    ? [subscriptionListener]
+                    : [...previousValue[action], subscriptionListener]
+        }))
+
         await request(`${action}-subscribe`, data || null)
 
-        return subscription
+        return subscriptionListener
     }
 
     const subscribe = async <T, U = null>(action: string, data: U, callback: SubscriptionCallback<T>) => {
@@ -146,21 +157,21 @@ export const useWebSockets = (url: string, timeout: number): ManagedWebSocket =>
             throw new Error('Socket not connected')
         }
 
-        await request(`${subscription.action}-unsubscribe`, null)
+        await request(`${subscription.subscription.action}-unsubscribe`, null)
 
-        const index = subscriptionListeners[subscription.action].findIndex(entry => entry === subscription)
+        const index = subscriptionListeners[subscription.subscription.action].findIndex(entry => entry === subscription)
 
         if (index === -1) {
             return
         }
 
         setSubscriptionListeners(previousValue => {
-            const subscriptions = (previousValue[subscription.action] || []).slice()
+            const subscriptions = (previousValue[subscription.subscription.action] || []).slice()
             subscriptions.splice(index, 1)
 
             return {
                 ...previousValue,
-                [subscription.action]: subscriptions
+                [subscription.subscription.action]: subscriptions
             }
         })
     }
@@ -331,7 +342,7 @@ const useSubscriptionManager = (opts: {
     const resubscribe = useCallback(() => {
         for (const subscriptionListeners of Object.values(opts.subscriptionListeners)) {
             for (const subscriptionListener of subscriptionListeners) {
-                opts.subscribe(subscriptionListener.action, subscriptionListener.data, subscriptionListener.callback)
+                opts.subscribe(subscriptionListener.subscription.action, subscriptionListener.subscription.data, subscriptionListener.callback)
             }
         }
     }, [opts.subscriptionListeners])
