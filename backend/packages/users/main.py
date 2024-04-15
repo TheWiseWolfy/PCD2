@@ -1,7 +1,5 @@
 import os
-import psycopg2
-import psycopg2.extras
-import redis
+from src.utils.clients import ClientsSingleton
 from src.utils.logger import BaseLogger
 from src.utils.router import Router
 from src.routes.get import GetRoute
@@ -21,10 +19,17 @@ def lambda_handler(event, context):
     pg_user = os.environ.get("DATABASE_USERNAME")
     pg_password = os.environ.get("DATABASE_PASSWORD")
 
-    redis_client = redis.Redis(host=redis_host, port=redis_port)
-    pg_conn = psycopg2.connect(
-        host=pg_host, port=pg_port, database=pg_db, user=pg_user, password=pg_password
+    clients = ClientsSingleton(
+        redis_host=redis_host,
+        redis_port=redis_port,
+        pg_host=pg_host,
+        pg_port=pg_port,
+        pg_db=pg_db,
+        pg_user=pg_user,
+        pg_password=pg_password,
     )
+    redis_client = clients.cache
+    pg_conn = clients.database
 
     logger = BaseLogger()
 

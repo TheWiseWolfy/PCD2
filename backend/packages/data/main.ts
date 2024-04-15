@@ -1,7 +1,4 @@
-import aws from 'aws-sdk'
-import pg from 'pg'
 import process from 'process'
-import redis from 'redis'
 import { makeCreateRoute } from './src/routes/create'
 import { makeGetAllRoute } from './src/routes/getAll'
 import { makeSubscribeRoute } from './src/routes/subscribe'
@@ -10,6 +7,7 @@ import { makeCreateService } from './src/services/create'
 import { makeGetAllService } from './src/services/getAll'
 import { makeSubscribeService } from './src/services/subscribe'
 import { makeUnsubscribeService } from './src/services/unsubscribe'
+import { makeClients } from './src/utils/clients'
 import { makeLogger } from './src/utils/logger'
 import { makeRouter } from './src/utils/router'
 
@@ -22,18 +20,20 @@ export const handler = async (event: any, _context: any) => {
     const DATABASE_USERNAME = process.env['DATABASE_USERNAME']
     const DATABASE_PASSWORD = process.env['DATABASE_PASSWORD']
 
-    const callbackAPIClient = new aws.ApiGatewayManagementApi({
-        apiVersion: '2018-11-29',
-        endpoint: event.requestContext.domainName + '/' + event.requestContext.stage,
-    })
-    const redisClient = await redis.createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` }).connect() as any
-    const postgresClient = new pg.Pool({
-        host: DATABASE_HOST,
-        port: DATABASE_PORT,
-        database: DATABASE_DATABASE,
-        user: DATABASE_USERNAME,
-        password: DATABASE_PASSWORD
-    })
+    const clients = await makeClients(
+        event.requestContext.domainName,
+        event.requestContext.stage,
+        REDIS_HOST,
+        REDIS_PORT,
+        DATABASE_HOST,
+        DATABASE_PORT,
+        DATABASE_DATABASE,
+        DATABASE_USERNAME,
+        DATABASE_PASSWORD
+    )
+    const callbackAPIClient = clients.callbackAPIClient
+    const redisClient = clients.redisClient
+    const postgresClient = clients.postgresClient
 
     const logger = makeLogger()
 
