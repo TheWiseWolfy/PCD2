@@ -7,7 +7,7 @@ import { getAllProjectsFailedHandler, getAllProjectsHandler, getAllProjectsSideE
 import { hydrate, hydrateFailedHandler, hydrateSuccessHandler } from './service/hydrate'
 import { createProjectSubscribeFailedHandler, createProjectSubscribeHandler, createProjectSubscribeStartedHandler, createProjectSubscribeSuccessHandler, subscribe } from './service/subscribe'
 import { createProjectUnsubscribeFailedHandler, createProjectUnsubscribeHandler, createProjectUnsubscribeStartedHandler, createProjectUnsubscribeSuccessHandler, unsubscribe } from './service/unsubscribe'
-import { ProjectsActions, ProjectsState } from './types'
+import { Project, ProjectsActions, ProjectsState } from './types'
 
 
 export const projectsInitialState: ProjectsState = ({
@@ -93,28 +93,30 @@ export const projectsReducer: React.Reducer<ProjectsState, ProjectsActions> = (s
     }
 }
 
-export const projectsSideEffects =
-    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>> => {
-        const boundGetAllProjects = getAllProjectsSideEffect(websocket)
-        const boundGetProject = getProjectSideEffect(websocket)
-        const boundCreateProject = createProjectSideEffect(websocket)
-        const boundCreateProjectSubscribe = subscribe(websocket)
-        const boundCreateProjectUnsubscribe = unsubscribe(websocket)
+export const projectsSideEffects = (
+    websocket: ManagedWebSocket,
+    additionalSubscriptions: (project: Project) => void
+): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>> => {
+    const boundGetAllProjects = getAllProjectsSideEffect(websocket)
+    const boundGetProject = getProjectSideEffect(websocket)
+    const boundCreateProject = createProjectSideEffect(websocket, additionalSubscriptions)
+    const boundCreateProjectSubscribe = subscribe(websocket, additionalSubscriptions)
+    const boundCreateProjectUnsubscribe = unsubscribe(websocket)
 
-        return (state, action, dispatch) => {
-            switch (action.type) {
-                case 'hydrate':
-                    return hydrate(state, action, dispatch)
-                case 'get-all-projects':
-                    return boundGetAllProjects(state, action, dispatch)
-                case 'get-project':
-                    return boundGetProject(state, action, dispatch)
-                case 'create-project':
-                    return boundCreateProject(state, action, dispatch)
-                case 'create-project-subscribe':
-                    return boundCreateProjectSubscribe(state, action, dispatch)
-                case 'create-project-unsubscribe':
-                    return boundCreateProjectUnsubscribe(state, action, dispatch)
-            }
+    return (state, action, dispatch) => {
+        switch (action.type) {
+            case 'hydrate':
+                return hydrate(state, action, dispatch)
+            case 'get-all-projects':
+                return boundGetAllProjects(state, action, dispatch)
+            case 'get-project':
+                return boundGetProject(state, action, dispatch)
+            case 'create-project':
+                return boundCreateProject(state, action, dispatch)
+            case 'create-project-subscribe':
+                return boundCreateProjectSubscribe(state, action, dispatch)
+            case 'create-project-unsubscribe':
+                return boundCreateProjectUnsubscribe(state, action, dispatch)
         }
     }
+}

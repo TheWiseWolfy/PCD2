@@ -66,7 +66,10 @@ export const createProjectFailedHandler = (state: ProjectsState, action: Project
     }
 }
 
-export const createProjectSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsCreateAction> =>
+export const createProjectSideEffect = (
+    websocket: ManagedWebSocket,
+    additionalSubscriptions: (project: Project) => void
+): ReducerSideEffect<React.Reducer<ProjectsState, ProjectsActions>, ProjectsCreateAction> =>
     async (state, action, dispatch) => {
         const requestId = window.crypto.randomUUID()
 
@@ -80,6 +83,7 @@ export const createProjectSideEffect = (websocket: ManagedWebSocket): ReducerSid
             }
 
             dispatch({ type: 'create-project-success', data: { requestId, data: result.project } })
+            additionalSubscriptions(result.project)
         } catch (error) {
             dispatch({ type: 'create-project-failed', data: { requestId, reason: error as string } })
         }

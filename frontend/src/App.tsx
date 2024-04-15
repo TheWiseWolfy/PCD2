@@ -18,16 +18,16 @@ export const App = () => {
     <NetContextProvider websocket={websocket}>
       <NotificationsContextProvider>
         <UsersContextProvider websocket={websocket}>
-          <ProjectsContextProvider websocket={websocket}>
-            <TokensContextProvider websocket={websocket}>
-              <VisualisationsContextProvider websocket={websocket}>
-                <DataContextProvider websocket={websocket}>
+          <DataContextProvider websocket={websocket}>
+            <VisualisationsContextProvider websocket={websocket}>
+              <TokensContextProvider websocket={websocket}>
+                <ProjectsContextProvider websocket={websocket}>
                   <RouterProvider router={router} />
                   <Notifications />
-                </DataContextProvider>
-              </VisualisationsContextProvider>
-            </TokensContextProvider>
-          </ProjectsContextProvider>
+                </ProjectsContextProvider>
+              </TokensContextProvider>
+            </VisualisationsContextProvider>
+          </DataContextProvider>
         </UsersContextProvider>
       </NotificationsContextProvider>
     </NetContextProvider>

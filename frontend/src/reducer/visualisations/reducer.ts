@@ -7,7 +7,7 @@ import { getAllVisualisationsFailedHandler, getAllVisualisationsHandler, getAllV
 import { hydrate, hydrateFailedHandler, hydrateSuccessHandler } from './service/hydrate'
 import { createVisualisationSubscribeFailedHandler, createVisualisationSubscribeHandler, createVisualisationSubscribeSideEffect, createVisualisationSubscribeStartedHandler, createVisualisationSubscribeSuccessHandler } from './service/subscribe'
 import { createVisualisationUnsubscribeFailedHandler, createVisualisationUnsubscribeHandler, createVisualisationUnsubscribeSideEffect, createVisualisationUnsubscribeStartedHandler, createVisualisationUnsubscribeSuccessHandler } from './service/unsubscribe'
-import { VisualisationsActions, VisualisationsState } from './types'
+import { Visualisation, VisualisationsActions, VisualisationsState } from './types'
 
 
 export const visualisationsInitialState: VisualisationsState = ({
@@ -94,12 +94,12 @@ export const visualisationsReducer: React.Reducer<VisualisationsState, Visualisa
 }
 
 export const visualisationsSideEffects =
-    (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>> => {
+    (websocket: ManagedWebSocket, additionalSubscriptions: (visualisation: Visualisation) => void): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>> => {
         const boundHydrate = hydrate()
         const boundGetAll = getAllVisualisationsSideEffect(websocket)
         const boundGet = getVisualisationSideEffect(websocket)
-        const boundCreate = createVisualisationSideEffect(websocket)
-        const boundSubscribe = createVisualisationSubscribeSideEffect(websocket)
+        const boundCreate = createVisualisationSideEffect(websocket, additionalSubscriptions)
+        const boundSubscribe = createVisualisationSubscribeSideEffect(websocket, additionalSubscriptions)
         const boundUnsubscribe = createVisualisationUnsubscribeSideEffect(websocket)
 
         return (state, action, dispatch) => {

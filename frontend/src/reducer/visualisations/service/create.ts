@@ -69,10 +69,13 @@ export const createVisualisationFailedHandler = (state: VisualisationsState, act
     }
 }
 
-export const createVisualisationSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateAction> =>
+export const createVisualisationSideEffect = (
+    websocket: ManagedWebSocket,
+    additionalSubscriptions: (visualisation: Visualisation) => void
+): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateAction> =>
     async (state, action, dispatch) => {
         const requestId = window.crypto.randomUUID()
-        
+
         try {
             dispatch({ type: 'create-visualisation-started', data: { requestId } })
 
@@ -83,6 +86,7 @@ export const createVisualisationSideEffect = (websocket: ManagedWebSocket): Redu
             }
 
             dispatch({ type: 'create-visualisation-success', data: { requestId, projectId: action.data.projectId, data: result.visualisation } })
+            additionalSubscriptions(result.visualisation)
         } catch (error) {
             dispatch({ type: 'create-visualisation-failed', data: { requestId, reason: error as string } })
         }

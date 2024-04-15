@@ -65,7 +65,10 @@ export const createVisualisationSubscribeFailedHandler = (
     }
 }
 
-export const createVisualisationSubscribeSideEffect = (websocket: ManagedWebSocket): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateSubscribeAction> =>
+export const createVisualisationSubscribeSideEffect = (
+    websocket: ManagedWebSocket,
+    additionalSubscriptions: (visualisation: Visualisation) => void
+): ReducerSideEffect<React.Reducer<VisualisationsState, VisualisationsActions>, VisualisationsCreateSubscribeAction> =>
     async (state, action, dispatch) => {
         const requestId = window.crypto.randomUUID()
 
@@ -78,6 +81,7 @@ export const createVisualisationSubscribeSideEffect = (websocket: ManagedWebSock
                 }
 
                 dispatch({ type: 'create-visualisation-success', data: { requestId: '', projectId: message.visualisation.project_id, data: message.visualisation } })
+                additionalSubscriptions(message.visualisation)
             })
 
             dispatch({ type: 'create-visualisation-subscribe-success', data: { requestId, projectId: action.data.projectId, subscription: result } })
