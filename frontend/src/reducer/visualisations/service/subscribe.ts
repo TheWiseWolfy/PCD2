@@ -73,7 +73,7 @@ export const createVisualisationSubscribeSideEffect = (
         const requestId = window.crypto.randomUUID()
 
         try {
-            dispatch({ type: 'create-visualisation-started', data: { requestId } })
+            dispatch({ type: 'create-visualisation-subscribe-started', data: { requestId } })
 
             const result = await websocket.subscribe<{ visualisation: Visualisation } | VisualisationsError, VisualisationsCreateSubscribeAction['data']>('visualisations-create', action.data, (message) => {
                 if ('reason' in message) {
