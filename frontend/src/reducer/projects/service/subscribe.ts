@@ -64,7 +64,7 @@ export const subscribe = (
         const requestId = window.crypto.randomUUID()
 
         try {
-            dispatch({ type: 'create-project-started', data: { requestId } })
+            dispatch({ type: 'create-project-subscribe-started', data: { requestId } })
 
             const result = await websocket.subscribe<{ project: Project } | ProjectsError>('projects-create', null, (message) => {
                 if ('reason' in message) {
