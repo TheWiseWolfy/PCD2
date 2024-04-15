@@ -15,7 +15,7 @@ export const useCreateTokenPageLogic = () => {
     const [descriptionValid, setDescriptionValid] = useState(true)
     const navigate = useNavigate()
     const params = useParams()
-    
+
     const onSubmit = useCallback(() => {
         tokensDispatch({ type: 'create-token', data: { projectId: params.projectId!, name, description } });
         setPageState(PageState.Fetching)
@@ -24,7 +24,7 @@ export const useCreateTokenPageLogic = () => {
     const onGoToTokensList = useCallback(() => {
         navigate(`/app/projects/${params.projectId}/tokens`)
     }, [params, navigate])
-    
+
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);
         setDescriptionValid(description.length < 257);
@@ -74,10 +74,10 @@ export const useCreateTokenPageLogic = () => {
     }, [pageState, tokensState.createToken.error, notificationsDispatch, onGoToTokensList])
 
     useEffect(() => {
-        if (pageState !== PageState.Initial) {
-            if (!tokensState.createToken.fetching && tokensState.createToken.error) {
+        if (pageState !== PageState.Initial && !tokensState.createToken.fetching) {
+            if (tokensState.createToken.error) {
                 setPageState(PageState.Failed);
-            } else if (!tokensState.createToken.fetching && !tokensState.createToken.error) {
+            } else {
                 setPageState(PageState.Successful);
             }
         }
@@ -88,7 +88,7 @@ export const useCreateTokenPageLogic = () => {
         setName,
         description,
         setDescription,
-        
+
         fetching: pageState === PageState.Fetching,
         disabled,
 

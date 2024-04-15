@@ -73,10 +73,10 @@ export const useCreateProjectPageLogic = () => {
     }, [pageState, projectsState.createProject.error, notificationsDispatch, onGoToProjectsList])
 
     useEffect(() => {
-        if (pageState !== PageState.Initial) {
-            if (!projectsState.createProject.fetching && projectsState.createProject.error) {
+        if (pageState !== PageState.Initial && !projectsState.createProject.fetching) {
+            if (projectsState.createProject.error) {
                 setPageState(PageState.Failed);
-            } else if (!projectsState.createProject.fetching && !projectsState.createProject.error) {
+            } else {
                 setPageState(PageState.Successful);
             }
         }

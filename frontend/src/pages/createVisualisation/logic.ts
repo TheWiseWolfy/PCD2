@@ -78,10 +78,10 @@ export const useCreateVisualisationPageLogic = () => {
     }, [pageState, visualisationsState.createVisualisation.error, notificationsDispatch, onGoToVisualisationsList])
 
     useEffect(() => {
-        if (pageState !== PageState.Initial) {
-            if (!visualisationsState.createVisualisation.fetching && visualisationsState.createVisualisation.error) {
+        if (pageState !== PageState.Initial && !visualisationsState.createVisualisation.fetching) {
+            if (visualisationsState.createVisualisation.error) {
                 setPageState(PageState.Failed);
-            } else if (!visualisationsState.createVisualisation.fetching && !visualisationsState.createVisualisation.error) {
+            } else {
                 setPageState(PageState.Successful);
             }
         }
