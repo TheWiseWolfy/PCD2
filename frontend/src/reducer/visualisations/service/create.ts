@@ -86,7 +86,7 @@ export const createVisualisationSideEffect = (
             }
 
             dispatch({ type: 'create-visualisation-success', data: { requestId, projectId: action.data.projectId, data: result.visualisation } })
-            additionalSubscriptions(result.visualisation)
+            dispatch({ type: 'create-visualisation-subscribe', data: { projectId: action.data.projectId } })
         } catch (error) {
             dispatch({ type: 'create-visualisation-failed', data: { requestId, reason: error as string } })
         }

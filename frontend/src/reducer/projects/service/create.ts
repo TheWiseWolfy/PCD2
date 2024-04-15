@@ -83,7 +83,6 @@ export const createProjectSideEffect = (
             }
 
             dispatch({ type: 'create-project-success', data: { requestId, data: result.project } })
-            additionalSubscriptions(result.project)
         } catch (error) {
             dispatch({ type: 'create-project-failed', data: { requestId, reason: error as string } })
         }
