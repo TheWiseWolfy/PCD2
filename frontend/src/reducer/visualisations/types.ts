@@ -5,7 +5,7 @@ export type Visualisation = {
     project_id: string
     name: string
     description: string
-    fn: string
+    type: string
 }
 
 export type VisualisationsError = {
@@ -55,7 +55,7 @@ export type VisualisationsGetAction = { type: 'get-visualisation', data: { proje
 export type VisualisationsGetStartedAction = { type: 'get-visualisation-started', data: { requestId: string } }
 export type VisualisationsGetSuccessAction = { type: 'get-visualisation-success', data: { requestId: string, projectId: string, data: Visualisation } }
 export type VisualisationsGetFailedAction = { type: 'get-visualisation-failed', data: { requestId: string, reason: string } }
-export type VisualisationsCreateAction = { type: 'create-visualisation', data: { projectId: string, name: string, description: string, fn: string } }
+export type VisualisationsCreateAction = { type: 'create-visualisation', data: { projectId: string, name: string, description: string, type: string } }
 export type VisualisationsCreateStartedAction = { type: 'create-visualisation-started', data: { requestId: string } }
 export type VisualisationsCreateSuccessAction = { type: 'create-visualisation-success', data: { requestId: string, projectId: string, data: Visualisation } }
 export type VisualisationsCreateFailedAction = { type: 'create-visualisation-failed', data: { requestId: string, reason: string } }

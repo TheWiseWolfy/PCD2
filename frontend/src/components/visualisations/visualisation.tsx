@@ -13,12 +13,11 @@ interface Props {
     visualisationId: string
     name: string
     description: string
-    fn: string
-    type?: string
+    type: string
     data: Data[]
 }
 
-export const Visualisation: FC<Props> = ({ visualisationId, name, description, fn, type, data }) => {
+export const Visualisation: FC<Props> = ({ visualisationId, name, description, type, data }) => {
     const options = useMemo<ReactApexChart['props']['options']>(() => {
         const timestamps = data.map(entry => new Date(entry.timestamp).toLocaleString())
 

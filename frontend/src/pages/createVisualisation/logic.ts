@@ -11,17 +11,17 @@ export const useCreateVisualisationPageLogic = () => {
     const [disabled, setDisabled] = useState(true);
     const [name, setName] = useState('')
     const [nameValid, setNameValid] = useState(true)
-    const [fn, setFn] = useState('average')
-    const [fnValid, setFnValid] = useState(true)
+    const [type, setType] = useState('average')
+    const [typeValid, setTypeValid] = useState(true)
     const [description, setDescription] = useState('')
     const [descriptionValid, setDescriptionValid] = useState(true)
     const navigate = useNavigate()
     const params = useParams()
     
     const onSubmit = useCallback(() => {
-        visualisationsDispatch({ type: 'create-visualisation', data: { projectId: params.projectId!, name, description, fn } });
+        visualisationsDispatch({ type: 'create-visualisation', data: { projectId: params.projectId!, name, description, type } });
         setPageState(PageState.Fetching)
-    }, [name, description, fn, params, visualisationsDispatch])
+    }, [name, description, type, params, visualisationsDispatch])
 
     const onGoToVisualisationsList = useCallback(() => {
         navigate(`/app/projects/${params.projectId}/visualisations`)
@@ -30,16 +30,16 @@ export const useCreateVisualisationPageLogic = () => {
     useEffect(() => {
         setNameValid(name.length > 0 && name.length < 65);
         setDescriptionValid(description.length < 257);
-        setFnValid(true); // TODO: update
-    }, [name, description, fn]);
+        setTypeValid(true); // TODO: update
+    }, [name, description, type]);
 
     useEffect(() => {
-        if (nameValid && descriptionValid && fnValid) {
+        if (nameValid && descriptionValid && typeValid) {
             setDisabled(false)
         } else {
             setDisabled(true)
         }
-    }, [nameValid, descriptionValid, fnValid])
+    }, [nameValid, descriptionValid, typeValid])
 
 
     useEffect(() => {
@@ -92,15 +92,15 @@ export const useCreateVisualisationPageLogic = () => {
         setName,
         description,
         setDescription,
-        fn,
-        setFn,
+        type,
+        setType,
         
         fetching: pageState === PageState.Fetching,
         disabled,
 
         nameValid,
         descriptionValid,
-        fnValid,
+        typeValid,
 
         onSubmit,
         onGoToVisualisationsList,

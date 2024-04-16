@@ -39,7 +39,7 @@ export const Visualisations: React.FC = () => {
                                             visualisationId={visualisation.visualisation_id}
                                             name={visualisation.name}
                                             description={visualisation.description}
-                                            fn={visualisation.fn}
+                                            type={visualisation.type}
                                             data={logic.data[visualisation.visualisation_id] || []}
                                         />
                                     ))

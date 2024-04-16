@@ -55,7 +55,7 @@ CREATE TABLE public.visualisations (
 	project_id uuid NOT NULL,
 	"name" varchar DEFAULT ''::character varying NOT NULL,
 	description varchar DEFAULT ''::character varying NOT NULL,
-	fn varchar DEFAULT 'avg'::character varying NOT NULL,
+	type varchar DEFAULT 'avg'::character varying NOT NULL,
 	CONSTRAINT visualisations_pk PRIMARY KEY (visualisation_id),
 	CONSTRAINT visualisations_projects_fk FOREIGN KEY (project_id) REFERENCES public.projects(project_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
