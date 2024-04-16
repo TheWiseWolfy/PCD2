@@ -39,8 +39,8 @@ export const Project: React.FC<Props> = ({ projectId, name, description, onGoToP
             <Spacing spacing='s' />
             <CardSpaceElement />
             <ButtonRow>
-                <Button onClick={onGoToProject}>Visit</Button>
-                <Button onClick={onGoToProjectTokens}>Manage tokens</Button>
+                <Button onClick={onGoToProject}>Visualisations</Button>
+                <Button onClick={onGoToProjectTokens}>Tokens</Button>
             </ButtonRow>
         </Card>
     );

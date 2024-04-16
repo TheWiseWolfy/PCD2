@@ -12,7 +12,7 @@ interface Props {
 
 export const AddMoreVisualisations: FC<Props> = ({ onGoToCreateVisualisation }) => {
     return (
-        <Card width={384} centered noShadow>
+        <Card width={'42vw'} centered noShadow>
             <H3>Need more?</H3>
             <CardSpaceElement />
             <Image id="chart" size="xl" scaleFactor={5} />

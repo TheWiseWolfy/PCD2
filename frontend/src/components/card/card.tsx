@@ -5,7 +5,7 @@ interface Props {
     noBorder?: boolean
     noShadow?: boolean
     centered?: boolean
-    width?: number
+    width?: number | string
     direction?: 'column' | 'row'
     children: React.ReactNode
 }
@@ -15,7 +15,7 @@ export const Card: FC<Props> = ({ noBorder, noShadow, centered, width, direction
     const shadowClass = noShadow ? '' : 'card-shadow'
     const centeredClass = !centered ? '' : 'card-centered'
     const directionClass = `card-${direction || 'column'}`
-    const widthStyle = width === undefined ? 'auto' : `${width}px`
+    const widthStyle = width === undefined ? 'auto' : width
 
     return (
         <div 
