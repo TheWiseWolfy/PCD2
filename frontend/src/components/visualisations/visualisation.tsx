@@ -36,7 +36,7 @@ export const Visualisation: FC<Props> = ({ visualisationId, name, description, t
     }, [data, visualisationId])
 
     const series = useMemo<ReactApexChart['props']['series']>(() => {
-        const series = data.map(entry => entry.value)
+        const series = data.map(entry => Number(entry.value))
 
         return [
             {
@@ -58,7 +58,7 @@ export const Visualisation: FC<Props> = ({ visualisationId, name, description, t
                             options={options}
                             series={series}
                             height={384}
-                            width={512}
+                            width={'150%'}
                         />
                 }
             </CardCenteredElement>

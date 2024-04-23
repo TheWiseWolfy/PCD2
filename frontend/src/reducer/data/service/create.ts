@@ -35,6 +35,10 @@ export const createDataSuccessHandler = (state: DataState, action: DataCreateSuc
         copy.splice(existingDataIndex, 1, action.data.data)
     }
 
+    if (copy.length > 200) {
+        copy.splice(0, copy.length - 200)
+    }
+
     const requestsCopy = { ...state.createData.requests }
     delete requestsCopy[action.data.requestId]
 

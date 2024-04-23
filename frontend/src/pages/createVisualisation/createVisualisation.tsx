@@ -41,9 +41,13 @@ export const CreateVisualisation: React.FC = () => {
                             <TextField value={logic.name} onChange={logic.setName} placeholder="Name" invalid={!logic.nameValid} />
                             <TextField value={logic.description} onChange={logic.setDescription} placeholder="Description" invalid={!logic.descriptionValid} />
                             <Dropdown value={logic.type} onChange={logic.setType}>
-                                <option value="average">Average</option>
-                                <option value="maximum">Maximum</option>
-                                <option value="minimum">Minimum</option>
+                                <option value="line">Line</option>
+                                <option value="bar">Bar</option>
+                                <option value="area">Area</option>
+                                <option value="pie">Pie</option>
+                                <option value="donut">Donut</option>
+                                <option value="heatmap">Heatmap</option>
+                                <option value="scatter">Scatter</option>
                             </Dropdown>
                         </List>
                         <Spacing spacing="m" />
